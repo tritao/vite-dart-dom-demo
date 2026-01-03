@@ -1,8 +1,10 @@
+import 'dart:js_interop';
 import 'dart:async';
 
 import 'package:web/web.dart' as web;
 
 import './morph_patch.dart';
+import './router.dart' as router;
 
 typedef Cleanup = void Function();
 
@@ -85,7 +87,7 @@ final class RenderScheduler {
 abstract class Component {
   Component();
 
-  late final web.Element _root;
+  late web.Element _root;
   bool _mounted = false;
   final List<void Function()> _cleanups = <void Function()>[];
   final Map<String, _EffectState> _effects = <String, _EffectState>{};
@@ -104,6 +106,13 @@ abstract class Component {
 
   bool get isMounted => _mounted;
 
+  bool get debugEnabled => router.getQueryFlag('debug');
+
+  void debugLog(String message) {
+    if (!debugEnabled) return;
+    web.console.log('[vite_ui] ${runtimeType}: $message'.toJS);
+  }
+
   void useEffect(
     String key,
     List<Object?> deps,
@@ -119,6 +128,7 @@ abstract class Component {
     if (_depsEqual(existing.deps, deps)) return;
     existing.deps = deps;
     existing.pending = true;
+    debugLog('effect "$key" deps changed');
   }
 
   Ref<T> useRef<T>(String key, T initialValue) {
@@ -179,6 +189,7 @@ abstract class Component {
     for (final state in _effects.values) {
       if (!state.pending) continue;
       state.pending = false;
+      debugLog('run effect');
       try {
         state.cleanup?.call();
       } catch (_) {}
@@ -219,6 +230,7 @@ abstract class Component {
     mount.append(_root);
     _mounted = true;
     onMount();
+    debugLog('mounted');
     _runEffects();
   }
 
@@ -250,6 +262,7 @@ abstract class Component {
 
   void _performRender() {
     if (!_mounted) return;
+    debugLog('render');
     final next = render();
     morphPatch(_root, next);
     onAfterPatch();

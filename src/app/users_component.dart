@@ -84,11 +84,17 @@ final class UsersComponent extends Component {
       ),
     ]);
 
+    final userRows = useMemo<List<(String, String)>>(
+      'userRows',
+      [_users],
+      () => _users.map((u) => (u.name, u.email)).toList(growable: false),
+    );
+
     final list = dom.list(
-      children: _users.map((user) {
-        final email = user.email;
+      children: userRows.map((row) {
+        final (name, email) = row;
         return dom.item(children: [
-          dom.textStrong(user.name),
+          dom.textStrong(name),
           if (email.isNotEmpty) dom.textMuted(' • $email'),
         ]);
       }).toList(growable: false),

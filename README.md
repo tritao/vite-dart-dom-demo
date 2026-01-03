@@ -6,6 +6,12 @@ Live demo: https://tritao.github.io/vite-dart-dom-demo/
 
 ![Demo screenshot](assets/demo.png)
 
+## URL State
+
+- Enable debug logs: add `?debug=1`
+- Show/hide users section: `?showUsers=1` / `?showUsers=0`
+- Users endpoint: `?users=all` / `?users=limited`
+
 ## Prerequisites
 
 - Node.js `^20.19.0 || >=22.12.0` (required by latest Vite)
