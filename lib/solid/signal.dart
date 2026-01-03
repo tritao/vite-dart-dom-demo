@@ -1,10 +1,16 @@
 part of "solid.dart";
 
 final class Signal<T> implements Dependency {
-  Signal(this._value);
+  Signal(
+    this._value, {
+    bool Function(T prev, T next)? equals,
+  }) : _equals = equals ?? _defaultEquals;
 
   T _value;
+  final bool Function(T prev, T next) _equals;
   final Set<Computation> _subscribers = <Computation>{};
+
+  static bool _defaultEquals<T>(T prev, T next) => prev == next;
 
   T get value {
     final computation = _currentComputation;
@@ -13,7 +19,7 @@ final class Signal<T> implements Dependency {
   }
 
   set value(T next) {
-    if (_value == next) return;
+    if (_equals(_value, next)) return;
     _value = next;
     _notify();
   }
@@ -35,21 +41,28 @@ final class Signal<T> implements Dependency {
       _subscribers.remove(computation);
 }
 
-Signal<T> createSignal<T>(T initial) => Signal<T>(initial);
+Signal<T> createSignal<T>(
+  T initial, {
+  bool Function(T prev, T next)? equals,
+}) =>
+    Signal<T>(initial, equals: equals);
 
 final class Memo<T> implements Dependency {
   Memo(this._compute, this._owner) {
     _computation = Computation._(() {
       try {
         final next = _compute();
-        final changed = !_hasValue || next != _cached;
+        final wasInitialized = _hasValue;
+        final changed = !wasInitialized || next != _cached;
         _cached = next;
         _hasValue = true;
-        if (changed) _notify();
+        // Avoid immediately re-triggering the currently running computation on
+        // first read/initialization.
+        if (wasInitialized && changed) _notify();
       } catch (e, st) {
         _reportError(_owner, e, st);
       }
-    }, _owner, isMemo: true);
+    }, _owner, isMemo: true, autoRun: false);
   }
 
   final T Function() _compute;

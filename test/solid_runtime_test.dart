@@ -141,7 +141,8 @@ void main() {
         });
       });
 
-      expect(computes, 1);
+      // Lazy: memo doesn't compute until first read.
+      expect(computes, 0);
       expect(m.value, 2);
       expect(m.value, 2);
       expect(computes, 1);
@@ -215,6 +216,37 @@ void main() {
       s.value = 2;
       await pump();
       expect(seen, [10, 20]);
+
+      dispose();
+    });
+
+    test("signal equals: prevents notifications when equal", () async {
+      late Signal<List<int>> s;
+      final runs = <int>[];
+      late Dispose dispose;
+
+      createRoot<void>((d) {
+        dispose = d;
+        s = createSignal<List<int>>(
+          <int>[1],
+          equals: (prev, next) => prev.length == next.length,
+        );
+        createEffect(() => runs.add(s.value.length));
+      });
+
+      expect(runs, [1]);
+
+      // New list, same length => treated equal => no notify.
+      s.value = <int>[9];
+      await pump();
+      flushSync();
+      expect(runs, [1]);
+
+      // Different length => notify.
+      s.value = <int>[1, 2];
+      await pump();
+      flushSync();
+      expect(runs, [1, 2]);
 
       dispose();
     });

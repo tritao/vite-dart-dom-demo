@@ -220,9 +220,14 @@ abstract class Dependency {
 }
 
 final class Computation implements Disposable {
-  Computation._(this._fn, this._owner, {required this.isMemo}) {
+  Computation._(
+    this._fn,
+    this._owner, {
+    required this.isMemo,
+    bool autoRun = true,
+  }) {
     _owner._own(this);
-    _run();
+    if (autoRun) _run();
   }
 
   final Owner _owner;

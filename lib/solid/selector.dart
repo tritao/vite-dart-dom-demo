@@ -6,7 +6,7 @@ part of "solid.dart";
 /// key's selection state changes are re-run when the underlying source changes.
 final class Selector<K> {
   Selector._(this._owner, this._source, this._equals) {
-    _computation = Computation._(_update, _owner, isMemo: true);
+    _computation = Computation._(_update, _owner, isMemo: true, autoRun: false);
   }
 
   final Owner _owner;
