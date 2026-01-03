@@ -195,6 +195,26 @@ async function inspectUrl(
           });
         } else {
           const incHandle = await inc.first().elementHandle();
+          const readBindings = async () =>
+            await page.evaluate(() => {
+              const box = document.querySelector("#solid-box");
+              const disabled = document.querySelector("#solid-disabled");
+              const opacity =
+                // @ts-ignore
+                box?.style?.getPropertyValue?.("opacity") ?? null;
+              const outline =
+                // @ts-ignore
+                box?.style?.getPropertyValue?.("outline") ?? null;
+              return {
+                dataCount: box?.getAttribute("data-count") ?? null,
+                hasActive: box?.classList?.contains("active") ?? null,
+                opacity,
+                outline,
+                disabled: disabled ? disabled.disabled : null,
+              };
+            });
+
+          const bindingsBeforeInc = await readBindings();
           const before = (await count.first().textContent())?.trim() ?? "";
 
           await inc.first().click({ timeout: timeoutMs });
@@ -217,19 +237,7 @@ async function inspectUrl(
               )
             : false;
 
-          const bindings = await page.evaluate(() => {
-            const box = document.querySelector("#solid-box");
-            const disabled = document.querySelector("#solid-disabled");
-            const opacity =
-              // @ts-ignore
-              box?.style?.getPropertyValue?.("opacity") ?? null;
-            return {
-              dataCount: box?.getAttribute("data-count") ?? null,
-              hasActive: box?.classList?.contains("active") ?? null,
-              opacity,
-              disabled: disabled ? disabled.disabled : null,
-            };
-          });
+          const bindingsAfterInc = await readBindings();
 
           // Toggle Show and observe cleanup reflected in #solid-status.
           const status = page.locator("#solid-status");
@@ -340,12 +348,15 @@ async function inspectUrl(
               portalInfo?.inBody === true &&
               portalInfo?.inRoot === false &&
               item1Same === true &&
-              clicksAfterUnmountBefore === clicksAfterUnmountAfter,
+              clicksAfterUnmountBefore === clicksAfterUnmountAfter &&
+              (bindingsBeforeInc.outline ?? "") !== "" &&
+              (bindingsAfterInc.outline ?? "") === "",
             details: {
               before,
               after,
               sameNode,
-              bindings,
+              bindingsBeforeInc,
+              bindingsAfterInc,
               initialStatus,
               clicksBefore,
               clicksDuring,
@@ -362,6 +373,76 @@ async function inspectUrl(
       } catch (e) {
         interactionResults.push({
           name: "solid-dom",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
+    } else if (scenario === "solid-for") {
+      try {
+        const item2 = page.locator("#solid-item-2");
+        const disposed = page.locator("#solid-disposed");
+
+        if (!(await item2.count()) || !(await disposed.count())) {
+          interactionResults.push({
+            name: "solid-for",
+            ok: false,
+            details: { reason: "missing #solid-item-2 or #solid-disposed" },
+          });
+        } else {
+          const item2Handle = await item2.first().elementHandle();
+          const disposedBefore = (await disposed.first().textContent())?.trim() ?? "";
+
+          await page.locator("#solid-remove-2").click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#solid-item-2") == null,
+            { timeout: timeoutMs },
+          );
+
+          await page.waitForFunction(
+            ({ before }) => {
+              const t = document.querySelector("#solid-disposed")?.textContent ?? "";
+              return t.trim() !== before;
+            },
+            { before: disposedBefore },
+            { timeout: timeoutMs },
+          );
+          const disposedAfterRemove = (await disposed.first().textContent())?.trim() ?? "";
+
+          await page.locator("#solid-add-2").click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#solid-item-2") != null,
+            { timeout: timeoutMs },
+          );
+          const item2NewSame = item2Handle
+            ? await item2Handle.evaluate(
+                (el) => el === document.querySelector("#solid-item-2"),
+              )
+            : false;
+
+          const item1 = page.locator("#solid-item-1");
+          const item1Handle = await item1.first().elementHandle();
+          await page.locator("#solid-reorder").click({ timeout: timeoutMs });
+          await page.waitForTimeout(250);
+          const item1Same = item1Handle
+            ? await item1Handle.evaluate(
+                (el) => el === document.querySelector("#solid-item-1"),
+              )
+            : false;
+
+          interactionResults.push({
+            name: "solid-for",
+            ok: item2NewSame === false && item1Same === true,
+            details: {
+              disposedBefore,
+              disposedAfterRemove,
+              item2NewSame,
+              item1Same,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-for",
           ok: false,
           details: { error: String(e) },
         });

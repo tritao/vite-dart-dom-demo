@@ -15,6 +15,8 @@ void mountSolidDomDemo(web.Element mount) {
     final extraMounted = createSignal<bool>(false);
     final docClicks = createSignal<int>(0);
     final items = createSignal<List<int>>(<int>[1, 2, 3]);
+    final disposed = createSignal<int>(0);
+    final nextId = createSignal<int>(4);
     final showPortal = createSignal<bool>(false);
 
     final title = web.HTMLHeadingElement.h1()..textContent = "Solid DOM Demo";
@@ -44,8 +46,15 @@ void mountSolidDomDemo(web.Element mount) {
         ..textContent = "attr/classList/style/prop track count",
     );
     attr(box, "data-count", () => "${count.value}");
-    classList(box, () => {"active": count.value.isOdd});
-    style(box, () => {"opacity": count.value.isOdd ? "1" : "0.7"});
+    classList(box, () => count.value.isOdd ? const {"active": true} : const {});
+    style(
+      box,
+      () => {
+        "opacity": count.value.isOdd ? "1" : "0.7",
+        if (count.value % 3 == 0)
+          "outline": "2px solid rgba(124, 92, 255, 0.6)",
+      },
+    );
     root.appendChild(box);
 
     final toggle = web.HTMLButtonElement()
@@ -94,11 +103,53 @@ void mountSolidDomDemo(web.Element mount) {
       ..id = "solid-list"
       ..className = "card";
     list.appendChild(web.HTMLHeadingElement.h2()..textContent = "Keyed For");
+    final listMeta = web.HTMLParagraphElement()
+      ..id = "solid-disposed"
+      ..className = "muted";
+    listMeta.appendChild(text(() => "Disposed: ${disposed.value}"));
+    list.appendChild(listMeta);
+
+    final remove2 = web.HTMLButtonElement()
+      ..id = "solid-remove-2"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Remove item 2";
+    on(remove2, "click", (_) {
+      items.value = items.value.where((x) => x != 2).toList(growable: false);
+    });
+    list.appendChild(remove2);
+
+    final add2 = web.HTMLButtonElement()
+      ..id = "solid-add-2"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Add item 2";
+    on(add2, "click", (_) {
+      if (items.value.contains(2)) return;
+      items.value = <int>[...items.value, 2];
+    });
+    list.appendChild(add2);
+
+    final addNew = web.HTMLButtonElement()
+      ..id = "solid-add-new"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Add new item";
+    on(addNew, "click", (_) {
+      final id = nextId.value;
+      nextId.value = id + 1;
+      items.value = <int>[...items.value, id];
+    });
+    list.appendChild(addNew);
+
     list.appendChild(
       For<int, int>(
         each: () => items.value,
         key: (v) => v,
         children: (v) {
+          // Prove disposal happens on removal.
+          onCleanup(() => disposed.value = disposed.value + 1);
+
           final el = web.HTMLDivElement()
             ..id = "solid-item-${v()}"
             ..className = "item";

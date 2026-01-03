@@ -70,8 +70,14 @@ void classList(
   web.Element element,
   Map<String, bool> Function() compute,
 ) {
+  final prev = <String, bool>{};
   createRenderEffect(() {
     final next = compute();
+    for (final key in prev.keys.toList(growable: false)) {
+      if (!next.containsKey(key)) {
+        element.classList.remove(key);
+      }
+    }
     for (final entry in next.entries) {
       if (entry.value) {
         element.classList.add(entry.key);
@@ -79,6 +85,9 @@ void classList(
         element.classList.remove(entry.key);
       }
     }
+    prev
+      ..clear()
+      ..addAll(next);
   });
 }
 
@@ -87,8 +96,14 @@ void style(
   web.HTMLElement element,
   Map<String, String?> Function() compute,
 ) {
+  final prevKeys = <String>{};
   createRenderEffect(() {
     final next = compute();
+    for (final key in prevKeys.toList(growable: false)) {
+      if (!next.containsKey(key)) {
+        element.style.removeProperty(key);
+      }
+    }
     for (final entry in next.entries) {
       final key = entry.key;
       final value = entry.value;
@@ -98,6 +113,9 @@ void style(
         element.style.setProperty(key, value);
       }
     }
+    prevKeys
+      ..clear()
+      ..addAll(next.keys);
   });
 }
 
@@ -129,6 +147,16 @@ web.DocumentFragment insert(web.Node parent, Object? Function() compute) {
   final current = <web.Node>[];
 
   void replaceWith(List<web.Node> next) {
+    if (current.length == next.length) {
+      var same = true;
+      for (var i = 0; i < current.length; i++) {
+        if (!identical(current[i], next[i])) {
+          same = false;
+          break;
+        }
+      }
+      if (same) return;
+    }
     for (final node in current) {
       _detach(node);
     }
@@ -158,11 +186,21 @@ web.DocumentFragment insert(web.Node parent, Object? Function() compute) {
 web.Comment Portal({
   required SolidView children,
   web.Node? mount,
+  String? id,
+  String? className,
+  Map<String, String>? attrs,
 }) {
   final placeholder = web.Comment("solid:portal");
   final target = mount ?? web.document.body!;
   final container = web.HTMLDivElement()
     ..setAttribute("data-solid-portal", "1");
+  if (id != null) container.id = id;
+  if (className != null) container.className = className;
+  if (attrs != null) {
+    for (final entry in attrs.entries) {
+      container.setAttribute(entry.key, entry.value);
+    }
+  }
   target.appendChild(container);
 
   Dispose? disposeSubtree;
@@ -252,6 +290,8 @@ web.DocumentFragment For<T, K>({
     ..appendChild(end);
 
   final Map<K, _ForItem<T, K>> byKey = <K, _ForItem<T, K>>{};
+  final orderTick = createSignal<int>(0);
+  var ordered = <_ForItem<T, K>>[];
 
   void disposeRemoved(Set<K> keep) {
     final remove = <K>[];
@@ -268,7 +308,7 @@ web.DocumentFragment For<T, K>({
     }
   }
 
-  createRenderEffect(() {
+  createEffect(() {
     final values = each().toList(growable: false);
     final keep = <K>{};
     final nextItems = <_ForItem<T, K>>[];
@@ -286,7 +326,8 @@ web.DocumentFragment For<T, K>({
       late _ForItem<T, K> created;
       createChildRoot<void>((dispose) {
         final sig = createSignal<T>(v);
-        final nodes = _normalizeToNodes(children(() => sig.value));
+        final built = children(() => sig.value);
+        final nodes = _normalizeToNodes(built);
         created = _ForItem<T, K>(k, sig, nodes, dispose);
       });
       byKey[k] = created;
@@ -295,8 +336,15 @@ web.DocumentFragment For<T, K>({
 
     disposeRemoved(keep);
 
-    // Ensure DOM order matches [nextItems] by moving existing nodes.
-    for (final item in nextItems) {
+    ordered = nextItems;
+    final nextTick = untrack(() => orderTick.value) + 1;
+    orderTick.value = nextTick;
+  });
+
+  createRenderEffect(() {
+    // ignore: unused_local_variable
+    final _ = orderTick.value;
+    for (final item in ordered) {
       for (final node in item.nodes) {
         end.parentNode?.insertBefore(node, end);
       }
@@ -321,7 +369,13 @@ web.DocumentFragment For<T, K>({
 List<web.Node> _normalizeToNodes(Object? value) {
   if (value == null) return const <web.Node>[];
   if (value is web.Node) return <web.Node>[value];
-  if (value is Iterable<web.Node>) return value.toList(growable: false);
+  if (value is Iterable) {
+    final out = <web.Node>[];
+    for (final v in value) {
+      out.addAll(_normalizeToNodes(v));
+    }
+    return out;
+  }
   if (value is String || value is num || value is bool) {
     return <web.Node>[web.Text(value.toString())];
   }
