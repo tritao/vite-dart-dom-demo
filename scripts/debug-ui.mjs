@@ -15,6 +15,7 @@ function parseArgs(argv) {
     timeoutMs: 120_000,
     expectH1: "Dart + Vite",
     expectSelector: "#app-root",
+    interactions: true,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -25,6 +26,7 @@ function parseArgs(argv) {
     else if (a === "--expect-h1") args.expectH1 = argv[++i] ?? args.expectH1;
     else if (a === "--expect-selector")
       args.expectSelector = argv[++i] ?? args.expectSelector;
+    else if (a === "--no-interactions") args.interactions = false;
   }
   return args;
 }
@@ -109,7 +111,7 @@ function isIgnorableConsoleError(text) {
   );
 }
 
-async function inspectUrl(url, { timeoutMs, expectSelector, expectH1 }) {
+async function inspectUrl(url, { timeoutMs, expectSelector, expectH1, interactions }) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
 
@@ -172,6 +174,53 @@ async function inspectUrl(url, { timeoutMs, expectSelector, expectH1 }) {
   );
   await page.waitForTimeout(250);
 
+  const interactionResults = [];
+  if (interactions) {
+    try {
+      const inc = page.locator('[data-action="counter-inc"]');
+      if (await inc.count()) {
+        const before = await page.evaluate(() => {
+          const counterRoot = document.querySelector("#counter-root");
+          const big = counterRoot?.querySelector(".big");
+          return (big?.textContent ?? "").trim();
+        });
+        await inc.first().click({ timeout: timeoutMs });
+        await page.waitForFunction(
+          (prev) => {
+            const counterRoot = document.querySelector("#counter-root");
+            const big = counterRoot?.querySelector(".big");
+            const now = (big?.textContent ?? "").trim();
+            return !!now && now !== prev;
+          },
+          before,
+          { timeout: timeoutMs },
+        );
+        const after = await page.evaluate(() => {
+          const counterRoot = document.querySelector("#counter-root");
+          const big = counterRoot?.querySelector(".big");
+          return (big?.textContent ?? "").trim();
+        });
+        interactionResults.push({
+          name: "counter-inc",
+          ok: true,
+          details: { before, after },
+        });
+      } else {
+        interactionResults.push({
+          name: "counter-inc",
+          ok: false,
+          details: { reason: "missing [data-action=counter-inc]" },
+        });
+      }
+    } catch (e) {
+      interactionResults.push({
+        name: "counter-inc",
+        ok: false,
+        details: { error: String(e) },
+      });
+    }
+  }
+
   const appInfo = await page.evaluate(() => {
     const mount = document.querySelector("#app");
     const h1 = document.querySelector("h1");
@@ -199,6 +248,7 @@ async function inspectUrl(url, { timeoutMs, expectSelector, expectH1 }) {
     badResponses,
     consoleLines,
     consoleErrors,
+    interactionResults,
   };
 }
 
@@ -327,6 +377,7 @@ async function main() {
       timeoutMs: args.timeoutMs,
       expectSelector: args.expectSelector,
       expectH1: args.expectH1,
+      interactions: args.interactions,
     });
 
     const reportPath = ".cache/debug-ui-report.json";
@@ -339,6 +390,13 @@ async function main() {
     if (report.badResponses.length) failures.push("badResponses");
     if (!report.appInfo.mountExists) failures.push("#app missing");
     if (report.appInfo.mountChildCount === 0) failures.push("#app empty");
+    if (args.interactions) {
+      const interactionFailures = report.interactionResults.filter((r) => !r.ok);
+      if (interactionFailures.length)
+        failures.push(
+          `interactions:${interactionFailures.map((r) => r.name).join(",")}`,
+        );
+    }
 
     log(`\n==> artifacts`);
     log(`- .cache/debug-ui.png`);
