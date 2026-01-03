@@ -35,11 +35,26 @@ class _Todo {
       );
 }
 
+abstract final class _Actions {
+  static const counterDec = 'counter-dec';
+  static const counterInc = 'counter-inc';
+  static const counterReset = 'counter-reset';
+
+  static const todoAdd = 'todo-add';
+  static const todoClearDone = 'todo-clear-done';
+  static const todoToggle = 'todo-toggle';
+  static const todoDelete = 'todo-delete';
+
+  static const usersLoad = 'users-load';
+  static const usersClear = 'users-clear';
+}
+
 class _App {
   _App({required this.mount});
 
   final web.Element mount;
   late final web.Element _root;
+  web.HTMLInputElement? _todoInput;
 
   int counter = 0;
 
@@ -55,6 +70,7 @@ class _App {
     _root = _buildShell();
     mount.append(_root);
     _attachDelegatedEvents(_root);
+    _cacheRefs();
   }
 
   void _setState(void Function() fn) {
@@ -65,6 +81,15 @@ class _App {
   void _render() {
     final next = _buildShell();
     morphPatch(_root, next);
+    _cacheRefs();
+  }
+
+  void _cacheRefs() {
+    try {
+      _todoInput = _root.querySelector('#todo-input') as web.HTMLInputElement?;
+    } catch (_) {
+      _todoInput = null;
+    }
   }
 
   web.Element _buildShell() {
@@ -118,20 +143,20 @@ class _App {
     if (action == null) return;
 
     switch (action) {
-      case 'counter-dec':
+      case _Actions.counterDec:
         _setState(() => counter--);
-      case 'counter-inc':
+      case _Actions.counterInc:
         _setState(() => counter++);
-      case 'counter-reset':
+      case _Actions.counterReset:
         _setState(() => counter = 0);
-      case 'todo-add':
+      case _Actions.todoAdd:
         _addTodoFromInput();
-      case 'todo-clear-done':
+      case _Actions.todoClearDone:
         _setState(() {
           _todos.removeWhere((t) => t.done);
           _saveTodos();
         });
-      case 'todo-delete':
+      case _Actions.todoDelete:
         final idRaw = actionEl.getAttribute('data-id');
         final id = int.tryParse(idRaw ?? '');
         if (id == null) return;
@@ -139,9 +164,9 @@ class _App {
           _todos.removeWhere((t) => t.id == id);
           _saveTodos();
         });
-      case 'users-load':
+      case _Actions.usersLoad:
         _loadUsers();
-      case 'users-clear':
+      case _Actions.usersClear:
         _setState(() {
           _usersError = null;
           _users = const [];
@@ -153,7 +178,7 @@ class _App {
     final target = _eventTargetAsElement(event);
     if (target == null) return;
 
-    final actionEl = target.closest('[data-action="todo-toggle"]');
+    final actionEl = target.closest('[data-action="$_Actions.todoToggle"]');
     if (actionEl == null) return;
 
     final idRaw = actionEl.getAttribute('data-id');
@@ -199,10 +224,10 @@ class _App {
   web.Element _buildCounterView() {
     final row = web.HTMLDivElement()..className = "row";
     row
-      ..append(_button("−1", action: "counter-dec"))
-      ..append(_button("+1", action: "counter-inc"))
+      ..append(_button("−1", action: _Actions.counterDec))
+      ..append(_button("+1", action: _Actions.counterInc))
       ..append(_button("Reset",
-          kind: "secondary", action: "counter-reset"));
+          kind: "secondary", action: _Actions.counterReset));
 
     return _buildCard(title: "Counter", children: [
       web.HTMLParagraphElement()
@@ -238,12 +263,12 @@ class _App {
     final row = web.HTMLDivElement()..className = "row";
     row
       ..append(input)
-      ..append(_button("Add", action: "todo-add"))
+      ..append(_button("Add", action: _Actions.todoAdd))
       ..append(_button(
         "Clear done",
         kind: "secondary",
         disabled: _todos.every((t) => !t.done),
-        action: "todo-clear-done",
+        action: _Actions.todoClearDone,
       ));
 
     return _buildCard(title: "Todos", children: [
@@ -264,7 +289,7 @@ class _App {
       ..type = "checkbox"
       ..checked = todo.done
       ..className = "checkbox"
-      ..setAttribute('data-action', 'todo-toggle')
+      ..setAttribute('data-action', _Actions.todoToggle)
       ..setAttribute('data-id', '${todo.id}');
 
     final label = web.HTMLSpanElement()
@@ -274,7 +299,7 @@ class _App {
     final remove = _button(
       "Delete",
       kind: "danger",
-      action: "todo-delete",
+      action: _Actions.todoDelete,
       dataId: todo.id,
     );
 
@@ -317,13 +342,13 @@ class _App {
       ..append(_button(
         _isLoadingUsers ? "Loading…" : "Load users",
         disabled: _isLoadingUsers,
-        action: "users-load",
+        action: _Actions.usersLoad,
       ))
       ..append(_button(
         "Clear",
         kind: "secondary",
         disabled: _isLoadingUsers && _users.isEmpty,
-        action: "users-clear",
+        action: _Actions.usersClear,
       ));
 
     return _buildCard(title: "Fetch (async)", children: [
@@ -356,12 +381,7 @@ class _App {
   }
 
   void _addTodoFromInput() {
-    web.HTMLInputElement? input;
-    try {
-      input = web.document.querySelector('#todo-input') as web.HTMLInputElement?;
-    } catch (_) {
-      input = null;
-    }
+    final input = _todoInput;
     if (input == null) return;
 
     final text = input.value.trim();

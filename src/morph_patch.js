@@ -9,11 +9,31 @@ export function morphPatch(fromNode, toNode) {
       return null;
     },
     onBeforeElUpdated(fromEl, toEl) {
-      if (fromEl instanceof HTMLInputElement && toEl instanceof HTMLInputElement) {
-        toEl.value = fromEl.value;
-        toEl.checked = fromEl.checked;
-      }
+      const isActive = document.activeElement === fromEl;
+
       if (
+        isActive &&
+        fromEl instanceof HTMLInputElement &&
+        toEl instanceof HTMLInputElement
+      ) {
+        const type = (fromEl.type || "").toLowerCase();
+        const preserveValue =
+          type === "" ||
+          type === "text" ||
+          type === "search" ||
+          type === "email" ||
+          type === "url" ||
+          type === "tel" ||
+          type === "password" ||
+          type === "number";
+
+        if (preserveValue) {
+          toEl.value = fromEl.value;
+        }
+      }
+
+      if (
+        isActive &&
         fromEl instanceof HTMLTextAreaElement &&
         toEl instanceof HTMLTextAreaElement
       ) {
@@ -23,4 +43,3 @@ export function morphPatch(fromNode, toNode) {
     },
   });
 }
-
