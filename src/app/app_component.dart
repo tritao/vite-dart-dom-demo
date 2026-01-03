@@ -115,16 +115,7 @@ final class AppComponent extends Component {
         title: 'Dart + Vite (DOM demo)',
         subtitle:
             'Counter + Todos (localStorage) + Fetch (async) to validate the integration.',
-        actions: [
-          dom.secondaryButton(
-            'Toggle users endpoint',
-            action: AppDomActions.toggleUsersEndpoint,
-          ),
-          dom.secondaryButton(
-            _showUsers ? 'Hide users' : 'Show users',
-            action: AppDomActions.toggleUsersVisible,
-          ),
-        ],
+        actions: const [],
       ),
       dom.spacer(),
       dom.section(
@@ -151,7 +142,25 @@ final class AppComponent extends Component {
       dom.spacer(),
       dom.mountPoint('todos-root'),
       dom.spacer(),
-      dom.mountPoint('users-root'),
+      dom.section(
+        title: 'Users demo',
+        subtitle: 'Fetch demo to validate async + routing.',
+        children: [
+          dom.spacer(),
+          dom.row(children: [
+            dom.secondaryButton(
+              'Toggle users endpoint',
+              action: AppDomActions.toggleUsersEndpoint,
+            ),
+            dom.secondaryButton(
+              _showUsers ? 'Hide users' : 'Show users',
+              action: AppDomActions.toggleUsersVisible,
+            ),
+          ]),
+          dom.spacer(),
+          dom.mountPoint('users-root'),
+        ],
+      ),
     ]);
   }
 }
