@@ -43,7 +43,7 @@ final class AriaHiddenHandle {
 }
 
 AriaHiddenHandle ariaHideOthers(web.Element keep) {
-  final hidden = <web.Element, String?>{};
+  final hidden = <web.Element, ({String? ariaHidden, String? inert})>{};
   var disposed = false;
 
   void apply() {
@@ -55,7 +55,10 @@ AriaHiddenHandle ariaHideOthers(web.Element keep) {
       if (node == null) continue;
       if (identical(node, keep) || node.contains(keep)) continue;
       if (!hidden.containsKey(node)) {
-        hidden[node] = node.getAttribute("aria-hidden");
+        hidden[node] = (
+          ariaHidden: node.getAttribute("aria-hidden"),
+          inert: node.getAttribute("inert"),
+        );
       }
       node.setAttribute("aria-hidden", "true");
       // inert isn't in all browsers, but it's safe as an attribute.
@@ -67,13 +70,18 @@ AriaHiddenHandle ariaHideOthers(web.Element keep) {
     disposed = true;
     for (final entry in hidden.entries) {
       final el = entry.key;
-      final prev = entry.value;
-      if (prev == null) {
+      final prevAria = entry.value.ariaHidden;
+      final prevInert = entry.value.inert;
+      if (prevAria == null) {
         el.removeAttribute("aria-hidden");
       } else {
-        el.setAttribute("aria-hidden", prev);
+        el.setAttribute("aria-hidden", prevAria);
       }
-      el.removeAttribute("inert");
+      if (prevInert == null) {
+        el.removeAttribute("inert");
+      } else {
+        el.setAttribute("inert", prevInert);
+      }
     }
     hidden.clear();
   }
@@ -116,11 +124,27 @@ final class FocusTrapHandle {
   void dispose() => _restore();
 }
 
+final List<_FocusTrapEntry> _focusTrapStack = <_FocusTrapEntry>[];
+
+final class _FocusTrapEntry {
+  _FocusTrapEntry(this.container);
+  final web.Element container;
+  bool disposed = false;
+}
+
+bool _isTopMostFocusTrap(_FocusTrapEntry entry) {
+  if (_focusTrapStack.isEmpty) return false;
+  return identical(_focusTrapStack.last, entry);
+}
+
 FocusTrapHandle focusTrap(
   web.Element container, {
   web.HTMLElement? initialFocus,
 }) {
   final previousActive = web.document.activeElement;
+  final entry = _FocusTrapEntry(container);
+  _focusTrapStack.add(entry);
+
   var disposed = false;
 
   void focusInitial() {
@@ -154,6 +178,7 @@ FocusTrapHandle focusTrap(
   scheduleMicrotask(focusWhenConnected);
 
   void onKeydown(web.Event e) {
+    if (!_isTopMostFocusTrap(entry)) return;
     if (e is! web.KeyboardEvent) return;
     if (e.key != "Tab") return;
     final focusables = _focusableWithin(container);
@@ -173,9 +198,25 @@ FocusTrapHandle focusTrap(
   final jsHandler = (onKeydown).toJS;
   container.addEventListener("keydown", jsHandler);
 
+  void onFocusIn(web.Event e) {
+    if (!_isTopMostFocusTrap(entry)) return;
+    if (e is! web.FocusEvent) return;
+    final target = e.target;
+    if (target is! web.Node) return;
+    if (container.contains(target)) return;
+    if (!container.isConnected) return;
+    focusInitial();
+  }
+
+  final jsFocusIn = (onFocusIn).toJS;
+  web.document.addEventListener("focusin", jsFocusIn, true.toJS);
+
   void restore() {
     disposed = true;
+    entry.disposed = true;
     container.removeEventListener("keydown", jsHandler);
+    web.document.removeEventListener("focusin", jsFocusIn, true.toJS);
+    _focusTrapStack.remove(entry);
     if (previousActive is web.HTMLElement) {
       try {
         previousActive.focus();
@@ -196,29 +237,173 @@ final class DismissableLayerHandle {
 final List<_LayerEntry> _layerStack = <_LayerEntry>[];
 
 final class _LayerEntry {
-  _LayerEntry(this.element, this.onDismiss);
+  _LayerEntry(
+    this.element,
+    this.onDismiss, {
+    required this.disableOutsidePointerEvents,
+  });
   final web.Element element;
   final void Function(String reason) onDismiss;
+  final bool disableOutsidePointerEvents;
+
+  String? _prevPointerEvents;
+  String? _prevTopLayerAttr;
+  bool _pointerPatched = false;
+}
+
+String? _prevBodyPointerEvents;
+
+bool _isTopMostLayer(_LayerEntry entry) {
+  if (_layerStack.isEmpty) return false;
+  return identical(_layerStack.last, entry);
+}
+
+_LayerEntry? _topPointerBlockingLayer() {
+  for (var i = _layerStack.length - 1; i >= 0; i--) {
+    final entry = _layerStack[i];
+    if (entry.disableOutsidePointerEvents) return entry;
+  }
+  return null;
+}
+
+void _restorePointerPatches() {
+  for (final entry in _layerStack) {
+    if (!entry._pointerPatched) continue;
+    entry._pointerPatched = false;
+    final el = entry.element;
+    final prev = entry._prevPointerEvents;
+    final prevTop = entry._prevTopLayerAttr;
+    entry._prevPointerEvents = null;
+    entry._prevTopLayerAttr = null;
+    if (prev == null) {
+      if (el is web.HTMLElement) el.style.pointerEvents = "";
+    } else {
+      if (el is web.HTMLElement) el.style.pointerEvents = prev;
+    }
+    if (prevTop == null) {
+      el.removeAttribute("data-solid-top-layer");
+    } else {
+      el.setAttribute("data-solid-top-layer", prevTop);
+    }
+  }
+  final body = web.document.body;
+  if (body != null && _prevBodyPointerEvents != null) {
+    body.style.pointerEvents = _prevBodyPointerEvents!;
+  }
+  _prevBodyPointerEvents = null;
+}
+
+void _restoreEntryPointerPatch(_LayerEntry entry) {
+  if (!entry._pointerPatched) return;
+  entry._pointerPatched = false;
+  final el = entry.element;
+  final prev = entry._prevPointerEvents;
+  final prevTop = entry._prevTopLayerAttr;
+  entry._prevPointerEvents = null;
+  entry._prevTopLayerAttr = null;
+  if (el is web.HTMLElement) {
+    if (prev == null) {
+      el.style.pointerEvents = "";
+    } else {
+      el.style.pointerEvents = prev;
+    }
+  }
+  if (prevTop == null) {
+    el.removeAttribute("data-solid-top-layer");
+  } else {
+    el.setAttribute("data-solid-top-layer", prevTop);
+  }
+}
+
+void _syncPointerBlocking() {
+  final body = web.document.body;
+  if (body == null) return;
+
+  // Always clear previous patches first; stack changes are infrequent and this
+  // keeps behavior predictable.
+  _restorePointerPatches();
+
+  final blocker = _topPointerBlockingLayer();
+  if (blocker == null) return;
+
+  _prevBodyPointerEvents = body.style.pointerEvents;
+  body.style.pointerEvents = "none";
+
+  final startIndex = _layerStack.indexOf(blocker);
+  if (startIndex == -1) return;
+  for (var i = startIndex; i < _layerStack.length; i++) {
+    final entry = _layerStack[i];
+    final el = entry.element;
+    if (el is! web.HTMLElement) continue;
+    entry._prevPointerEvents = el.style.pointerEvents;
+    entry._prevTopLayerAttr = el.getAttribute("data-solid-top-layer");
+    entry._pointerPatched = true;
+    el.style.pointerEvents = "auto";
+    el.setAttribute("data-solid-top-layer", "1");
+  }
 }
 
 DismissableLayerHandle dismissableLayer(
   web.Element layer, {
   required void Function(String reason) onDismiss,
+  bool disableOutsidePointerEvents = false,
+  List<web.Element? Function()>? excludedElements,
+  void Function(web.Event event)? onPointerDownOutside,
+  void Function(web.Event event)? onFocusOutside,
+  void Function(web.Event event)? onInteractOutside,
+  bool bypassTopMostLayerCheck = false,
 }) {
-  final entry = _LayerEntry(layer, onDismiss);
+  final entry = _LayerEntry(
+    layer,
+    onDismiss,
+    disableOutsidePointerEvents: disableOutsidePointerEvents,
+  );
   _layerStack.add(entry);
+  _syncPointerBlocking();
+
+  bool shouldExclude(web.Element target) {
+    if (excludedElements != null) {
+      for (final get in excludedElements) {
+        final el = get();
+        if (el == null) continue;
+        if (el.contains(target) || identical(el, target)) return true;
+      }
+    }
+    // Ignore events targeting any top-layer element (e.g. toasts).
+    if (target.closest("[data-solid-top-layer]") != null) return true;
+    return false;
+  }
+
+  bool isEventOutside(web.Event e) {
+    final target = e.target;
+    if (target is! web.Element) return false;
+    if (!target.isConnected) return false;
+    if (layer.contains(target)) return false;
+    if (shouldExclude(target)) return false;
+    return true;
+  }
 
   void maybeDismissOutside(web.Event e) {
-    if (_layerStack.isEmpty || !identical(_layerStack.last, entry)) return;
-    final target = e.target;
-    if (target is web.Node) {
-      if (layer.contains(target)) return;
-    }
+    if (!bypassTopMostLayerCheck && !_isTopMostLayer(entry)) return;
+    if (!isEventOutside(e)) return;
+    onPointerDownOutside?.call(e);
+    onInteractOutside?.call(e);
+    if (e.defaultPrevented) return;
     onDismiss("outside");
   }
 
+  void maybeDismissFocusOutside(web.Event e) {
+    if (!bypassTopMostLayerCheck && !_isTopMostLayer(entry)) return;
+    if (e is! web.FocusEvent) return;
+    if (!isEventOutside(e)) return;
+    onFocusOutside?.call(e);
+    onInteractOutside?.call(e);
+    if (e.defaultPrevented) return;
+    onDismiss("focus-outside");
+  }
+
   void maybeDismissEscape(web.Event e) {
-    if (_layerStack.isEmpty || !identical(_layerStack.last, entry)) return;
+    if (!bypassTopMostLayerCheck && !_isTopMostLayer(entry)) return;
     if (e is! web.KeyboardEvent) return;
     if (e.key != "Escape") return;
     e.preventDefault();
@@ -226,14 +411,27 @@ DismissableLayerHandle dismissableLayer(
   }
 
   final jsOutside = (maybeDismissOutside).toJS;
+  final jsFocusOutside = (maybeDismissFocusOutside).toJS;
   final jsEscape = (maybeDismissEscape).toJS;
-  web.document.addEventListener("pointerdown", jsOutside, true.toJS);
+
+  Timer? registerTimer;
+  registerTimer = Timer(Duration.zero, () {
+    web.document.addEventListener("pointerdown", jsOutside, true.toJS);
+    registerTimer = null;
+  });
+
+  web.document.addEventListener("focusin", jsFocusOutside, true.toJS);
   web.document.addEventListener("keydown", jsEscape, true.toJS);
 
   void dispose() {
+    registerTimer?.cancel();
+    registerTimer = null;
     web.document.removeEventListener("pointerdown", jsOutside, true.toJS);
+    web.document.removeEventListener("focusin", jsFocusOutside, true.toJS);
     web.document.removeEventListener("keydown", jsEscape, true.toJS);
+    _restoreEntryPointerPatch(entry);
     _layerStack.remove(entry);
+    _syncPointerBlocking();
   }
 
   onCleanup(dispose);

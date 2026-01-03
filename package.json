@@ -33,7 +33,9 @@
     "debug:solid-popover-flip": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=popover\" --scenario solid-popover-flip --expect-h1 \"Solid Popover Demo\" --expect-selector \"#popover-root\"",
     "debug:solid-popover-flip:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=popover\" --scenario solid-popover-flip --expect-h1 \"Solid Popover Demo\" --expect-selector \"#popover-root\"",
     "debug:solid-toast": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\"",
-    "debug:solid-toast:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\""
+    "debug:solid-toast:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\"",
+    "debug:solid-menu": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=menu\" --scenario solid-menu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
+    "debug:solid-menu:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=menu\" --scenario solid-menu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
@@ -41,7 +43,7 @@
   "devDependencies": {
     "playwright": "^1.57.0",
     "vite": "^7.3.0",
-    "vite-plugin-dart": "^1.0.3"
+    "vite-plugin-dart": "file:vendor/vite-plugin-dart"
   },
   "dependencies": {
     "morphdom": "^2.7.7"

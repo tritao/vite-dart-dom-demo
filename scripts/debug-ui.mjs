@@ -134,7 +134,9 @@ async function inspectUrl(
     if (msg.type() === "error" && !isIgnorableConsoleError(msg.text()))
       consoleErrors.push(line);
   });
-  page.on("pageerror", (err) => pageErrors.push(String(err)));
+  page.on("pageerror", (err) =>
+    pageErrors.push(err?.stack ? String(err.stack) : String(err)),
+  );
   page.on("requestfailed", (req) => {
     const record = {
       url: req.url(),
@@ -1132,6 +1134,54 @@ async function inspectUrl(
       } catch (e) {
         interactionResults.push({
           name: "solid-toast",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
+    } else if (scenario === "solid-menu") {
+      try {
+        const trigger = page.locator("#menu-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-menu",
+            ok: false,
+            details: { reason: "missing #menu-trigger" },
+          });
+        } else {
+          await trigger.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#menu-content") != null,
+            { timeout: timeoutMs },
+          );
+
+          const initialFocus = await page.evaluate(() => document.activeElement?.id ?? "");
+          await page.keyboard.press("ArrowDown");
+          const afterDown = await page.evaluate(() => document.activeElement?.id ?? "");
+          await page.keyboard.press("End");
+          const afterEnd = await page.evaluate(() => document.activeElement?.id ?? "");
+
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#menu-content") == null,
+            { timeout: timeoutMs },
+          );
+          const focusAfterClose = await page.evaluate(() => document.activeElement?.id ?? "");
+
+          const ok =
+            initialFocus === "menu-item-profile" &&
+            afterDown === "menu-item-billing" &&
+            afterEnd === "menu-item-logout" &&
+            focusAfterClose === "menu-trigger";
+
+          interactionResults.push({
+            name: "solid-menu",
+            ok,
+            details: { initialFocus, afterDown, afterEnd, focusAfterClose },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-menu",
           ok: false,
           details: { error: String(e) },
         });

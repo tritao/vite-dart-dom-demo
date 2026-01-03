@@ -40,8 +40,7 @@ void _positionFixed({
     if (placement.startsWith("bottom") &&
         a.bottom + offset + f.height > viewportHeight) {
       effective = placement.replaceFirst("bottom", "top");
-    } else if (placement.startsWith("top") &&
-        a.top - offset - f.height < 0) {
+    } else if (placement.startsWith("top") && a.top - offset - f.height < 0) {
       effective = placement.replaceFirst("top", "bottom");
     } else if (placement.startsWith("right") &&
         a.right + offset + f.width > viewportWidth) {
@@ -51,39 +50,59 @@ void _positionFixed({
     }
   }
 
-  double left;
-  double top;
+  final parts = effective.split("-");
+  final side = parts.first;
+  final align = parts.length > 1 ? parts[1] : "center";
 
-  switch (effective) {
+  double left = 0;
+  double top = 0;
+
+  double alignX() {
+    switch (align) {
+      case "start":
+        return a.left;
+      case "end":
+        return a.right - f.width;
+      default:
+        return a.left + (a.width - f.width) / 2;
+    }
+  }
+
+  double alignY() {
+    switch (align) {
+      case "start":
+        return a.top;
+      case "end":
+        return a.bottom - f.height;
+      default:
+        return a.top + (a.height - f.height) / 2;
+    }
+  }
+
+  switch (side) {
     case "top":
-      left = a.left + (a.width - f.width) / 2;
+      left = alignX();
       top = a.top - f.height - offset;
       break;
-    case "top-start":
-      left = a.left;
-      top = a.top - f.height - offset;
-      break;
-    case "right-start":
+    case "right":
       left = a.right + offset;
-      top = a.top;
+      top = alignY();
       break;
-    case "left-start":
+    case "left":
       left = a.left - f.width - offset;
-      top = a.top;
+      top = alignY();
       break;
     case "bottom":
-      left = a.left + (a.width - f.width) / 2;
-      top = a.bottom + offset;
-      break;
-    case "bottom-start":
     default:
-      left = a.left;
+      left = alignX();
       top = a.bottom + offset;
       break;
   }
 
-  left = _clampSafe(left, viewportPadding, viewportWidth - f.width - viewportPadding);
-  top = _clampSafe(top, viewportPadding, viewportHeight - f.height - viewportPadding);
+  left = _clampSafe(
+      left, viewportPadding, viewportWidth - f.width - viewportPadding);
+  top = _clampSafe(
+      top, viewportPadding, viewportHeight - f.height - viewportPadding);
 
   floating.style.position = "fixed";
   _setPx(floating, "left", left);
@@ -98,6 +117,7 @@ FloatingHandle floatToAnchor({
   double viewportPadding = 8,
   bool flip = true,
   bool updateOnAnimationFrame = false,
+  bool updateOnScrollParents = true,
 }) {
   var disposed = false;
 
@@ -126,6 +146,24 @@ FloatingHandle floatToAnchor({
   scheduleMicrotask(computeWhenConnected);
   on(web.window, "scroll", (_) => compute());
   on(web.window, "resize", (_) => compute());
+
+  if (updateOnScrollParents && anchor.isConnected) {
+    web.Node? current = anchor;
+    while (current != null) {
+      if (current is web.HTMLElement) {
+        try {
+          // Heuristic: if it can scroll now, listen to scroll.
+          if (current.scrollHeight > current.clientHeight ||
+              current.scrollWidth > current.clientWidth) {
+            on(current, "scroll", (_) => compute());
+          }
+        } catch (_) {
+          // Some host objects can throw when probing layout metrics.
+        }
+      }
+      current = current.parentNode;
+    }
+  }
 
   if (updateOnAnimationFrame) {
     late final JSFunction jsLoop;

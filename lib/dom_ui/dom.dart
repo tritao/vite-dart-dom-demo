@@ -196,6 +196,36 @@ web.HTMLButtonElement dangerButton(
     actionButton(label,
         kind: 'danger', disabled: disabled, action: action, dataId: dataId);
 
+web.HTMLAnchorElement link(
+  String label, {
+  required String href,
+  String? className,
+  bool newTab = false,
+}) {
+  final a = web.HTMLAnchorElement()
+    ..href = href
+    ..textContent = label;
+  if (className != null) a.className = className;
+  if (newTab) {
+    a.target = '_blank';
+    a.rel = 'noreferrer';
+  }
+  return a;
+}
+
+web.HTMLAnchorElement linkButton(
+  String label, {
+  required String href,
+  String kind = 'secondary',
+  bool newTab = false,
+}) =>
+    link(
+      label,
+      href: href,
+      className: 'btn $kind',
+      newTab: newTab,
+    );
+
 web.HTMLInputElement actionCheckbox({
   bool checked = false,
   String? className,

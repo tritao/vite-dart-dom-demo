@@ -126,6 +126,25 @@ final class AppComponent extends Component {
           ),
         ],
       ),
+      dom.spacer(),
+      dom.section(
+        title: 'Solid primitives demos',
+        subtitle:
+            'Quick links to the Solid-style DOM demos (query-based routes).',
+        children: [
+          dom.spacer(),
+          dom.row(children: [
+            dom.linkButton('Menu', href: '?solid=menu'),
+            dom.linkButton('Dialog', href: '?solid=dialog'),
+            dom.linkButton('Popover', href: '?solid=popover'),
+            dom.linkButton('Toast', href: '?solid=toast'),
+            dom.linkButton('Roving', href: '?solid=roving'),
+            dom.linkButton('Overlay', href: '?solid=overlay'),
+            dom.linkButton('Solid DOM', href: '?solid=1'),
+          ]),
+        ],
+      ),
+      dom.spacer(),
       dom.mountPoint('counter-root'),
       dom.spacer(),
       dom.mountPoint('todos-root'),

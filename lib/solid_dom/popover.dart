@@ -52,6 +52,11 @@ web.DocumentFragment Popover({
 
         dismissableLayer(
           popover,
+          excludedElements: anchor == null
+              ? null
+              : <web.Element? Function()>[
+                  () => anchor,
+                ],
           onDismiss: (reason) => close(reason),
         );
         if (trapFocus) focusTrap(popover, initialFocus: initialFocus);

@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
@@ -61,7 +63,15 @@ web.DocumentFragment Dialog({
           dialog,
           onDismiss: (reason) => close(reason),
         );
-        focusTrap(dialog, initialFocus: initialFocus);
+        if (modal) {
+          focusTrap(dialog, initialFocus: initialFocus);
+        } else if (initialFocus != null) {
+          scheduleMicrotask(() {
+            try {
+              initialFocus.focus();
+            } catch (_) {}
+          });
+        }
         if (modal) {
           scrollLock();
           ariaHideOthers(dialog);

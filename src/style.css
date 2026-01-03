@@ -48,6 +48,10 @@ a {
   color: inherit;
 }
 
+a.btn {
+  text-decoration: none;
+}
+
 .container {
   max-width: 920px;
   margin: 48px auto;
@@ -190,4 +194,35 @@ a {
 
 .user {
   font-weight: 600;
+}
+
+.menu {
+  padding: 8px;
+  min-width: 220px;
+}
+
+.menuItem {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.menuItem:focus {
+  outline: none;
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15);
+}
+
+.menuItem.destructive:focus {
+  border-color: rgba(255, 77, 77, 0.55);
+  box-shadow: 0 0 0 4px rgba(255, 77, 77, 0.15);
 }

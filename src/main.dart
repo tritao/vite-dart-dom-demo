@@ -10,6 +10,7 @@ import './solid_dialog_demo.dart';
 import './solid_popover_demo.dart';
 import './solid_roving_demo.dart';
 import './solid_toast_demo.dart';
+import './solid_menu_demo.dart';
 
 void main() {
   final mount = web.document.querySelector('#app');
@@ -34,6 +35,10 @@ void main() {
   }
   if (search.contains('solid=toast')) {
     mountSolidToastDemo(mount);
+    return;
+  }
+  if (search.contains('solid=menu')) {
+    mountSolidMenuDemo(mount);
     return;
   }
   if (search.contains('solid=1')) {
