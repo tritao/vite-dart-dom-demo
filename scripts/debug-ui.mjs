@@ -827,6 +827,174 @@ async function inspectUrl(
           details: { error: String(e) },
         });
       }
+    } else if (scenario === "solid-popover") {
+      try {
+        const trigger = page.locator("#popover-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-popover",
+            ok: false,
+            details: { reason: "missing #popover-trigger" },
+          });
+        } else {
+          const triggerHandle = await trigger.first().elementHandle();
+          const appBefore = await page.evaluate(() => {
+            const app = document.querySelector("#app");
+            return {
+              ariaHidden: app?.getAttribute("aria-hidden") ?? null,
+              inert: app?.hasAttribute("inert") ?? null,
+            };
+          });
+
+          await trigger.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel") != null,
+            { timeout: timeoutMs },
+          );
+
+          const afterOpen = await page.evaluate(() => ({
+            panelExists: document.querySelector("#popover-panel") != null,
+            activeId: document.activeElement?.id ?? null,
+            appAriaHidden: document.querySelector("#app")?.getAttribute("aria-hidden") ?? null,
+            appInert: document.querySelector("#app")?.hasAttribute("inert") ?? null,
+          }));
+
+          // Escape should dismiss.
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+          const afterEscape = await page.evaluate(() => ({
+            activeId: document.activeElement?.id ?? null,
+            status: document.querySelector("#popover-status")?.textContent ?? null,
+          }));
+
+          const focusRestoredEscape = triggerHandle
+            ? await triggerHandle.evaluate((el) => el === document.activeElement)
+            : false;
+
+          // Outside click should dismiss too.
+          await trigger.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel") != null,
+            { timeout: timeoutMs },
+          );
+          await page.click("body", { position: { x: 5, y: 5 } });
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+          const afterOutside = await page.evaluate(() => ({
+            status: document.querySelector("#popover-status")?.textContent ?? null,
+            appAriaHidden: document.querySelector("#app")?.getAttribute("aria-hidden") ?? null,
+            appInert: document.querySelector("#app")?.hasAttribute("inert") ?? null,
+          }));
+
+          const ok =
+            appBefore.ariaHidden == null &&
+            appBefore.inert === false &&
+            afterOpen.panelExists === true &&
+            afterOpen.appAriaHidden == null &&
+            afterOpen.appInert === false &&
+            focusRestoredEscape === true &&
+            (afterEscape.status ?? "").includes("escape") &&
+            (afterOutside.status ?? "").includes("outside") &&
+            afterOutside.appAriaHidden == null &&
+            afterOutside.appInert === false;
+
+          interactionResults.push({
+            name: "solid-popover",
+            ok,
+            details: {
+              appBefore,
+              afterOpen,
+              afterEscape,
+              focusRestoredEscape,
+              afterOutside,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-popover",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
+    } else if (scenario === "solid-toast") {
+      try {
+        const trigger = page.locator("#toast-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-toast",
+            ok: false,
+            details: { reason: "missing #toast-trigger" },
+          });
+        } else {
+          await trigger.first().click({ timeout: timeoutMs });
+          await trigger.first().click({ timeout: timeoutMs });
+
+          await page.waitForFunction(
+            () => document.querySelector("#toast-viewport") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(
+            () => document.querySelectorAll('[id^=\"toast-\"]').length >= 2,
+            { timeout: timeoutMs },
+          );
+
+          const afterTwo = await page.evaluate(() => {
+            const viewport = document.querySelector("#toast-viewport");
+            const ids = Array.from(viewport?.querySelectorAll('[id^=\"toast-\"]') ?? []).map(
+              (n) => n.id,
+            );
+            return { count: ids.length, ids };
+          });
+
+          // Dismiss first toast by button.
+          await page.locator("#toast-1 button").click({ timeout: timeoutMs });
+          await page.waitForTimeout(120);
+          const afterButton = await page.evaluate(() => {
+            const viewport = document.querySelector("#toast-viewport");
+            const ids = Array.from(viewport?.querySelectorAll('[id^=\"toast-\"]') ?? []).map(
+              (n) => n.id,
+            );
+            return { count: ids.length, ids };
+          });
+
+          // Auto-dismiss should remove the remaining toast shortly after TTL+exit.
+          await page.waitForTimeout(400);
+          const afterAuto = await page.evaluate(() => {
+            const viewport = document.querySelector("#toast-viewport");
+            const ids = Array.from(viewport?.querySelectorAll('[id^=\"toast-\"]') ?? []).map(
+              (n) => n.id,
+            );
+            return { count: ids.length, ids };
+          });
+
+          const ok =
+            afterTwo.count >= 2 &&
+            afterTwo.ids[0] === "toast-1" &&
+            afterTwo.ids[1] === "toast-2" &&
+            afterButton.ids.includes("toast-1") === false &&
+            afterAuto.count === 0;
+
+          interactionResults.push({
+            name: "solid-toast",
+            ok,
+            details: { afterTwo, afterButton, afterAuto },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-toast",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
     } else {
       // Default scenario: existing app.
       try {

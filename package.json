@@ -25,7 +25,11 @@
     "debug:solid-dialog": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=dialog\" --scenario solid-dialog --expect-h1 \"Solid Dialog Demo\" --expect-selector \"#dialog-root\"",
     "debug:solid-dialog:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=dialog\" --scenario solid-dialog --expect-h1 \"Solid Dialog Demo\" --expect-selector \"#dialog-root\"",
     "debug:solid-roving": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=roving\" --scenario solid-roving --expect-h1 \"Solid Roving Demo\" --expect-selector \"#roving-root\"",
-    "debug:solid-roving:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=roving\" --scenario solid-roving --expect-h1 \"Solid Roving Demo\" --expect-selector \"#roving-root\""
+    "debug:solid-roving:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=roving\" --scenario solid-roving --expect-h1 \"Solid Roving Demo\" --expect-selector \"#roving-root\"",
+    "debug:solid-popover": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=popover\" --scenario solid-popover --expect-h1 \"Solid Popover Demo\" --expect-selector \"#popover-root\"",
+    "debug:solid-popover:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=popover\" --scenario solid-popover --expect-h1 \"Solid Popover Demo\" --expect-selector \"#popover-root\"",
+    "debug:solid-toast": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\"",
+    "debug:solid-toast:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
