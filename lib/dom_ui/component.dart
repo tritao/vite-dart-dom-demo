@@ -111,8 +111,11 @@ abstract class Component {
   T? query<T extends web.Element>(String selector) {
     final el = root.querySelector(selector);
     if (el == null) return null;
-    if (el is T) return el;
-    return null;
+    try {
+      return el as T;
+    } catch (_) {
+      return null;
+    }
   }
 
   T queryOrThrow<T extends web.Element>(String selector) {

@@ -126,9 +126,13 @@ final class TodosComponent extends Component {
     final id = events.actionIdFromElement(actionEl);
     if (id == null) return;
 
-    if (actionEl is! web.HTMLInputElement) return;
-    final checked = actionEl.checked == true;
-    _store.dispatch(TodosToggle(id: id, done: checked));
+    try {
+      final checkbox = actionEl as web.HTMLInputElement;
+      final checked = checkbox.checked == true;
+      _store.dispatch(TodosToggle(id: id, done: checked));
+    } catch (_) {
+      return;
+    }
   }
 
   void _onKeyDown(web.KeyboardEvent event) {
