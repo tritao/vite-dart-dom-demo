@@ -11,15 +11,18 @@ const HOST = "127.0.0.1";
 function parseArgs(argv) {
   const args = {
     url: null,
+    path: "/",
     mode: "dev",
     timeoutMs: 120_000,
     expectH1: "Dart + Vite",
     expectSelector: "#app-root",
     interactions: true,
+    scenario: "app",
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--url") args.url = argv[++i] ?? null;
+    else if (a === "--path") args.path = argv[++i] ?? args.path;
     else if (a === "--mode") args.mode = argv[++i] ?? "dev";
     else if (a === "--timeout-ms")
       args.timeoutMs = Number(argv[++i] ?? args.timeoutMs);
@@ -27,6 +30,7 @@ function parseArgs(argv) {
     else if (a === "--expect-selector")
       args.expectSelector = argv[++i] ?? args.expectSelector;
     else if (a === "--no-interactions") args.interactions = false;
+    else if (a === "--scenario") args.scenario = argv[++i] ?? args.scenario;
   }
   return args;
 }
@@ -111,7 +115,10 @@ function isIgnorableConsoleError(text) {
   );
 }
 
-async function inspectUrl(url, { timeoutMs, expectSelector, expectH1, interactions }) {
+async function inspectUrl(
+  url,
+  { timeoutMs, expectSelector, expectH1, interactions, scenario },
+) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
 
@@ -176,48 +183,129 @@ async function inspectUrl(url, { timeoutMs, expectSelector, expectH1, interactio
 
   const interactionResults = [];
   if (interactions) {
-    try {
-      const inc = page.locator('[data-action="counter-inc"]');
-      if (await inc.count()) {
-        const before = await page.evaluate(() => {
-          const counterRoot = document.querySelector("#counter-root");
-          const big = counterRoot?.querySelector(".big");
-          return (big?.textContent ?? "").trim();
+    if (scenario === "solid-dom") {
+      try {
+        const inc = page.locator("#solid-inc");
+        const count = page.locator("#solid-count");
+        if (!(await inc.count()) || !(await count.count())) {
+          interactionResults.push({
+            name: "solid-dom",
+            ok: false,
+            details: { reason: "missing #solid-inc or #solid-count" },
+          });
+        } else {
+          const incHandle = await inc.first().elementHandle();
+          const before = (await count.first().textContent())?.trim() ?? "";
+
+          await inc.first().click({ timeout: timeoutMs });
+
+          await page.waitForFunction(
+            ({ prev }) => {
+              const el = document.querySelector("#solid-count");
+              const now = (el?.textContent ?? "").trim();
+              return !!now && now !== prev;
+            },
+            { prev: before },
+            { timeout: timeoutMs },
+          );
+
+          const after = (await count.first().textContent())?.trim() ?? "";
+
+          const sameNode = incHandle
+            ? await incHandle.evaluate(
+                (el) => el === document.querySelector("#solid-inc"),
+              )
+            : false;
+
+          // Toggle Show and observe cleanup reflected in #solid-status.
+          const status = page.locator("#solid-status");
+          const toggle = page.locator("#solid-toggle");
+          const initialStatus = (await status.first().textContent())?.trim() ?? "";
+          await toggle.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => (document.querySelector("#solid-extra") != null),
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(
+            () => (document.querySelector("#solid-status")?.textContent ?? "").includes("yes"),
+            { timeout: timeoutMs },
+          );
+
+          await toggle.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => (document.querySelector("#solid-extra") == null),
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(
+            () => (document.querySelector("#solid-status")?.textContent ?? "").includes("no"),
+            { timeout: timeoutMs },
+          );
+          const finalStatus = (await status.first().textContent())?.trim() ?? "";
+
+          interactionResults.push({
+            name: "solid-dom",
+            ok: true,
+            details: {
+              before,
+              after,
+              sameNode,
+              initialStatus,
+              finalStatus,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-dom",
+          ok: false,
+          details: { error: String(e) },
         });
-        await inc.first().click({ timeout: timeoutMs });
-        await page.waitForFunction(
-          (prev) => {
+      }
+    } else {
+      // Default scenario: existing app.
+      try {
+        const inc = page.locator('[data-action="counter-inc"]');
+        if (await inc.count()) {
+          const before = await page.evaluate(() => {
             const counterRoot = document.querySelector("#counter-root");
             const big = counterRoot?.querySelector(".big");
-            const now = (big?.textContent ?? "").trim();
-            return !!now && now !== prev;
-          },
-          before,
-          { timeout: timeoutMs },
-        );
-        const after = await page.evaluate(() => {
-          const counterRoot = document.querySelector("#counter-root");
-          const big = counterRoot?.querySelector(".big");
-          return (big?.textContent ?? "").trim();
-        });
-        interactionResults.push({
-          name: "counter-inc",
-          ok: true,
-          details: { before, after },
-        });
-      } else {
+            return (big?.textContent ?? "").trim();
+          });
+          await inc.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            (prev) => {
+              const counterRoot = document.querySelector("#counter-root");
+              const big = counterRoot?.querySelector(".big");
+              const now = (big?.textContent ?? "").trim();
+              return !!now && now !== prev;
+            },
+            before,
+            { timeout: timeoutMs },
+          );
+          const after = await page.evaluate(() => {
+            const counterRoot = document.querySelector("#counter-root");
+            const big = counterRoot?.querySelector(".big");
+            return (big?.textContent ?? "").trim();
+          });
+          interactionResults.push({
+            name: "counter-inc",
+            ok: true,
+            details: { before, after },
+          });
+        } else {
+          interactionResults.push({
+            name: "counter-inc",
+            ok: false,
+            details: { reason: "missing [data-action=counter-inc]" },
+          });
+        }
+      } catch (e) {
         interactionResults.push({
           name: "counter-inc",
           ok: false,
-          details: { reason: "missing [data-action=counter-inc]" },
+          details: { error: String(e) },
         });
       }
-    } catch (e) {
-      interactionResults.push({
-        name: "counter-inc",
-        ok: false,
-        details: { error: String(e) },
-      });
     }
   }
 
@@ -242,6 +330,7 @@ async function inspectUrl(url, { timeoutMs, expectSelector, expectH1, interactio
     url,
     status: response?.status() ?? null,
     expectations: { expectSelector, expectH1 },
+    scenario,
     appInfo,
     pageErrors,
     failedRequests,
@@ -306,7 +395,10 @@ async function main() {
 
     if (!url) {
       port = await findFreePort();
-      url = `http://${HOST}:${port}/`;
+      const pathPart = args.path?.startsWith("/") || args.path?.startsWith("?")
+        ? args.path
+        : `/${args.path}`;
+      url = `http://${HOST}:${port}${pathPart ?? "/"}`;
 
       if (args.mode === "preview") {
         log(`\n==> build`);
@@ -378,6 +470,7 @@ async function main() {
       expectSelector: args.expectSelector,
       expectH1: args.expectH1,
       interactions: args.interactions,
+      scenario: args.scenario,
     });
 
     const reportPath = ".cache/debug-ui-report.json";

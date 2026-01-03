@@ -42,6 +42,12 @@ jobs:
           DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
         run: npm run debug:ui:ci
 
+      - name: Solid DOM semantics smoke (Playwright)
+        if: runner.os == 'Linux'
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run debug:solid-dom:ci
+
       - name: Upload UI debug artifacts (on failure)
         if: failure() && runner.os == 'Linux'
         uses: actions/upload-artifact@v4

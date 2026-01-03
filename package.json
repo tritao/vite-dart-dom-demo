@@ -14,7 +14,9 @@
     "debug:ui": "node scripts/debug-ui.mjs",
     "debug:ui:dev": "node scripts/debug-ui.mjs --mode dev",
     "debug:ui:preview": "node scripts/debug-ui.mjs --mode preview",
-    "debug:ui:ci": "node scripts/debug-ui.mjs --mode preview --timeout-ms 240000"
+    "debug:ui:ci": "node scripts/debug-ui.mjs --mode preview --timeout-ms 240000",
+    "debug:solid-dom": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=1\" --scenario solid-dom --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
+    "debug:solid-dom:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-dom --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

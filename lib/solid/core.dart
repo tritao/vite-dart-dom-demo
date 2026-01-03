@@ -298,7 +298,9 @@ final class Computation implements Disposable {
     _running = true;
 
     final previous = _currentComputation;
+    final previousOwner = _currentOwner;
     _currentComputation = this;
+    _currentOwner = _owner;
 
     _clearDeps();
     _cleanup();
@@ -307,6 +309,7 @@ final class Computation implements Disposable {
       _fn();
     } finally {
       _currentComputation = previous;
+      _currentOwner = previousOwner;
       _running = false;
     }
   }
