@@ -12,9 +12,16 @@ abstract final class _UsersActions {
 }
 
 final class UsersComponent extends Component {
-  UsersComponent();
+  UsersComponent({
+    this.title = 'Fetch (async)',
+    this.endpoint = 'https://jsonplaceholder.typicode.com/users',
+  });
+
+  String title;
+  String endpoint;
 
   int _requestToken = 0;
+  String? _lastEndpoint;
 
   bool _isLoading = false;
   String? _error;
@@ -22,6 +29,20 @@ final class UsersComponent extends Component {
 
   @override
   web.Element render() {
+    useEffect('endpoint', [endpoint], () {
+      final previous = _lastEndpoint;
+      _lastEndpoint = endpoint;
+      if (previous != null && previous != endpoint) {
+        _requestToken++;
+        setState(() {
+          _isLoading = false;
+          _error = null;
+          _users = const [];
+        });
+      }
+      return null;
+    });
+
     final status = dom.p('', className: 'muted');
     if (_isLoading) {
       status.textContent = 'Loading users…';
@@ -62,12 +83,11 @@ final class UsersComponent extends Component {
       list.append(li);
     }
 
-    return dom.card(title: 'Fetch (async)', children: [
+    return dom.card(title: title, children: [
       row,
       status,
       if (_users.isNotEmpty) list,
-      dom.p('Endpoint: https://jsonplaceholder.typicode.com/users',
-          className: 'muted'),
+      dom.p('Endpoint: $endpoint', className: 'muted'),
     ]);
   }
 
@@ -118,7 +138,7 @@ final class UsersComponent extends Component {
 
     try {
       final response = await http.get(
-        Uri.parse('https://jsonplaceholder.typicode.com/users'),
+        Uri.parse(endpoint),
       );
       if (!isMounted || token != _requestToken) return;
       if (response.statusCode < 200 || response.statusCode >= 300) {

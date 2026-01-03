@@ -4,6 +4,22 @@ import 'package:web/web.dart' as web;
 
 import '../morph_patch.dart';
 
+typedef Cleanup = void Function();
+
+final class _EffectState {
+  _EffectState({
+    required this.deps,
+    required this.effect,
+    this.cleanup,
+    this.pending = true,
+  });
+
+  List<Object?> deps;
+  Cleanup? Function() effect;
+  Cleanup? cleanup;
+  bool pending;
+}
+
 final class RenderScheduler {
   RenderScheduler._();
 
@@ -38,6 +54,7 @@ abstract class Component {
   late final web.Element _root;
   bool _mounted = false;
   final List<void Function()> _cleanups = <void Function()>[];
+  final Map<String, _EffectState> _effects = <String, _EffectState>{};
 
   web.Element render();
 
@@ -50,6 +67,49 @@ abstract class Component {
   web.Element get root => _root;
 
   bool get isMounted => _mounted;
+
+  void useEffect(
+    String key,
+    List<Object?> deps,
+    Cleanup? Function() effect,
+  ) {
+    final existing = _effects[key];
+    if (existing == null) {
+      _effects[key] = _EffectState(deps: deps, effect: effect);
+      return;
+    }
+
+    existing.effect = effect;
+    if (_depsEqual(existing.deps, deps)) return;
+    existing.deps = deps;
+    existing.pending = true;
+  }
+
+  bool _depsEqual(List<Object?> a, List<Object?> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  void _runEffects() {
+    if (!_mounted) return;
+    for (final state in _effects.values) {
+      if (!state.pending) continue;
+      state.pending = false;
+      try {
+        state.cleanup?.call();
+      } catch (_) {}
+      state.cleanup = null;
+      try {
+        state.cleanup = state.effect();
+      } catch (_) {
+        state.cleanup = null;
+      }
+    }
+  }
 
   void addCleanup(void Function() cleanup) {
     if (!_mounted) return;
@@ -79,6 +139,7 @@ abstract class Component {
     mount.append(_root);
     _mounted = true;
     onMount();
+    _runEffects();
   }
 
   void setState(void Function() fn) {
@@ -86,6 +147,8 @@ abstract class Component {
     if (!_mounted) return;
     RenderScheduler.instance.invalidate(this);
   }
+
+  void update(void Function() fn) => setState(fn);
 
   void invalidate() {
     if (!_mounted) return;
@@ -97,6 +160,7 @@ abstract class Component {
     final next = render();
     morphPatch(_root, next);
     onAfterPatch();
+    _runEffects();
   }
 
   void dispose() {
@@ -104,6 +168,12 @@ abstract class Component {
     try {
       onDispose();
     } catch (_) {}
+    for (final state in _effects.values) {
+      try {
+        state.cleanup?.call();
+      } catch (_) {}
+    }
+    _effects.clear();
     for (final cleanup in _cleanups.reversed) {
       try {
         cleanup();
