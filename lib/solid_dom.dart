@@ -10,3 +10,4 @@ export "solid_dom/toast.dart";
 export "solid_dom/tooltip.dart";
 export "solid_dom/select.dart";
 export "solid_dom/combobox.dart";
+export "solid_dom/listbox_core.dart";

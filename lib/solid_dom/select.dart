@@ -5,21 +5,29 @@ import "package:web/web.dart" as web;
 
 import "./floating.dart";
 import "./focus_scope.dart";
+import "./listbox_core.dart";
 import "./overlay.dart";
 import "./presence.dart";
 import "./solid_dom.dart";
 
-final class SelectOption<T> {
+final class SelectOption<T> implements ListboxItem<T> {
   const SelectOption({
     required this.value,
     required this.label,
+    String? textValue,
     this.disabled = false,
     this.id,
-  });
+  }) : textValue = textValue ?? label;
 
+  @override
   final T value;
+  @override
   final String label;
+  @override
+  final String textValue;
+  @override
   final bool disabled;
+  @override
   final String? id;
 }
 
@@ -125,15 +133,17 @@ web.DocumentFragment Select<T>({
 
         final optionEls = <web.HTMLElement>[];
         final optionValues = <T>[];
+        final typeahead = ListboxTypeahead();
 
         int initialActiveIndex() {
           final current = value();
-          if (current == null) return 0;
           final opts = options().toList(growable: false);
-          for (var i = 0; i < opts.length; i++) {
-            if (eq(opts[i].value, current)) return i;
-          }
-          return 0;
+          final idx = findSelectedIndex<T, SelectOption<T>>(
+            opts,
+            current,
+            equals: eq,
+          );
+          return idx == -1 ? 0 : idx;
         }
 
         final activeIndex = createSignal<int>(initialActiveIndex());
@@ -236,23 +246,8 @@ web.DocumentFragment Select<T>({
           },
         );
 
-        Timer? typeaheadTimer;
-        var typeahead = "";
-
         void clearTypeahead() {
-          typeahead = "";
-          typeaheadTimer?.cancel();
-          typeaheadTimer = null;
-        }
-
-        int nextEnabledIndex(int start, int delta) {
-          if (optionEls.isEmpty) return 0;
-          var idx = start;
-          for (var i = 0; i < optionEls.length; i++) {
-            idx = (idx + delta + optionEls.length) % optionEls.length;
-            if (optionEls[idx].getAttribute("aria-disabled") != "true") return idx;
-          }
-          return start;
+          typeahead.clear();
         }
 
         void onKeydown(web.Event e) {
@@ -275,21 +270,22 @@ web.DocumentFragment Select<T>({
           }
 
           if (optionEls.isEmpty) return;
+          final opts = options().toList(growable: false);
           final active = activeIndex.value.clamp(0, optionEls.length - 1);
 
           int? next;
           switch (e.key) {
             case "ArrowDown":
-              next = nextEnabledIndex(active, 1);
+              next = nextEnabledIndex(opts, active, 1);
               break;
             case "ArrowUp":
-              next = nextEnabledIndex(active, -1);
+              next = nextEnabledIndex(opts, active, -1);
               break;
             case "Home":
-              next = nextEnabledIndex(-1, 1);
+              next = firstEnabledIndex(opts);
               break;
             case "End":
-              next = nextEnabledIndex(0, -1);
+              next = lastEnabledIndex(opts);
               break;
             case "Enter":
             case " ":
@@ -305,31 +301,19 @@ web.DocumentFragment Select<T>({
             return;
           }
 
-          final key = e.key;
-          if (key.length == 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-            typeaheadTimer?.cancel();
-            typeahead += key.toLowerCase();
-            typeaheadTimer =
-                Timer(const Duration(milliseconds: 500), clearTypeahead);
-
-            for (var i = 0; i < optionEls.length; i++) {
-              final idx = (active + i) % optionEls.length;
-              if (optionEls[idx].getAttribute("aria-disabled") == "true") continue;
-              final text =
-                  (optionEls[idx].textContent ?? "").trim().toLowerCase();
-              if (text.startsWith(typeahead) && text.isNotEmpty) {
-                e.preventDefault();
-                activeIndex.value = idx;
-                scheduleMicrotask(focusActive);
-                return;
-              }
-            }
+          final match = typeahead.handleKey(e, opts, startIndex: active);
+          if (match != null) {
+            e.preventDefault();
+            activeIndex.value = match;
+            scheduleMicrotask(focusActive);
+            return;
           }
         }
 
         on(listbox, "keydown", onKeydown);
 
         onCleanup(clearTypeahead);
+        onCleanup(typeahead.dispose);
 
         return listbox;
       },

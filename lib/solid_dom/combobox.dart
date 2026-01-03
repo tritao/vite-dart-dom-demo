@@ -4,11 +4,12 @@ import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
 import "./floating.dart";
+import "./listbox_core.dart";
 import "./overlay.dart";
 import "./presence.dart";
 import "./solid_dom.dart";
 
-final class ComboboxOption<T> {
+final class ComboboxOption<T> implements ListboxItem<T> {
   const ComboboxOption({
     required this.value,
     required this.label,
@@ -17,10 +18,15 @@ final class ComboboxOption<T> {
     this.id,
   }) : textValue = textValue ?? label;
 
+  @override
   final T value;
+  @override
   final String label;
+  @override
   final String textValue;
+  @override
   final bool disabled;
+  @override
   final String? id;
 }
 
@@ -105,23 +111,6 @@ web.DocumentFragment Combobox<T>({
     return all.where((o) => f(o, q)).toList(growable: false);
   }
 
-  int firstEnabledIndex(List<ComboboxOption<T>> opts) {
-    for (var i = 0; i < opts.length; i++) {
-      if (!opts[i].disabled) return i;
-    }
-    return -1;
-  }
-
-  int nextEnabledIndex(List<ComboboxOption<T>> opts, int start, int delta) {
-    if (opts.isEmpty) return -1;
-    var idx = start;
-    for (var i = 0; i < opts.length; i++) {
-      idx = (idx + delta + opts.length) % opts.length;
-      if (!opts[idx].disabled) return idx;
-    }
-    return start;
-  }
-
   void openNow([int? focusIndex]) {
     setOpen(true);
     if (focusIndex != null) {
@@ -173,7 +162,7 @@ web.DocumentFragment Combobox<T>({
       final idx = activeIndex.value;
       final opts = filteredOptions();
       if (idx < 0 || idx >= opts.length) return null;
-      return opts[idx].id ?? "$resolvedListboxId-opt-$idx";
+      return optionIdFor(opts, resolvedListboxId, idx);
     },
   );
 
@@ -215,7 +204,7 @@ web.DocumentFragment Combobox<T>({
     if (e.key == "ArrowUp") {
       if (!open()) {
         e.preventDefault();
-        openNow(nextEnabledIndex(opts, 0, -1));
+        openNow(lastEnabledIndex(opts));
         return;
       }
       e.preventDefault();
@@ -317,7 +306,7 @@ web.DocumentFragment Combobox<T>({
                   ..textContent = opt.label);
 
             el.setAttribute("role", "option");
-            el.id = opt.id ?? "$resolvedListboxId-opt-$i";
+            el.id = optionIdFor(opts, resolvedListboxId, i);
             el.setAttribute("aria-selected", selected ? "true" : "false");
             if (opt.disabled) el.setAttribute("aria-disabled", "true");
             if (active) el.setAttribute("data-active", "true");
@@ -347,4 +336,3 @@ web.DocumentFragment Combobox<T>({
     ),
   );
 }
-
