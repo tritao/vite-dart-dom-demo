@@ -19,6 +19,8 @@ web.DocumentFragment Popover({
   int exitMs = 120,
   web.HTMLElement? initialFocus,
   bool trapFocus = false,
+  void Function(FocusScopeAutoFocusEvent event)? onOpenAutoFocus,
+  void Function(FocusScopeAutoFocusEvent event)? onCloseAutoFocus,
   web.Element? anchor,
   String placement = "bottom-start",
   double offset = 8,
@@ -61,15 +63,11 @@ web.DocumentFragment Popover({
         focusScope(
           popover,
           trapFocus: trapFocus,
+          autoFocus: trapFocus || initialFocus != null,
           initialFocus: initialFocus,
+          onMountAutoFocus: onOpenAutoFocus,
+          onUnmountAutoFocus: onCloseAutoFocus,
         );
-        if (!trapFocus && initialFocus != null) {
-          scheduleMicrotask(() {
-            try {
-              initialFocus.focus();
-            } catch (_) {}
-          });
-        }
 
         return popover;
       },

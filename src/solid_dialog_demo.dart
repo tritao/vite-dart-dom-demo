@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:dart_web_test/solid.dart";
 import "package:dart_web_test/solid_dom.dart";
 import "package:web/web.dart" as web;
@@ -9,6 +11,8 @@ void mountSolidDialogDemo(web.Element mount) {
       ..className = "container";
 
     final open = createSignal(false);
+    final noBackdropOpen = createSignal(false);
+    final hooksOpen = createSignal(false);
     final nestedOpen = createSignal(false);
     final lastDismiss = createSignal("none");
     final outsideClicks = createSignal(0);
@@ -23,6 +27,22 @@ void mountSolidDialogDemo(web.Element mount) {
       ..textContent = "Open dialog";
     on(trigger, "click", (_) => open.value = true);
     root.appendChild(trigger);
+
+    final noBackdropTrigger = web.HTMLButtonElement()
+      ..id = "dialog-trigger-nobackdrop"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Open dialog (no backdrop)";
+    on(noBackdropTrigger, "click", (_) => noBackdropOpen.value = true);
+    root.appendChild(noBackdropTrigger);
+
+    final hooksTrigger = web.HTMLButtonElement()
+      ..id = "dialog-hooks-trigger"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Open dialog (autofocus hooks)";
+    on(hooksTrigger, "click", (_) => hooksOpen.value = true);
+    root.appendChild(hooksTrigger);
 
     final status = web.HTMLParagraphElement()
       ..id = "dialog-status"
@@ -111,6 +131,100 @@ void mountSolidDialogDemo(web.Element mount) {
               },
             ),
           );
+
+          return dialog;
+        },
+      ),
+    );
+
+    root.appendChild(
+      Dialog(
+        open: () => noBackdropOpen.value,
+        setOpen: (next) => noBackdropOpen.value = next,
+        backdrop: false,
+        labelledBy: "dialog-nobackdrop-title",
+        describedBy: "dialog-nobackdrop-desc",
+        onClose: (reason) => lastDismiss.value = "nobackdrop:$reason",
+        portalId: "dialog-nobackdrop-portal",
+        builder: (close) {
+          final dialog = web.HTMLDivElement()
+            ..id = "dialog-nobackdrop-panel"
+            ..className = "card";
+
+          dialog.appendChild(web.HTMLHeadingElement.h2()
+            ..id = "dialog-nobackdrop-title"
+            ..textContent = "Dialog (no backdrop)");
+          dialog.appendChild(web.HTMLParagraphElement()
+            ..id = "dialog-nobackdrop-desc"
+            ..textContent = "Modal dialog without a backdrop element.");
+
+          final closeBtn = web.HTMLButtonElement()
+            ..id = "dialog-nobackdrop-close"
+            ..type = "button"
+            ..className = "btn secondary"
+            ..textContent = "Close";
+          on(closeBtn, "click", (_) {
+            lastDismiss.value = "nobackdrop:close";
+            close();
+          });
+          dialog.appendChild(closeBtn);
+          return dialog;
+        },
+      ),
+    );
+
+    web.HTMLButtonElement? hooksSecondary;
+    root.appendChild(
+      Dialog(
+        open: () => hooksOpen.value,
+        setOpen: (next) => hooksOpen.value = next,
+        backdrop: true,
+        backdropId: "dialog-hooks-backdrop",
+        onClose: (reason) => lastDismiss.value = "hooks:$reason",
+        onOpenAutoFocus: (e) {
+          e.preventDefault();
+          scheduleMicrotask(() {
+            try {
+              hooksSecondary?.focus();
+            } catch (_) {}
+          });
+        },
+        onCloseAutoFocus: (e) {
+          e.preventDefault();
+          scheduleMicrotask(() {
+            try {
+              outsideAction.focus();
+            } catch (_) {}
+          });
+        },
+        portalId: "dialog-hooks-portal",
+        builder: (close) {
+          final dialog = web.HTMLDivElement()
+            ..id = "dialog-hooks-panel"
+            ..className = "card";
+          dialog.appendChild(web.HTMLHeadingElement.h2()
+            ..id = "dialog-hooks-title"
+            ..textContent = "Dialog (hooks)");
+          dialog.appendChild(web.HTMLParagraphElement()
+            ..textContent = "Uses onOpenAutoFocus/onCloseAutoFocus overrides.");
+
+          hooksSecondary = web.HTMLButtonElement()
+            ..id = "dialog-hooks-secondary"
+            ..type = "button"
+            ..className = "btn secondary"
+            ..textContent = "Secondary (should receive focus)";
+          dialog.appendChild(hooksSecondary!);
+
+          final closeBtn = web.HTMLButtonElement()
+            ..id = "dialog-hooks-close"
+            ..type = "button"
+            ..className = "btn secondary"
+            ..textContent = "Close";
+          on(closeBtn, "click", (_) {
+            lastDismiss.value = "hooks:close";
+            close();
+          });
+          dialog.appendChild(closeBtn);
 
           return dialog;
         },

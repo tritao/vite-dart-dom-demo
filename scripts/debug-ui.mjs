@@ -532,7 +532,7 @@ async function inspectUrl(
             () => document.querySelector("#overlay-dialog") != null,
             { timeout: timeoutMs },
           );
-          await page.click("body", { position: { x: 5, y: 5 } });
+          await page.click("#overlay-backdrop", { timeout: timeoutMs });
           await page.waitForFunction(
             () => document.querySelector("#overlay-dialog") == null,
             { timeout: timeoutMs },
@@ -575,8 +575,8 @@ async function inspectUrl(
         });
       }
     } else if (scenario === "solid-dialog") {
+      let step = "init";
       try {
-        let step = "init";
         const trigger = page.locator("#dialog-trigger");
         if (!(await trigger.count())) {
           interactionResults.push({
@@ -785,14 +785,97 @@ async function inspectUrl(
             () => document.querySelector("#dialog-panel") != null,
             { timeout: timeoutMs },
           );
-          await page.click("body", { position: { x: 5, y: 5 } });
-          step = "wait dialog closed by body click";
+          await page.click("#dialog-backdrop", { timeout: timeoutMs });
+          step = "wait dialog closed by backdrop click";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") == null,
             { timeout: timeoutMs },
           );
           await page.waitForTimeout(80);
           const statusText =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+
+          // No-backdrop modal should still pointer-block and dismiss on outside click.
+          step = "open no-backdrop dialog";
+          await page.click("#dialog-trigger-nobackdrop", { timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#dialog-nobackdrop-panel") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(
+            () => document.activeElement?.id === "dialog-nobackdrop-close",
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+
+          const statusTextNoBackdropBefore =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+          const noBackdropOutsideBeforeMatch = statusTextNoBackdropBefore.match(
+            /Outside clicks:\s*(\d+)/,
+          );
+          const noBackdropOutsideBefore = noBackdropOutsideBeforeMatch
+            ? Number(noBackdropOutsideBeforeMatch[1])
+            : null;
+          const noBackdropOutsideRect = await page.evaluate(() => {
+            const el = document.querySelector("#dialog-outside-action");
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { x: r.left + 6, y: r.top + 6 };
+          });
+          if (noBackdropOutsideRect) {
+            await page.mouse.click(noBackdropOutsideRect.x, noBackdropOutsideRect.y);
+          }
+          step = "wait no-backdrop dialog closed by outside click";
+          await page.waitForFunction(
+            () => document.querySelector("#dialog-nobackdrop-panel") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+          const statusTextNoBackdropAfterFirst =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+          const noBackdropOutsideAfterFirstMatch =
+            statusTextNoBackdropAfterFirst.match(/Outside clicks:\s*(\d+)/);
+          const noBackdropOutsideAfterFirst = noBackdropOutsideAfterFirstMatch
+            ? Number(noBackdropOutsideAfterFirstMatch[1])
+            : null;
+          const noBackdropFocusRestored = await page.evaluate(
+            () => document.activeElement?.id ?? null,
+          );
+
+          await page.click("#dialog-outside-action", { timeout: timeoutMs });
+          await page.waitForTimeout(30);
+          const statusTextNoBackdropAfterSecond =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+          const noBackdropOutsideAfterSecondMatch =
+            statusTextNoBackdropAfterSecond.match(/Outside clicks:\s*(\d+)/);
+          const noBackdropOutsideAfterSecond = noBackdropOutsideAfterSecondMatch
+            ? Number(noBackdropOutsideAfterSecondMatch[1])
+            : null;
+
+          // Auto focus hooks should be preventable/overrideable.
+          step = "open hooks dialog";
+          await page.click("#dialog-hooks-trigger", { timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#dialog-hooks-panel") != null,
+            { timeout: timeoutMs },
+          );
+          step = "wait hooks autofocus";
+          await page.waitForFunction(
+            () => document.activeElement?.id === "dialog-hooks-secondary",
+            { timeout: timeoutMs },
+          );
+          await page.keyboard.press("Escape");
+          step = "wait hooks closed";
+          await page.waitForFunction(
+            () => document.querySelector("#dialog-hooks-panel") == null,
+            { timeout: timeoutMs },
+          );
+          step = "wait hooks close autofocus";
+          await page.waitForFunction(
+            () => document.activeElement?.id === "dialog-outside-action",
+            { timeout: timeoutMs },
+          );
+          const statusTextHooks =
             (await page.locator("#dialog-status").textContent())?.trim() ?? "";
 
           const ok =
@@ -819,7 +902,12 @@ async function inspectUrl(
             outsideBefore != null &&
             outsideAfterFirst === outsideBefore &&
             outsideAfterSecond === outsideBefore + 1 &&
-            statusText.includes("outside");
+            statusText.includes("outside") &&
+            noBackdropOutsideBefore != null &&
+            noBackdropOutsideAfterFirst === noBackdropOutsideBefore &&
+            noBackdropOutsideAfterSecond === noBackdropOutsideBefore + 1 &&
+            noBackdropFocusRestored === "dialog-trigger-nobackdrop" &&
+            statusTextHooks.includes("hooks:escape");
 
           interactionResults.push({
             name: "solid-dialog",
@@ -840,6 +928,11 @@ async function inspectUrl(
               outsideAfterFirst,
               outsideAfterSecond,
               statusText,
+              noBackdropOutsideBefore,
+              noBackdropOutsideAfterFirst,
+              noBackdropOutsideAfterSecond,
+              noBackdropFocusRestored,
+              statusTextHooks,
             },
           });
         }
@@ -1024,6 +1117,7 @@ async function inspectUrl(
             afterOpen.panelExists === true &&
             afterOpen.appAriaHidden == null &&
             afterOpen.appInert === false &&
+            afterOpen.activeId === "popover-trigger" &&
             focusRestoredEscape === true &&
             (afterEscape.status ?? "").includes("escape") &&
             (afterOutside.status ?? "").includes("outside") &&

@@ -10,6 +10,21 @@ final class FocusScopeHandle {
   void dispose() => _dispose();
 }
 
+final class FocusScopeAutoFocusEvent {
+  FocusScopeAutoFocusEvent._({
+    required this.scope,
+    required this.previousFocus,
+  });
+
+  final web.Element scope;
+  final web.HTMLElement? previousFocus;
+
+  bool defaultPrevented = false;
+  void preventDefault() {
+    defaultPrevented = true;
+  }
+}
+
 final class _FocusScopeEntry {
   _FocusScopeEntry(this.container);
   final web.Element container;
@@ -95,14 +110,15 @@ FocusScopeHandle focusScope(
   web.Element container, {
   bool trapFocus = false,
   bool? loop,
+  bool autoFocus = true,
   web.HTMLElement? initialFocus,
   bool restoreFocus = true,
 
-  /// Return true to prevent the default auto-focus behavior.
-  bool Function()? onMountAutoFocus,
+  /// Call `event.preventDefault()` to prevent the default auto-focus behavior.
+  void Function(FocusScopeAutoFocusEvent event)? onMountAutoFocus,
 
-  /// Return true to prevent the default restore-focus behavior.
-  bool Function()? onUnmountAutoFocus,
+  /// Call `event.preventDefault()` to prevent the default restore-focus behavior.
+  void Function(FocusScopeAutoFocusEvent event)? onUnmountAutoFocus,
 }) {
   final shouldLoop = loop ?? trapFocus;
   final entry = _FocusScopeEntry(container);
@@ -144,7 +160,6 @@ FocusScopeHandle focusScope(
 
   void focusInitial() {
     if (entry.disposed) return;
-    if (onMountAutoFocus?.call() == true) return;
     if (initialFocus != null) {
       _focusElement(initialFocus);
       return;
@@ -160,8 +175,17 @@ FocusScopeHandle focusScope(
   scheduleMicrotask(() {
     if (entry.disposed) return;
     if (!container.isConnected) return;
+
+    final mountEvent = FocusScopeAutoFocusEvent._(
+      scope: container,
+      previousFocus: entry.previouslyFocused,
+    );
+    onMountAutoFocus?.call(mountEvent);
+    if (mountEvent.defaultPrevented) return;
+
     final active = web.document.activeElement;
     if (active is web.Node && container.contains(active)) return;
+    if (!autoFocus) return;
     focusInitial();
   });
 
@@ -295,8 +319,14 @@ FocusScopeHandle focusScope(
     _focusScopeStack.remove(entry);
     _resumeTopScope();
 
+    final unmountEvent = FocusScopeAutoFocusEvent._(
+      scope: container,
+      previousFocus: entry.previouslyFocused,
+    );
+    onUnmountAutoFocus?.call(unmountEvent);
+
     if (!restoreFocus) return;
-    if (onUnmountAutoFocus?.call() == true) return;
+    if (unmountEvent.defaultPrevented) return;
     if (_isLikelyFocusableOutside(container)) return;
     _focusElement(entry.previouslyFocused);
   }

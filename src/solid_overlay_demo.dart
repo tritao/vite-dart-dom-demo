@@ -36,6 +36,17 @@ void mountSolidOverlayDemo(web.Element mount) {
         children: () => Portal(
           id: "overlay-portal-container",
           children: () {
+            final wrapper = web.HTMLDivElement()
+              ..id = "overlay-wrapper";
+            wrapper.style.position = "fixed";
+            wrapper.style.inset = "0";
+
+            final backdrop = web.HTMLDivElement()..id = "overlay-backdrop";
+            backdrop.setAttribute("data-solid-backdrop", "1");
+            backdrop.style.position = "fixed";
+            backdrop.style.inset = "0";
+            backdrop.style.background = "transparent";
+
             final dialog = web.HTMLDivElement()
               ..id = "overlay-dialog"
               ..className = "card";
@@ -64,16 +75,21 @@ void mountSolidOverlayDemo(web.Element mount) {
             // Overlay behaviors.
             dismissableLayer(
               dialog,
+              stackElement: wrapper,
+              disableOutsidePointerEvents: true,
+              dismissOnFocusOutside: false,
               onDismiss: (reason) {
                 lastDismiss.value = reason;
                 open.value = false;
               },
             );
-            focusTrap(dialog, initialFocus: close);
+            focusScope(dialog, trapFocus: true, initialFocus: close);
             scrollLock();
             ariaHideOthers(dialog);
 
-            return dialog;
+            wrapper.appendChild(backdrop);
+            wrapper.appendChild(dialog);
+            return wrapper;
           },
         ),
       ),

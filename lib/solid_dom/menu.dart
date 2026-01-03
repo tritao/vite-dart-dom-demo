@@ -30,6 +30,8 @@ web.DocumentFragment DropdownMenu({
   required web.Element anchor,
   required DropdownMenuBuilder builder,
   void Function(String reason)? onClose,
+  void Function(FocusScopeAutoFocusEvent event)? onOpenAutoFocus,
+  void Function(FocusScopeAutoFocusEvent event)? onCloseAutoFocus,
   int exitMs = 120,
   String placement = "bottom-start",
   double offset = 4,
@@ -117,11 +119,17 @@ web.DocumentFragment DropdownMenu({
           menu,
           trapFocus: false,
           restoreFocus: true,
-          onMountAutoFocus: () {
+          onMountAutoFocus: (e) {
+            onOpenAutoFocus?.call(e);
+            if (e.defaultPrevented) return;
+            e.preventDefault();
             scheduleMicrotask(() => focusActive());
-            return true;
           },
-          onUnmountAutoFocus: () => closeReason == "tab",
+          onUnmountAutoFocus: (e) {
+            onCloseAutoFocus?.call(e);
+            if (e.defaultPrevented) return;
+            if (closeReason == "tab") e.preventDefault();
+          },
         );
 
         Timer? typeaheadTimer;

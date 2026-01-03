@@ -21,6 +21,9 @@ web.DocumentFragment Dialog({
   String? backdropClassName,
   int exitMs = 120,
   web.HTMLElement? initialFocus,
+  bool restoreFocus = true,
+  void Function(FocusScopeAutoFocusEvent event)? onOpenAutoFocus,
+  void Function(FocusScopeAutoFocusEvent event)? onCloseAutoFocus,
   String? labelledBy,
   String? describedBy,
   String role = "dialog",
@@ -48,6 +51,13 @@ web.DocumentFragment Dialog({
         }
         dialog.tabIndex = -1;
 
+        final wrapper = web.HTMLDivElement()
+          ..setAttribute("data-solid-dialog-wrapper", "1");
+        if (modal || backdrop) {
+          wrapper.style.position = "fixed";
+          wrapper.style.inset = "0";
+        }
+
         web.HTMLElement? backdropEl;
         if (backdrop) {
           final el = web.HTMLDivElement()
@@ -59,9 +69,6 @@ web.DocumentFragment Dialog({
           el.style.background = "transparent";
           backdropEl = el;
         }
-
-        final wrapper = web.HTMLDivElement()
-          ..setAttribute("data-solid-dialog-wrapper", "1");
         if (backdropEl != null) wrapper.appendChild(backdropEl);
         wrapper.appendChild(dialog);
 
@@ -77,6 +84,9 @@ web.DocumentFragment Dialog({
             dialog,
             trapFocus: true,
             initialFocus: initialFocus,
+            restoreFocus: restoreFocus,
+            onMountAutoFocus: onOpenAutoFocus,
+            onUnmountAutoFocus: onCloseAutoFocus,
           );
         } else if (initialFocus != null) {
           scheduleMicrotask(() {
@@ -90,10 +100,8 @@ web.DocumentFragment Dialog({
           ariaHideOthers(dialog);
         }
 
-        // If there is no backdrop, returning `dialog` keeps DOM lean, but we
-        // still use `wrapper` as the pointer-blocking element when modal.
-        if (backdropEl == null) return dialog;
-        return wrapper;
+        if (modal || backdropEl != null) return wrapper;
+        return dialog;
       },
     ),
   );
