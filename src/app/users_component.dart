@@ -13,67 +13,119 @@ abstract final class _UsersActions {
   static const clear = 'users-clear';
 }
 
-final class UsersComponent extends Component {
+sealed class _UsersAction {
+  const _UsersAction();
+}
+
+final class _UsersStartLoad extends _UsersAction {
+  const _UsersStartLoad();
+}
+
+final class _UsersLoaded extends _UsersAction {
+  const _UsersLoaded(this.users);
+  final List<User> users;
+}
+
+final class _UsersFailed extends _UsersAction {
+  const _UsersFailed(this.message);
+  final String message;
+}
+
+final class _UsersClear extends _UsersAction {
+  const _UsersClear();
+}
+
+final class _UsersSetEndpoint extends _UsersAction {
+  const _UsersSetEndpoint(this.endpoint);
+  final String endpoint;
+}
+
+final class _UsersState {
+  const _UsersState({
+    required this.endpoint,
+    required this.isLoading,
+    required this.error,
+    required this.users,
+  });
+
+  final String endpoint;
+  final bool isLoading;
+  final String? error;
+  final List<User> users;
+
   static const usersAll = 'https://jsonplaceholder.typicode.com/users';
-  static const usersLimited = 'https://jsonplaceholder.typicode.com/users?_limit=5';
+  static const usersLimited =
+      'https://jsonplaceholder.typicode.com/users?_limit=5';
+
+  factory _UsersState.initial() => const _UsersState(
+        endpoint: usersAll,
+        isLoading: false,
+        error: null,
+        users: [],
+      );
+}
+
+final class UsersComponent extends Component {
+  static const usersAll = _UsersState.usersAll;
+  static const usersLimited = _UsersState.usersLimited;
 
   UsersComponent({
     String title = 'Fetch (async)',
-    String endpoint = usersAll,
-  })  : _title = title,
-        _endpoint = endpoint;
+    String endpoint = _UsersState.usersAll,
+  }) : _title = title {
+    _store.dispatch(_UsersSetEndpoint(endpoint));
+  }
 
   String _title;
-  String _endpoint;
 
   String get title => _title;
-  String get endpoint => _endpoint;
+  String get endpoint => _store.state.endpoint;
 
   void setTitle(String value) => update(() => _title = value);
 
-  void setEndpoint(String value) => update(() => _endpoint = value);
+  void setEndpoint(String value) => _store.dispatch(_UsersSetEndpoint(value));
 
-  bool _isLoading = false;
-  String? _error;
-  List<User> _users = const [];
+  ReducerHandle<_UsersState, _UsersAction> get _store =>
+      useReducer<_UsersState, _UsersAction>(
+        'users',
+        _UsersState.initial(),
+        _reduce,
+      );
 
-  bool get canClear => !_isLoading && _users.isNotEmpty;
+  bool get canClear => !_store.state.isLoading && _store.state.users.isNotEmpty;
 
-  String get endpointLabel => 'Endpoint: $_endpoint';
+  String get endpointLabel => 'Endpoint: ${_store.state.endpoint}';
 
-  String get statusText {
-    if (_isLoading) return 'Loading users…';
-    if (_error != null) return _error!;
-    if (_users.isEmpty) return 'Click “Load users” to fetch JSON from the network.';
-    return 'Loaded ${_users.length} users.';
-  }
+  String get statusText => switch (_store.state) {
+        _UsersState(isLoading: true) => 'Loading users…',
+        _UsersState(error: final e?) => e,
+        _UsersState(users: final u) when u.isEmpty =>
+          'Click “Load users” to fetch JSON from the network.',
+        _UsersState(users: final u) => 'Loaded ${u.length} users.',
+      };
 
   @override
   web.Element render() {
     final requestToken = useRef<int>('requestToken', 0);
     final lastEndpoint = useRef<String?>('lastEndpoint', null);
 
-    useEffect('endpoint', [_endpoint], () {
+    useEffect('endpoint', [_store.state.endpoint], () {
       final previous = lastEndpoint.value;
-      lastEndpoint.value = _endpoint;
-      if (previous != null && previous != _endpoint) {
+      lastEndpoint.value = _store.state.endpoint;
+      if (previous != null && previous != _store.state.endpoint) {
         requestToken.value++;
-        setState(() {
-          _isLoading = false;
-          _error = null;
-          _users = const [];
-        });
+        _store.dispatch(const _UsersClear());
       }
       return null;
     });
 
     final status =
-        _error != null ? dom.danger(statusText) : dom.muted(statusText);
+        _store.state.error != null ? dom.danger(statusText) : dom.muted(statusText);
 
     final row = dom.row(children: [
       dom.actionButton(
-        _isLoading ? 'Loading…' : 'Load users',
-        disabled: _isLoading,
+        _store.state.isLoading ? 'Loading…' : 'Load users',
+        disabled: _store.state.isLoading,
         action: _UsersActions.load,
       ),
       dom.actionButton(
@@ -84,10 +136,12 @@ final class UsersComponent extends Component {
       ),
     ]);
 
+    final users = _store.state.users;
+
     final userRows = useMemo<List<(String, String)>>(
       'userRows',
-      [_users],
-      () => _users.map((u) => (u.name, u.email)).toList(growable: false),
+      [users],
+      () => users.map((u) => (u.name, u.email)).toList(growable: false),
     );
 
     final list = dom.list(
@@ -105,7 +159,7 @@ final class UsersComponent extends Component {
       children: [
         row,
         status,
-        if (_users.isNotEmpty) list,
+        if (users.isNotEmpty) list,
         dom.muted(endpointLabel),
       ],
     );
@@ -124,24 +178,18 @@ final class UsersComponent extends Component {
   void _onClick(web.MouseEvent event) {
     dispatchAction(event, {
       _UsersActions.load: (_) => _loadUsers(),
-      _UsersActions.clear: (_) => setState(() {
-            _error = null;
-            _users = const [];
-          }),
+      _UsersActions.clear: (_) => _store.dispatch(const _UsersClear()),
     });
   }
 
   Future<void> _loadUsers() async {
     final requestToken = useRef<int>('requestToken', 0);
     final token = ++requestToken.value;
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    _store.dispatch(const _UsersStartLoad());
 
     try {
       final response = await http.get(
-        Uri.parse(_endpoint),
+        Uri.parse(_store.state.endpoint),
       );
       if (!isMounted || token != requestToken.value) return;
       if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -157,13 +205,50 @@ final class UsersComponent extends Component {
           .map(User.fromJson)
           .toList(growable: false);
 
-      setState(() => _users = users);
+      _store.dispatch(_UsersLoaded(users));
     } catch (e) {
       if (!isMounted || token != requestToken.value) return;
-      setState(() => _error = 'Failed to load users: $e');
-    } finally {
-      if (!isMounted || token != requestToken.value) return;
-      setState(() => _isLoading = false);
+      _store.dispatch(_UsersFailed('Failed to load users: $e'));
+    }
+  }
+
+  static _UsersState _reduce(_UsersState state, _UsersAction action) {
+    switch (action) {
+      case _UsersSetEndpoint(:final endpoint):
+        return _UsersState(
+          endpoint: endpoint,
+          isLoading: false,
+          error: null,
+          users: const [],
+        );
+      case _UsersStartLoad():
+        return _UsersState(
+          endpoint: state.endpoint,
+          isLoading: true,
+          error: null,
+          users: state.users,
+        );
+      case _UsersLoaded(:final users):
+        return _UsersState(
+          endpoint: state.endpoint,
+          isLoading: false,
+          error: null,
+          users: users,
+        );
+      case _UsersFailed(:final message):
+        return _UsersState(
+          endpoint: state.endpoint,
+          isLoading: false,
+          error: message,
+          users: const [],
+        );
+      case _UsersClear():
+        return _UsersState(
+          endpoint: state.endpoint,
+          isLoading: false,
+          error: null,
+          users: const [],
+        );
     }
   }
 }

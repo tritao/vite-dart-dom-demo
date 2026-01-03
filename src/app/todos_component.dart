@@ -87,9 +87,18 @@ final class TodosComponent extends Component {
       placeholder: 'New todo…',
     );
 
+    final todoRows = useMemo<List<(int, String, bool)>>(
+      'todoRows',
+      [_todos],
+      () => _todos.map((t) => (t.id, t.text, t.done)).toList(growable: false),
+    );
+
     final listChildren = isEmpty
         ? <web.Element>[dom.mutedLi('No todos yet.')]
-        : _todos.map(_todoItem).toList(growable: false);
+        : todoRows.map((row) {
+            final (id, text, done) = row;
+            return _todoItem(Todo(id: id, text: text, done: done));
+          }).toList(growable: false);
 
     return dom.section(
       title: 'Todos',

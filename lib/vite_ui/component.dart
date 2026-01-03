@@ -93,6 +93,7 @@ abstract class Component {
   final Map<String, _EffectState> _effects = <String, _EffectState>{};
   final Map<String, Object> _refs = <String, Object>{};
   final Set<Component> _children = <Component>{};
+  final Map<String, Object> _context = <String, Object>{};
 
   web.Element render();
 
@@ -112,6 +113,28 @@ abstract class Component {
     if (!debugEnabled) return;
     web.console.log('[vite_ui] ${runtimeType}: $message'.toJS);
   }
+
+  void provide<T>(String key, T value) {
+    _context[key] = value as Object;
+  }
+
+  T useContext<T>(String key) {
+    Component? current = this;
+    while (current != null) {
+      final value = current._context[key];
+      if (value != null) return value as T;
+      current = _findParent(current);
+    }
+    throw StateError('Missing context for key "$key"');
+  }
+
+  Component? _findParent(Component child) {
+    // Best-effort: walk from this component down its children; parent tracking
+    // is stored on the child at mount time.
+    return child._parent;
+  }
+
+  Component? _parent;
 
   void useEffect(
     String key,
@@ -236,6 +259,7 @@ abstract class Component {
 
   void mountChild(Component child, web.Element mount) {
     _children.add(child);
+    child._parent = this;
     child.mountInto(mount);
   }
 
@@ -281,6 +305,8 @@ abstract class Component {
       } catch (_) {}
     }
     _children.clear();
+    _context.clear();
+    _parent = null;
 
     for (final state in _effects.values) {
       try {
