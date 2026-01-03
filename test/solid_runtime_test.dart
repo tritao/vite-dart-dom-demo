@@ -251,6 +251,57 @@ void main() {
       dispose();
     });
 
+    test("render effects run before regular effects on updates", () async {
+      late Signal<int> s;
+      late Dispose dispose;
+      final order = <String>[];
+
+      createRoot<void>((d) {
+        dispose = d;
+        s = createSignal<int>(0);
+        createRenderEffect(() => order.add("render:${s.value}"));
+        createEffect(() => order.add("effect:${s.value}"));
+      });
+
+      // Initial runs occur in creation order.
+      expect(order, ["render:0", "effect:0"]);
+
+      order.clear();
+      s.value = 1;
+      await pump();
+      flushSync();
+
+      // On updates, render effects flush before effects.
+      expect(order, ["render:1", "effect:1"]);
+
+      dispose();
+    });
+
+    test("render effects flush before effects even in batch", () async {
+      late Signal<int> s;
+      late Dispose dispose;
+      final order = <String>[];
+
+      createRoot<void>((d) {
+        dispose = d;
+        s = createSignal<int>(0);
+        createRenderEffect(() => order.add("render:${s.value}"));
+        createEffect(() => order.add("effect:${s.value}"));
+      });
+
+      order.clear();
+      batch(() {
+        s.value = 1;
+        s.value = 2;
+      });
+      await pump();
+
+      // Only final value should be observed, and render should precede effect.
+      expect(order, ["render:2", "effect:2"]);
+
+      dispose();
+    });
+
     test("resource: starts loading, resolves value, notifies dependents",
         () async {
       final states = <String>[];

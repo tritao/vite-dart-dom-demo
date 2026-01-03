@@ -125,5 +125,21 @@ Effect createEffect(void Function() fn) {
     } catch (e, st) {
       _reportError(owner, e, st);
     }
-  }, owner, isMemo: false));
+  }, owner, isMemo: false, phase: _ComputationPhase.effect));
+}
+
+/// Render effects run in a higher-priority synchronous phase.
+///
+/// This is intended for DOM writes so they happen before regular effects.
+Effect createRenderEffect(void Function() fn) {
+  final owner = _currentOwner;
+  if (owner == null)
+    throw StateError("createRenderEffect() called with no active owner");
+  return Effect._(Computation._(() {
+    try {
+      fn();
+    } catch (e, st) {
+      _reportError(owner, e, st);
+    }
+  }, owner, isMemo: false, phase: _ComputationPhase.render));
 }

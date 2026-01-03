@@ -69,6 +69,7 @@ Computation? _currentComputation;
 int _batchDepth = 0;
 bool _flushScheduled = false;
 final Set<Computation> _queue = <Computation>{};
+final Set<Computation> _renderQueue = <Computation>{};
 ErrorHandler? _globalErrorHandler;
 
 void setGlobalErrorHandler(ErrorHandler handler) {
@@ -163,9 +164,16 @@ void batch(void Function() fn) {
 
 void _enqueue(Computation computation) {
   if (computation._disposed) return;
-  if (!computation._queued) {
-    computation._queued = true;
-    _queue.add(computation);
+  if (computation._phase == _ComputationPhase.render) {
+    if (!computation._queued) {
+      computation._queued = true;
+      _renderQueue.add(computation);
+    }
+  } else {
+    if (!computation._queued) {
+      computation._queued = true;
+      _queue.add(computation);
+    }
   }
 
   if (_batchDepth > 0) return;
@@ -178,8 +186,21 @@ void _enqueue(Computation computation) {
 }
 
 void _flushSync() {
-  if (_queue.isEmpty) return;
-  while (_queue.isNotEmpty) {
+  while (_renderQueue.isNotEmpty || _queue.isNotEmpty) {
+    if (_renderQueue.isNotEmpty) {
+      final batch = _renderQueue.toList(growable: false);
+      _renderQueue.clear();
+      for (final computation in batch) {
+        computation._queued = false;
+        try {
+          computation._run();
+        } catch (e, st) {
+          _reportError(computation._owner, e, st);
+        }
+      }
+      continue;
+    }
+
     final batch = _queue.toList(growable: false);
     _queue.clear();
     for (final computation in batch) {
@@ -225,7 +246,9 @@ final class Computation implements Disposable {
     this._owner, {
     required this.isMemo,
     bool autoRun = true,
+    _ComputationPhase phase = _ComputationPhase.effect,
   }) {
+    _phase = phase;
     _owner._own(this);
     if (autoRun) _run();
   }
@@ -233,6 +256,7 @@ final class Computation implements Disposable {
   final Owner _owner;
   final bool isMemo;
   void Function() _fn;
+  late final _ComputationPhase _phase;
 
   final Set<Dependency> _deps = <Dependency>{};
   final List<Cleanup> _cleanups = <Cleanup>[];
@@ -300,3 +324,5 @@ final class Computation implements Disposable {
     _cleanup();
   }
 }
+
+enum _ComputationPhase { render, effect }
