@@ -20,6 +20,11 @@ final class _EffectState {
   bool pending;
 }
 
+final class Ref<T> {
+  Ref(this.value);
+  T value;
+}
+
 final class RenderScheduler {
   RenderScheduler._();
 
@@ -55,6 +60,8 @@ abstract class Component {
   bool _mounted = false;
   final List<void Function()> _cleanups = <void Function()>[];
   final Map<String, _EffectState> _effects = <String, _EffectState>{};
+  final Map<String, Object> _refs = <String, Object>{};
+  final Set<Component> _children = <Component>{};
 
   web.Element render();
 
@@ -83,6 +90,14 @@ abstract class Component {
     if (_depsEqual(existing.deps, deps)) return;
     existing.deps = deps;
     existing.pending = true;
+  }
+
+  Ref<T> useRef<T>(String key, T initialValue) {
+    final existing = _refs[key];
+    if (existing is Ref<T>) return existing;
+    final ref = Ref<T>(initialValue);
+    _refs[key] = ref;
+    return ref;
   }
 
   bool _depsEqual(List<Object?> a, List<Object?> b) {
@@ -142,6 +157,17 @@ abstract class Component {
     _runEffects();
   }
 
+  void mountChild(Component child, web.Element mount) {
+    _children.add(child);
+    child.mountInto(mount);
+  }
+
+  void unmountChild(Component child) {
+    if (_children.remove(child)) {
+      child.dispose();
+    }
+  }
+
   void setState(void Function() fn) {
     fn();
     if (!_mounted) return;
@@ -170,12 +196,21 @@ abstract class Component {
     try {
       onDispose();
     } catch (_) {}
+
+    for (final child in _children.toList(growable: false)) {
+      try {
+        child.dispose();
+      } catch (_) {}
+    }
+    _children.clear();
+
     for (final state in _effects.values) {
       try {
         state.cleanup?.call();
       } catch (_) {}
     }
     _effects.clear();
+    _refs.clear();
     for (final cleanup in _cleanups.reversed) {
       try {
         cleanup();

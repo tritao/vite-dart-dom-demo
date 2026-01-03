@@ -34,9 +34,9 @@ final class AppComponent extends Component {
 
   @override
   void onMount() {
-    counter.mountInto(root.querySelector('#counter-root')!);
-    todos.mountInto(root.querySelector('#todos-root')!);
-    users.mountInto(root.querySelector('#users-root')!);
+    mountChild(counter, root.querySelector('#counter-root')!);
+    mountChild(todos, root.querySelector('#todos-root')!);
+    mountChild(users, root.querySelector('#users-root')!);
     listen(root.onClick, _onClick);
   }
 

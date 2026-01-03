@@ -28,20 +28,20 @@ final class UsersComponent extends Component {
 
   void setEndpoint(String value) => update(() => _endpoint = value);
 
-  int _requestToken = 0;
-  String? _lastEndpoint;
-
   bool _isLoading = false;
   String? _error;
   List<Map<String, Object?>> _users = const [];
 
   @override
   web.Element render() {
+    final requestToken = useRef<int>('requestToken', 0);
+    final lastEndpoint = useRef<String?>('lastEndpoint', null);
+
     useEffect('endpoint', [_endpoint], () {
-      final previous = _lastEndpoint;
-      _lastEndpoint = _endpoint;
+      final previous = lastEndpoint.value;
+      lastEndpoint.value = _endpoint;
       if (previous != null && previous != _endpoint) {
-        _requestToken++;
+        requestToken.value++;
         setState(() {
           _isLoading = false;
           _error = null;
@@ -106,7 +106,7 @@ final class UsersComponent extends Component {
 
   @override
   void onDispose() {
-    _requestToken++;
+    useRef<int>('requestToken', 0).value++;
   }
 
   void _onClick(web.MouseEvent event) {
@@ -138,7 +138,8 @@ final class UsersComponent extends Component {
   }
 
   Future<void> _loadUsers() async {
-    final token = ++_requestToken;
+    final requestToken = useRef<int>('requestToken', 0);
+    final token = ++requestToken.value;
     setState(() {
       _isLoading = true;
       _error = null;
@@ -148,7 +149,7 @@ final class UsersComponent extends Component {
       final response = await http.get(
         Uri.parse(_endpoint),
       );
-      if (!isMounted || token != _requestToken) return;
+      if (!isMounted || token != requestToken.value) return;
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw Exception('HTTP ${response.statusCode}');
       }
@@ -163,10 +164,10 @@ final class UsersComponent extends Component {
 
       setState(() => _users = users);
     } catch (e) {
-      if (!isMounted || token != _requestToken) return;
+      if (!isMounted || token != requestToken.value) return;
       setState(() => _error = 'Failed to load users: $e');
     } finally {
-      if (!isMounted || token != _requestToken) return;
+      if (!isMounted || token != requestToken.value) return;
       setState(() => _isLoading = false);
     }
   }
