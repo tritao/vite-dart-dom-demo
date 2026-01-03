@@ -9,4 +9,3 @@ final class AppConfig {
   final String usersAll;
   final String usersLimited;
 }
-

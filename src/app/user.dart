@@ -12,4 +12,3 @@ final class User {
         email: (json['email'] as String?) ?? '',
       );
 }
-

@@ -1,13 +1,14 @@
 import 'package:web/web.dart' as web;
 
-import './todo.dart';
-import './todos_state.dart';
 import 'package:dart_web_test/dom_ui/action_dispatch.dart';
 import 'package:dart_web_test/dom_ui/component.dart';
 import 'package:dart_web_test/dom_ui/dom.dart' as dom;
 import 'package:dart_web_test/dom_ui/events.dart' as events;
 
-abstract final class _TodosDomActions {
+import './todo.dart';
+import './todos_state.dart';
+
+abstract final class TodosDomActions {
   static const add = 'todos-add';
   static const clearDone = 'todos-clear-done';
   static const toggle = 'todos-toggle';
@@ -61,11 +62,11 @@ final class TodosComponent extends Component {
 
   web.Element _buildControls(web.Element input) => dom.row(children: [
         input,
-        dom.actionButton('Add', action: _TodosDomActions.add),
+        dom.actionButton('Add', action: TodosDomActions.add),
         dom.secondaryButton(
           'Clear done',
           disabled: !canClearDone,
-          action: _TodosDomActions.clearDone,
+          action: TodosDomActions.clearDone,
         ),
       ]);
 
@@ -105,9 +106,9 @@ final class TodosComponent extends Component {
 
   void _onClick(web.MouseEvent event) {
     dispatchAction(event, {
-      _TodosDomActions.add: (_) => _addFromInput(),
-      _TodosDomActions.clearDone: (_) => _store.dispatch(const TodosClearDone()),
-      _TodosDomActions.remove: (el) {
+      TodosDomActions.add: (_) => _addFromInput(),
+      TodosDomActions.clearDone: (_) => _store.dispatch(const TodosClearDone()),
+      TodosDomActions.remove: (el) {
         if (el == null) return;
         final id = events.actionIdFromElement(el);
         if (id == null) return;
@@ -121,7 +122,7 @@ final class TodosComponent extends Component {
     if (targetEl == null) return;
 
     final actionEl =
-        targetEl.closest('[data-action="${_TodosDomActions.toggle}"]');
+        targetEl.closest('[data-action="${TodosDomActions.toggle}"]');
     if (actionEl == null) return;
 
     final id = events.actionIdFromElement(actionEl);
@@ -174,21 +175,23 @@ final class TodosComponent extends Component {
     final checkbox = dom.actionCheckbox(
       checked: todo.done,
       className: 'checkbox',
-      action: _TodosDomActions.toggle,
+      action: TodosDomActions.toggle,
       dataId: todo.id,
     );
 
-    final label =
-        dom.span(todo.text, className: todo.done ? 'todoText done' : 'todoText');
+    final label = dom.span(todo.text,
+        className: todo.done ? 'todoText done' : 'todoText');
 
     final remove = dom.dangerButton(
       'Delete',
-      action: _TodosDomActions.remove,
+      action: TodosDomActions.remove,
       dataId: todo.id,
     );
 
-    item..append(checkbox)..append(label)..append(remove);
+    item
+      ..append(checkbox)
+      ..append(label)
+      ..append(remove);
     return item;
   }
-
 }

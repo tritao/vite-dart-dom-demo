@@ -37,7 +37,14 @@ web.HTMLDivElement row({
   String? className,
   List<web.Element>? children,
 }) =>
-    div(className: className == null ? 'row' : 'row $className', children: children);
+    div(
+        className: className == null ? 'row' : 'row $className',
+        children: children);
+
+web.HTMLDivElement buttonRow({
+  List<web.Element> children = const [],
+}) =>
+    row(children: children);
 
 web.HTMLParagraphElement p(
   String text, {
@@ -47,7 +54,8 @@ web.HTMLParagraphElement p(
 
 web.HTMLParagraphElement muted(String text) => p(text, className: 'muted');
 
-web.HTMLParagraphElement danger(String text) => p(text, className: 'muted error');
+web.HTMLParagraphElement danger(String text) =>
+    p(text, className: 'muted error');
 
 web.HTMLLIElement mutedLi(String text) => li(className: 'muted', text: text);
 
@@ -152,10 +160,7 @@ web.HTMLButtonElement actionButton(
   int? dataId,
 }) =>
     button(label,
-        kind: kind,
-        disabled: disabled,
-        action: action,
-        dataId: dataId);
+        kind: kind, disabled: disabled, action: action, dataId: dataId);
 
 web.HTMLButtonElement primaryButton(
   String label, {
@@ -163,7 +168,8 @@ web.HTMLButtonElement primaryButton(
   required String action,
   int? dataId,
 }) =>
-    actionButton(label, kind: 'primary', disabled: disabled, action: action, dataId: dataId);
+    actionButton(label,
+        kind: 'primary', disabled: disabled, action: action, dataId: dataId);
 
 web.HTMLButtonElement secondaryButton(
   String label, {
@@ -171,7 +177,8 @@ web.HTMLButtonElement secondaryButton(
   required String action,
   int? dataId,
 }) =>
-    actionButton(label, kind: 'secondary', disabled: disabled, action: action, dataId: dataId);
+    actionButton(label,
+        kind: 'secondary', disabled: disabled, action: action, dataId: dataId);
 
 web.HTMLButtonElement dangerButton(
   String label, {
@@ -179,7 +186,8 @@ web.HTMLButtonElement dangerButton(
   required String action,
   int? dataId,
 }) =>
-    actionButton(label, kind: 'danger', disabled: disabled, action: action, dataId: dataId);
+    actionButton(label,
+        kind: 'danger', disabled: disabled, action: action, dataId: dataId);
 
 web.HTMLInputElement actionCheckbox({
   bool checked = false,
@@ -223,4 +231,16 @@ web.Element section({
     cardEl.append(child);
   }
   return cardEl;
+}
+
+web.Element header({
+  required String title,
+  required String subtitle,
+  List<web.Element> actions = const [],
+}) {
+  return div(className: 'header', children: [
+    h1(title),
+    p(subtitle, className: 'muted'),
+    if (actions.isNotEmpty) buttonRow(children: actions),
+  ]);
 }

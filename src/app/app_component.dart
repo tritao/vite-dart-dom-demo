@@ -9,6 +9,7 @@ import './counter_component.dart';
 import './route.dart' as route;
 import './todos_component.dart';
 import './users_component.dart';
+import './users_state.dart';
 
 abstract final class AppDomActions {
   static const toggleUsersEndpoint = 'app-toggle-users-endpoint';
@@ -27,7 +28,7 @@ final class AppComponent extends Component {
   final UsersComponent Function() usersFactory;
 
   UsersComponent? _users;
-  String _usersEndpoint = UsersComponent.usersAll;
+  String _usersEndpoint = UsersState.usersAll;
   bool _showUsers = false;
 
   @override
@@ -35,8 +36,8 @@ final class AppComponent extends Component {
     provide<AppConfig>(
       AppConfig.contextKey,
       const AppConfig(
-        usersAll: UsersComponent.usersAll,
-        usersLimited: UsersComponent.usersLimited,
+        usersAll: UsersState.usersAll,
+        usersLimited: UsersState.usersLimited,
       ),
     );
 
@@ -110,13 +111,11 @@ final class AppComponent extends Component {
   @override
   web.Element render() {
     return dom.div(id: 'app-root', className: 'container', children: [
-      dom.div(className: 'header', children: [
-        dom.h1('Dart + Vite (DOM demo)'),
-        dom.p(
-          'Counter + Todos (localStorage) + Fetch (async) to validate the integration.',
-          className: 'muted',
-        ),
-        dom.row(children: [
+      dom.header(
+        title: 'Dart + Vite (DOM demo)',
+        subtitle:
+            'Counter + Todos (localStorage) + Fetch (async) to validate the integration.',
+        actions: [
           dom.secondaryButton(
             'Toggle users endpoint',
             action: AppDomActions.toggleUsersEndpoint,
@@ -125,8 +124,8 @@ final class AppComponent extends Component {
             _showUsers ? 'Hide users' : 'Show users',
             action: AppDomActions.toggleUsersVisible,
           ),
-        ]),
-      ]),
+        ],
+      ),
       dom.div(id: 'counter-root'),
       dom.div(className: 'spacer'),
       dom.div(id: 'todos-root'),

@@ -54,4 +54,3 @@ void saveTodosToLocalStorage({
   if (storage == null) return;
   storage.setItem(key, jsonEncode(todos.map((t) => t.toJson()).toList()));
 }
-

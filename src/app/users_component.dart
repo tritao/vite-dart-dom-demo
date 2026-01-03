@@ -3,26 +3,31 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:web/web.dart' as web;
 
-import './user.dart';
-import './users_state.dart';
 import 'package:dart_web_test/dom_ui/action_dispatch.dart';
 import 'package:dart_web_test/dom_ui/component.dart';
 import 'package:dart_web_test/dom_ui/dom.dart' as dom;
 
-abstract final class _UsersDomActions {
+import './config.dart';
+import './user.dart';
+import './users_state.dart';
+
+abstract final class UsersDomActions {
   static const load = 'users-load';
   static const clear = 'users-clear';
 }
 
 final class UsersComponent extends Component {
-  static const usersAll = UsersState.usersAll;
-  static const usersLimited = UsersState.usersLimited;
+  static const _defaultEndpointSentinel = '';
 
   UsersComponent({
     String title = 'Fetch (async)',
-    String endpoint = UsersState.usersAll,
+    String? endpoint,
   }) : _title = title {
-    _store.dispatch(UsersSetEndpoint(endpoint));
+    if (endpoint != null) {
+      _store.dispatch(UsersSetEndpoint(endpoint));
+    } else {
+      _store.dispatch(const UsersSetEndpoint(_defaultEndpointSentinel));
+    }
   }
 
   String _title;
@@ -52,6 +57,16 @@ final class UsersComponent extends Component {
           'Click “Load users” to fetch JSON from the network.',
         UsersState(users: final u) => 'Loaded ${u.length} users.',
       };
+
+  @override
+  void onMount() {
+    if (_store.state.endpoint == _defaultEndpointSentinel) {
+      final config = useContext<AppConfig>(AppConfig.contextKey);
+      _store.dispatch(UsersSetEndpoint(config.usersAll));
+    }
+    listen(root.onClick, _onClick);
+    super.onMount();
+  }
 
   @override
   web.Element render() {
@@ -92,12 +107,12 @@ final class UsersComponent extends Component {
         dom.actionButton(
           _store.state.isLoading ? 'Loading…' : 'Load users',
           disabled: _store.state.isLoading,
-          action: _UsersDomActions.load,
+          action: UsersDomActions.load,
         ),
         dom.secondaryButton(
           'Clear',
           disabled: !canClear,
-          action: _UsersDomActions.clear,
+          action: UsersDomActions.clear,
         ),
       ]);
 
@@ -120,19 +135,14 @@ final class UsersComponent extends Component {
   }
 
   @override
-  void onMount() {
-    listen(root.onClick, _onClick);
-  }
-
-  @override
   void onDispose() {
     useRef<int>('requestToken', 0).value++;
   }
 
   void _onClick(web.MouseEvent event) {
     dispatchAction(event, {
-      _UsersDomActions.load: (_) => _loadUsers(),
-      _UsersDomActions.clear: (_) => _store.dispatch(const UsersClear()),
+      UsersDomActions.load: (_) => _loadUsers(),
+      UsersDomActions.clear: (_) => _store.dispatch(const UsersClear()),
     });
   }
 
