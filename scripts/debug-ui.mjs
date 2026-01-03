@@ -1383,6 +1383,171 @@ async function inspectUrl(
           details: { error: String(e) },
         });
       }
+    } else if (scenario === "solid-select") {
+      let step = "init";
+      try {
+        const trigger = page.locator("#select-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-select",
+            ok: false,
+            details: { reason: "missing #select-trigger" },
+          });
+        } else {
+          const afterButton = page.locator("#select-after");
+
+          step = "open";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait listbox open";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+
+          const afterOpen = await page.evaluate(() => ({
+            expanded: document
+              .querySelector("#select-trigger")
+              ?.getAttribute("aria-expanded") ?? null,
+            activeId: document.activeElement?.id ?? null,
+          }));
+
+          // Arrow navigation + skip disabled (Vue).
+          step = "keydown down 1";
+          await page.keyboard.press("ArrowDown");
+          await page.waitForTimeout(30);
+          const afterDown1 = await page.evaluate(() => document.activeElement?.id ?? null);
+          step = "keydown down 2";
+          await page.keyboard.press("ArrowDown");
+          await page.waitForTimeout(30);
+          const afterDown2 = await page.evaluate(() => document.activeElement?.id ?? null);
+          step = "keydown down 3";
+          await page.keyboard.press("ArrowDown");
+          await page.waitForTimeout(30);
+          const afterDown3 = await page.evaluate(() => document.activeElement?.id ?? null);
+
+          step = "select enter";
+          await page.keyboard.press("Enter");
+          step = "wait listbox closed after select";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+          const afterSelect = await page.evaluate(() => ({
+            status: document.querySelector("#select-status")?.textContent ?? null,
+            triggerText: document.querySelector("#select-trigger")?.textContent ?? null,
+            activeId: document.activeElement?.id ?? null,
+          }));
+
+          // Escape closes.
+          step = "open for escape";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait listbox open for escape";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") != null,
+            { timeout: timeoutMs },
+          );
+          step = "press escape";
+          await page.keyboard.press("Escape");
+          step = "wait listbox closed by escape";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+          const afterEscape = await page.evaluate(() => ({
+            status: document.querySelector("#select-status")?.textContent ?? null,
+            activeId: document.activeElement?.id ?? null,
+          }));
+
+          // Tab closes and allows focus to move to next element.
+          step = "open for tab";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait listbox open for tab";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") != null,
+            { timeout: timeoutMs },
+          );
+          step = "press tab";
+          await page.keyboard.press("Tab");
+          step = "wait listbox closed by tab";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") == null,
+            { timeout: timeoutMs },
+          );
+          step = "wait focus after tab";
+          await page.waitForFunction(
+            () => document.activeElement?.id === "select-after",
+            { timeout: timeoutMs },
+          );
+          const afterTab = await page.evaluate(() => ({
+            status: document.querySelector("#select-status")?.textContent ?? null,
+            activeId: document.activeElement?.id ?? null,
+          }));
+
+          // Outside click dismiss.
+          step = "open for outside";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait listbox open for outside";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") != null,
+            { timeout: timeoutMs },
+          );
+          step = "click body outside";
+          await page.click("body", { position: { x: 5, y: 5 } });
+          step = "wait listbox closed by outside";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+          const afterOutside = await page.evaluate(() => ({
+            status: document.querySelector("#select-status")?.textContent ?? null,
+            expanded: document
+              .querySelector("#select-trigger")
+              ?.getAttribute("aria-expanded") ?? null,
+          }));
+
+          const ok =
+            afterOpen.expanded === "true" &&
+            typeof afterOpen.activeId === "string" &&
+            afterOpen.activeId === "select-listbox-opt-0" &&
+            afterDown1 === "select-listbox-opt-1" &&
+            afterDown2 === "select-listbox-opt-2" &&
+            afterDown3 === "select-listbox-opt-4" &&
+            (afterSelect.status ?? "").includes("Last: select") &&
+            (afterSelect.triggerText ?? "").includes("Dart") &&
+            afterSelect.activeId === "select-trigger" &&
+            (afterEscape.status ?? "").includes("Last: escape") &&
+            afterEscape.activeId === "select-trigger" &&
+            (afterTab.status ?? "").includes("Last: tab") &&
+            afterTab.activeId === "select-after" &&
+            (afterOutside.status ?? "").includes("Last: outside") &&
+            afterOutside.expanded === "false";
+
+          interactionResults.push({
+            name: "solid-select",
+            ok,
+            details: {
+              afterOpen,
+              afterDown1,
+              afterDown2,
+              afterDown3,
+              afterSelect,
+              afterEscape,
+              afterTab,
+              afterOutside,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-select",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
     } else if (scenario === "solid-toast") {
       try {
         const trigger = page.locator("#toast-trigger");

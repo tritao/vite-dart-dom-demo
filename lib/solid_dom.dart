@@ -8,3 +8,4 @@ export "solid_dom/presence.dart";
 export "solid_dom/solid_dom.dart";
 export "solid_dom/toast.dart";
 export "solid_dom/tooltip.dart";
+export "solid_dom/select.dart";
