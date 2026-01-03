@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.dart_tool/
+.packages
+build/
+.cache/
+.dart-sdk/
+.env.local
+dartsdk-*-release.zip

@@ -1,0 +1,22 @@
+{
+  "name": "dart-web-test",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "provision:dart": "bash scripts/provision-dart.sh",
+    "dart:get": "node scripts/dart-pub-get.mjs",
+    "predev": "npm run dart:get",
+    "dev": "vite",
+    "prebuild": "npm run dart:get",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.0",
+    "vite-plugin-dart": "^1.0.3"
+  }
+}
