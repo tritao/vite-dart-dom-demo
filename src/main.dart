@@ -4,6 +4,7 @@ import './app/counter_component.dart';
 import './app/todos_component.dart';
 import './app/users_component.dart';
 import './ui/component.dart';
+import './ui/action_dispatch.dart';
 import './ui/dom.dart' as dom;
 import './ui/events.dart' as events;
 
@@ -42,13 +43,13 @@ final class AppComponent extends Component {
   }
 
   void _onClick(web.MouseEvent event) {
-    final action = events.actionNameFromEvent(event);
-    if (action != _AppActions.toggleUsersEndpoint) return;
-
-    const full = 'https://jsonplaceholder.typicode.com/users';
-    const limited = 'https://jsonplaceholder.typicode.com/users?_limit=5';
-
-    users.setEndpoint(users.endpoint == full ? limited : full);
+    dispatchAction(event, {
+      _AppActions.toggleUsersEndpoint: (_) {
+        const full = 'https://jsonplaceholder.typicode.com/users';
+        const limited = 'https://jsonplaceholder.typicode.com/users?_limit=5';
+        users.setEndpoint(users.endpoint == full ? limited : full);
+      }
+    });
   }
 
   @override
@@ -60,7 +61,7 @@ final class AppComponent extends Component {
           'Counter + Todos (localStorage) + Fetch (async) to validate the integration.',
           className: 'muted',
         ),
-        dom.div(className: 'row', children: [
+        dom.row(children: [
           dom.actionButton(
             'Toggle users endpoint',
             kind: 'secondary',

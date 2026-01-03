@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:web/web.dart' as web;
 
 import '../ui/component.dart';
+import '../ui/action_dispatch.dart';
 import '../ui/dom.dart' as dom;
 import '../ui/events.dart' as events;
 
@@ -66,19 +67,19 @@ final class UsersComponent extends Component {
     final status = dom.p('', className: _error != null ? 'muted error' : 'muted')
       ..textContent = statusText;
 
-    final row = dom.div(className: 'row');
-    row
-      ..append(dom.actionButton(
+    final row = dom.row(children: [
+      dom.actionButton(
         _isLoading ? 'Loading…' : 'Load users',
         disabled: _isLoading,
         action: _UsersActions.load,
-      ))
-      ..append(dom.actionButton(
+      ),
+      dom.actionButton(
         'Clear',
         kind: 'secondary',
         disabled: !canClear,
         action: _UsersActions.clear,
-      ));
+      ),
+    ]);
 
     final list = dom.ul(className: 'list');
     for (final user in _users) {
@@ -93,12 +94,15 @@ final class UsersComponent extends Component {
       list.append(li);
     }
 
-    return dom.card(title: _title, children: [
-      row,
-      status,
-      if (_users.isNotEmpty) list,
-      dom.p(endpointLabel, className: 'muted'),
-    ]);
+    return dom.section(
+      title: _title,
+      children: [
+        row,
+        status,
+        if (_users.isNotEmpty) list,
+        dom.p(endpointLabel, className: 'muted'),
+      ],
+    );
   }
 
   @override
@@ -112,18 +116,13 @@ final class UsersComponent extends Component {
   }
 
   void _onClick(web.MouseEvent event) {
-    final action = events.actionNameFromEvent(event);
-    if (action == null) return;
-
-    switch (action) {
-      case _UsersActions.load:
-        _loadUsers();
-      case _UsersActions.clear:
-        setState(() {
-          _error = null;
-          _users = const [];
-        });
-    }
+    dispatchAction(event, {
+      _UsersActions.load: (_) => _loadUsers(),
+      _UsersActions.clear: (_) => setState(() {
+            _error = null;
+            _users = const [];
+          }),
+    });
   }
 
   Future<void> _loadUsers() async {

@@ -1,8 +1,8 @@
 import 'package:web/web.dart' as web;
 
 import '../ui/component.dart';
+import '../ui/action_dispatch.dart';
 import '../ui/dom.dart' as dom;
-import '../ui/events.dart' as events;
 
 abstract final class _CounterActions {
   static const dec = 'counter-dec';
@@ -17,20 +17,19 @@ final class CounterComponent extends Component {
 
   @override
   web.Element render() {
-    final row = dom.div(className: 'row');
-    row
-      ..append(dom.actionButton('−1', action: _CounterActions.dec))
-      ..append(dom.actionButton('+1', action: _CounterActions.inc))
-      ..append(
-        dom.actionButton('Reset',
-            kind: 'secondary', action: _CounterActions.reset),
-      );
-
-    return dom.card(title: 'Counter', children: [
-      dom.p('$counter', className: 'big'),
-      row,
-      dom.p('Exercises state updates and re-rendering.', className: 'muted'),
-    ]);
+    return dom.section(
+      title: 'Counter',
+      subtitle: 'Exercises state updates and re-rendering.',
+      children: [
+        dom.p('$counter', className: 'big'),
+        dom.row(children: [
+          dom.actionButton('−1', action: _CounterActions.dec),
+          dom.actionButton('+1', action: _CounterActions.inc),
+          dom.actionButton('Reset',
+              kind: 'secondary', action: _CounterActions.reset),
+        ]),
+      ],
+    );
   }
 
   @override
@@ -39,16 +38,10 @@ final class CounterComponent extends Component {
   }
 
   void _onClick(web.MouseEvent event) {
-    final action = events.actionNameFromEvent(event);
-    if (action == null) return;
-
-    switch (action) {
-      case _CounterActions.dec:
-        setState(() => counter--);
-      case _CounterActions.inc:
-        setState(() => counter++);
-      case _CounterActions.reset:
-        setState(() => counter = 0);
-    }
+    dispatchAction(event, {
+      _CounterActions.dec: (_) => setState(() => counter--),
+      _CounterActions.inc: (_) => setState(() => counter++),
+      _CounterActions.reset: (_) => setState(() => counter = 0),
+    });
   }
 }

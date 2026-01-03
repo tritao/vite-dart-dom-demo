@@ -33,6 +33,12 @@ web.HTMLDivElement div({
     _apply(web.HTMLDivElement(),
         id: id, className: className, attrs: attrs, children: children);
 
+web.HTMLDivElement row({
+  String? className,
+  List<web.Element>? children,
+}) =>
+    div(className: className == null ? 'row' : 'row $className', children: children);
+
 web.HTMLParagraphElement p(
   String text, {
   String? className,
@@ -146,6 +152,22 @@ web.Element card({
 }) {
   final cardEl = div(className: 'card');
   cardEl.append(h2(title));
+  for (final child in children) {
+    cardEl.append(child);
+  }
+  return cardEl;
+}
+
+web.Element section({
+  required String title,
+  String? subtitle,
+  required List<web.Element> children,
+}) {
+  final cardEl = div(className: 'card');
+  cardEl.append(h2(title));
+  if (subtitle != null) {
+    cardEl.append(p(subtitle, className: 'muted'));
+  }
   for (final child in children) {
     cardEl.append(child);
   }

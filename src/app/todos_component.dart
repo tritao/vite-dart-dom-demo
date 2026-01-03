@@ -2,6 +2,7 @@ import 'package:web/web.dart' as web;
 
 import './todo.dart';
 import '../ui/component.dart';
+import '../ui/action_dispatch.dart';
 import '../ui/dom.dart' as dom;
 import '../ui/events.dart' as events;
 
@@ -39,31 +40,27 @@ final class TodosComponent extends Component {
       placeholder: 'New todo…',
     );
 
-    final list = dom.ul(className: 'list');
-    if (isEmpty) {
-      list.append(dom.li(className: 'muted', text: 'No todos yet.'));
-    } else {
-      for (final todo in _todos) {
-        list.append(_todoItem(todo));
-      }
-    }
+    final listChildren = isEmpty
+        ? <web.Element>[dom.li(className: 'muted', text: 'No todos yet.')]
+        : _todos.map(_todoItem).toList(growable: false);
 
-    final row = dom.div(className: 'row');
-    row
-      ..append(input)
-      ..append(dom.actionButton('Add', action: _TodosActions.add))
-      ..append(dom.actionButton(
-        'Clear done',
-        kind: 'secondary',
-        disabled: !canClearDone,
-        action: _TodosActions.clearDone,
-      ));
-
-    return dom.card(title: 'Todos', children: [
-      row,
-      dom.p(summaryText, className: 'muted'),
-      list,
-    ]);
+    return dom.section(
+      title: 'Todos',
+      subtitle: summaryText,
+      children: [
+        dom.row(children: [
+          input,
+          dom.actionButton('Add', action: _TodosActions.add),
+          dom.actionButton(
+            'Clear done',
+            kind: 'secondary',
+            disabled: !canClearDone,
+            action: _TodosActions.clearDone,
+          ),
+        ]),
+        dom.ul(className: 'list', children: listChildren),
+      ],
+    );
   }
 
   @override
@@ -88,26 +85,22 @@ final class TodosComponent extends Component {
   }
 
   void _onClick(web.MouseEvent event) {
-    final actionEl = events.closestActionElement(event);
-    final action = actionEl?.getAttribute('data-action');
-    if (action == null) return;
-
-    switch (action) {
-      case _TodosActions.add:
-        _addFromInput();
-      case _TodosActions.clearDone:
-        setState(() {
-          _todos.removeWhere((t) => t.done);
-          _saveTodos();
-        });
-      case _TodosActions.remove:
-        final id = actionEl == null ? null : events.actionIdFromElement(actionEl);
+    dispatchAction(event, {
+      _TodosActions.add: (_) => _addFromInput(),
+      _TodosActions.clearDone: (_) => setState(() {
+            _todos.removeWhere((t) => t.done);
+            _saveTodos();
+          }),
+      _TodosActions.remove: (el) {
+        if (el == null) return;
+        final id = events.actionIdFromElement(el);
         if (id == null) return;
         setState(() {
           _todos.removeWhere((t) => t.id == id);
           _saveTodos();
         });
-    }
+      },
+    });
   }
 
   void _onChange(web.Event event) {
