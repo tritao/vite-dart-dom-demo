@@ -247,7 +247,7 @@ final class _LayerEntry {
   final bool disableOutsidePointerEvents;
 
   String? _prevPointerEvents;
-  String? _prevTopLayerAttr;
+  String? _prevPointerLayerAttr;
   bool _pointerPatched = false;
 }
 
@@ -272,18 +272,18 @@ void _restorePointerPatches() {
     entry._pointerPatched = false;
     final el = entry.element;
     final prev = entry._prevPointerEvents;
-    final prevTop = entry._prevTopLayerAttr;
+    final prevLayerAttr = entry._prevPointerLayerAttr;
     entry._prevPointerEvents = null;
-    entry._prevTopLayerAttr = null;
+    entry._prevPointerLayerAttr = null;
     if (prev == null) {
       if (el is web.HTMLElement) el.style.pointerEvents = "";
     } else {
       if (el is web.HTMLElement) el.style.pointerEvents = prev;
     }
-    if (prevTop == null) {
-      el.removeAttribute("data-solid-top-layer");
+    if (prevLayerAttr == null) {
+      el.removeAttribute("data-solid-pointer-layer");
     } else {
-      el.setAttribute("data-solid-top-layer", prevTop);
+      el.setAttribute("data-solid-pointer-layer", prevLayerAttr);
     }
   }
   final body = web.document.body;
@@ -298,9 +298,9 @@ void _restoreEntryPointerPatch(_LayerEntry entry) {
   entry._pointerPatched = false;
   final el = entry.element;
   final prev = entry._prevPointerEvents;
-  final prevTop = entry._prevTopLayerAttr;
+  final prevLayerAttr = entry._prevPointerLayerAttr;
   entry._prevPointerEvents = null;
-  entry._prevTopLayerAttr = null;
+  entry._prevPointerLayerAttr = null;
   if (el is web.HTMLElement) {
     if (prev == null) {
       el.style.pointerEvents = "";
@@ -308,10 +308,10 @@ void _restoreEntryPointerPatch(_LayerEntry entry) {
       el.style.pointerEvents = prev;
     }
   }
-  if (prevTop == null) {
-    el.removeAttribute("data-solid-top-layer");
+  if (prevLayerAttr == null) {
+    el.removeAttribute("data-solid-pointer-layer");
   } else {
-    el.setAttribute("data-solid-top-layer", prevTop);
+    el.setAttribute("data-solid-pointer-layer", prevLayerAttr);
   }
 }
 
@@ -336,10 +336,10 @@ void _syncPointerBlocking() {
     final el = entry.element;
     if (el is! web.HTMLElement) continue;
     entry._prevPointerEvents = el.style.pointerEvents;
-    entry._prevTopLayerAttr = el.getAttribute("data-solid-top-layer");
+    entry._prevPointerLayerAttr = el.getAttribute("data-solid-pointer-layer");
     entry._pointerPatched = true;
     el.style.pointerEvents = "auto";
-    el.setAttribute("data-solid-top-layer", "1");
+    el.setAttribute("data-solid-pointer-layer", "1");
   }
 }
 
@@ -348,14 +348,16 @@ DismissableLayerHandle dismissableLayer(
   required void Function(String reason) onDismiss,
   bool disableOutsidePointerEvents = false,
   bool dismissOnFocusOutside = true,
+  web.Element? stackElement,
   List<web.Element? Function()>? excludedElements,
   void Function(web.Event event)? onPointerDownOutside,
   void Function(web.Event event)? onFocusOutside,
   void Function(web.Event event)? onInteractOutside,
   bool bypassTopMostLayerCheck = false,
 }) {
+  final stackEl = stackElement ?? layer;
   final entry = _LayerEntry(
-    layer,
+    stackEl,
     onDismiss,
     disableOutsidePointerEvents: disableOutsidePointerEvents,
   );
@@ -383,7 +385,8 @@ DismissableLayerHandle dismissableLayer(
     }
     // Ignore interactions inside nested layers (e.g. submenus / nested dialogs).
     if (isWithinNestedLayer(target)) return true;
-    // Ignore events targeting any top-layer element (e.g. toasts).
+    // Ignore events targeting "top layer" elements (e.g. toasts), but do not
+    // confuse that with pointer-blocking layers (data-solid-pointer-layer).
     if (target.closest("[data-solid-top-layer]") != null) return true;
     return false;
   }

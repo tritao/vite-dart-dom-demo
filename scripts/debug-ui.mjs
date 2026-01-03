@@ -576,6 +576,7 @@ async function inspectUrl(
       }
     } else if (scenario === "solid-dialog") {
       try {
+        let step = "init";
         const trigger = page.locator("#dialog-trigger");
         if (!(await trigger.count())) {
           interactionResults.push({
@@ -591,10 +592,12 @@ async function inspectUrl(
           );
 
           await trigger.first().click({ timeout: timeoutMs });
+          step = "wait dialog open";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") != null,
             { timeout: timeoutMs },
           );
+          step = "wait focus close";
           await page.waitForFunction(
             () => document.activeElement?.id === "dialog-close",
             { timeout: timeoutMs },
@@ -650,10 +653,12 @@ async function inspectUrl(
 
           // Open nested dialog.
           await page.click("#dialog-nested-trigger", { timeout: timeoutMs });
+          step = "wait nested open";
           await page.waitForFunction(
             () => document.querySelector("#dialog-nested-panel") != null,
             { timeout: timeoutMs },
           );
+          step = "wait nested focus";
           await page.waitForFunction(
             () => document.activeElement?.id === "dialog-nested-close",
             { timeout: timeoutMs },
@@ -665,10 +670,12 @@ async function inspectUrl(
 
           // Clicking outside nested (on its backdrop) should close nested only.
           await page.click("#dialog-nested-backdrop", { timeout: timeoutMs });
+          step = "wait nested closed by backdrop";
           await page.waitForFunction(
             () => document.querySelector("#dialog-nested-panel") == null,
             { timeout: timeoutMs },
           );
+          step = "wait parent still open after nested close";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") != null,
             { timeout: timeoutMs },
@@ -676,15 +683,18 @@ async function inspectUrl(
 
           // Escape closes nested only.
           await page.click("#dialog-nested-trigger", { timeout: timeoutMs });
+          step = "wait nested reopen";
           await page.waitForFunction(
             () => document.querySelector("#dialog-nested-panel") != null,
             { timeout: timeoutMs },
           );
           await page.keyboard.press("Escape");
+          step = "wait nested closed by escape";
           await page.waitForFunction(
             () => document.querySelector("#dialog-nested-panel") == null,
             { timeout: timeoutMs },
           );
+          step = "wait parent still open after nested escape";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") != null,
             { timeout: timeoutMs },
@@ -696,6 +706,7 @@ async function inspectUrl(
 
           // Escape closes parent.
           await page.keyboard.press("Escape");
+          step = "wait parent closed by escape";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") == null,
             { timeout: timeoutMs },
@@ -720,11 +731,62 @@ async function inspectUrl(
 
           // Outside click closes.
           await trigger.first().click({ timeout: timeoutMs });
+          step = "wait dialog reopen for outside click";
+          await page.waitForFunction(
+            () => document.querySelector("#dialog-panel") != null,
+            { timeout: timeoutMs },
+          );
+
+          // Pointer-blocking: clicking an outside button should close the dialog
+          // but not activate the button (requires a second click after close).
+          await page.waitForTimeout(60);
+          const statusTextBefore =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+          const outsideBeforeMatch = statusTextBefore.match(/Outside clicks:\s*(\d+)/);
+          const outsideBefore = outsideBeforeMatch
+            ? Number(outsideBeforeMatch[1])
+            : null;
+          const outsideRect = await page.evaluate(() => {
+            const el = document.querySelector("#dialog-outside-action");
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { x: r.left + 6, y: r.top + 6 };
+          });
+          if (outsideRect) {
+            await page.mouse.click(outsideRect.x, outsideRect.y);
+          }
+          step = "wait closed after outside click";
+          await page.waitForFunction(
+            () => document.querySelector("#dialog-panel") == null,
+            { timeout: timeoutMs },
+          );
+          const statusTextAfterFirst =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+          const outsideAfterFirstMatch = statusTextAfterFirst.match(
+            /Outside clicks:\s*(\d+)/,
+          );
+          const outsideAfterFirst = outsideAfterFirstMatch
+            ? Number(outsideAfterFirstMatch[1])
+            : null;
+          await page.click("#dialog-outside-action", { timeout: timeoutMs });
+          const statusTextAfterSecond =
+            (await page.locator("#dialog-status").textContent())?.trim() ?? "";
+          const outsideAfterSecondMatch = statusTextAfterSecond.match(
+            /Outside clicks:\s*(\d+)/,
+          );
+          const outsideAfterSecond = outsideAfterSecondMatch
+            ? Number(outsideAfterSecondMatch[1])
+            : null;
+
+          // Re-open to validate outside dismiss still works.
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait dialog reopen for body click";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") != null,
             { timeout: timeoutMs },
           );
           await page.click("body", { position: { x: 5, y: 5 } });
+          step = "wait dialog closed by body click";
           await page.waitForFunction(
             () => document.querySelector("#dialog-panel") == null,
             { timeout: timeoutMs },
@@ -754,6 +816,9 @@ async function inspectUrl(
             afterClose.appAriaHidden == null &&
             afterClose.appInert === false &&
             focusRestored === true &&
+            outsideBefore != null &&
+            outsideAfterFirst === outsideBefore &&
+            outsideAfterSecond === outsideBefore + 1 &&
             statusText.includes("outside");
 
           interactionResults.push({
@@ -771,6 +836,9 @@ async function inspectUrl(
               overflowAfterNestedClose,
               afterClose,
               focusRestored,
+              outsideBefore,
+              outsideAfterFirst,
+              outsideAfterSecond,
               statusText,
             },
           });
@@ -779,7 +847,7 @@ async function inspectUrl(
         interactionResults.push({
           name: "solid-dialog",
           ok: false,
-          details: { error: String(e) },
+          details: { error: String(e), step },
         });
       }
     } else if (scenario === "solid-roving") {

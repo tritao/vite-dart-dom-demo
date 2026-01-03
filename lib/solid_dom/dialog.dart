@@ -60,8 +60,15 @@ web.DocumentFragment Dialog({
           backdropEl = el;
         }
 
+        final wrapper = web.HTMLDivElement()
+          ..setAttribute("data-solid-dialog-wrapper", "1");
+        if (backdropEl != null) wrapper.appendChild(backdropEl);
+        wrapper.appendChild(dialog);
+
         dismissableLayer(
           dialog,
+          stackElement: wrapper,
+          disableOutsidePointerEvents: modal,
           dismissOnFocusOutside: false,
           onDismiss: (reason) => close(reason),
         );
@@ -83,11 +90,9 @@ web.DocumentFragment Dialog({
           ariaHideOthers(dialog);
         }
 
+        // If there is no backdrop, returning `dialog` keeps DOM lean, but we
+        // still use `wrapper` as the pointer-blocking element when modal.
         if (backdropEl == null) return dialog;
-        final wrapper = web.HTMLDivElement()
-          ..setAttribute("data-solid-dialog-wrapper", "1");
-        wrapper.appendChild(backdropEl);
-        wrapper.appendChild(dialog);
         return wrapper;
       },
     ),

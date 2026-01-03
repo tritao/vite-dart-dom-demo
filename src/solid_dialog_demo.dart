@@ -11,8 +11,10 @@ void mountSolidDialogDemo(web.Element mount) {
     final open = createSignal(false);
     final nestedOpen = createSignal(false);
     final lastDismiss = createSignal("none");
+    final outsideClicks = createSignal(0);
 
-    root.appendChild(web.HTMLHeadingElement.h1()..textContent = "Solid Dialog Demo");
+    root.appendChild(
+        web.HTMLHeadingElement.h1()..textContent = "Solid Dialog Demo");
 
     final trigger = web.HTMLButtonElement()
       ..id = "dialog-trigger"
@@ -25,8 +27,17 @@ void mountSolidDialogDemo(web.Element mount) {
     final status = web.HTMLParagraphElement()
       ..id = "dialog-status"
       ..className = "muted";
-    status.appendChild(text(() => "Dismiss: ${lastDismiss.value}"));
+    status.appendChild(text(() =>
+        "Dismiss: ${lastDismiss.value} • Outside clicks: ${outsideClicks.value}"));
     root.appendChild(status);
+
+    final outsideAction = web.HTMLButtonElement()
+      ..id = "dialog-outside-action"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Outside action (increments)";
+    on(outsideAction, "click", (_) => outsideClicks.value++);
+    root.appendChild(outsideAction);
 
     final titleId = "dialog-title";
     final descId = "dialog-desc";
