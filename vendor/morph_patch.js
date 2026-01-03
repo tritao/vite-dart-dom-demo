@@ -41,5 +41,11 @@ export function morphPatch(fromNode, toNode) {
       }
       return true;
     },
+    onBeforeElChildrenUpdated(fromEl, toEl) {
+      if (fromEl?.getAttribute?.("data-dom-ui-preserve-children") === "1") {
+        return false;
+      }
+      return true;
+    },
   });
 }

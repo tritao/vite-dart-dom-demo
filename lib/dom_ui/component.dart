@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:web/web.dart' as web;
 
 import './morph_patch.dart';
+import './reactive.dart' as rx;
 import './router.dart' as router;
 
 typedef Cleanup = void Function();
@@ -177,6 +178,28 @@ abstract class Component {
     final ref = Ref<T>(initialValue);
     _refs[key] = ref;
     return ref;
+  }
+
+  rx.Signal<T> useSignal<T>(String key, T initialValue) {
+    final ref = useRef<rx.Signal<T>?>(key, null);
+    ref.value ??= rx.Signal<T>(initialValue);
+    return ref.value!;
+  }
+
+  rx.Computed<T> useComputed<T>(
+    String key,
+    T Function() compute,
+  ) {
+    final ref = useRef<rx.Computed<T>?>(key, null);
+    final existing = ref.value;
+    if (existing == null) {
+      final created = rx.Computed<T>(compute);
+      ref.value = created;
+      addCleanup(created.dispose);
+      return created;
+    }
+    existing.updateCompute(compute);
+    return existing;
   }
 
   T useMemo<T>(

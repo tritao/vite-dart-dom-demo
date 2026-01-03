@@ -48,7 +48,10 @@ web.HTMLDivElement buttonRow({
 
 web.HTMLDivElement spacer() => div(className: 'spacer');
 
-web.HTMLDivElement mountPoint(String id) => div(id: id);
+web.HTMLDivElement mountPoint(String id) => div(
+      id: id,
+      attrs: const {'data-dom-ui-preserve-children': '1'},
+    );
 
 web.HTMLParagraphElement p(
   String text, {
