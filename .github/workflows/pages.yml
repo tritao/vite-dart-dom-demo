@@ -15,6 +15,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ci:
+    name: CI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Provision Dart SDK
+        run: npm run provision:dart
+
+      - name: Build (CI)
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run build
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -45,7 +71,7 @@ jobs:
           path: dist
 
   deploy:
-    needs: build
+    needs: [ci, build]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -53,4 +79,3 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
-

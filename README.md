@@ -13,7 +13,7 @@ Live demo: https://tritao.github.io/vite-dart-dom-demo/
 
 ## Provision Dart (Linux x64)
 
-If you don't have `dart` installed, provision Dart SDK 3.10.7 locally into `.dart-sdk/`:
+If you don't have `dart` installed, provision Dart SDK 3.10.7 locally into `.dart-sdk/` (Linux/macOS):
 
 ```bash
 npm run provision:dart

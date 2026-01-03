@@ -1,7 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-URL_DEFAULT="https://storage.googleapis.com/dart-archive/channels/stable/release/3.10.7/sdk/dartsdk-linux-x64-release.zip"
+CHANNEL_DEFAULT="stable"
+VERSION_DEFAULT="3.10.7"
+
+CHANNEL="${DART_SDK_CHANNEL:-$CHANNEL_DEFAULT}"
+VERSION="${DART_SDK_VERSION:-$VERSION_DEFAULT}"
+
+OS_RAW="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH_RAW="$(uname -m | tr '[:upper:]' '[:lower:]')"
+
+case "$OS_RAW" in
+  linux*) OS="linux" ;;
+  darwin*) OS="macos" ;;
+  *)
+    echo "Error: unsupported OS '$OS_RAW' (expected Linux or Darwin)." >&2
+    exit 1
+    ;;
+esac
+
+case "$ARCH_RAW" in
+  x86_64|amd64) ARCH="x64" ;;
+  arm64|aarch64) ARCH="arm64" ;;
+  *)
+    echo "Error: unsupported arch '$ARCH_RAW' (expected x86_64/arm64)." >&2
+    exit 1
+    ;;
+esac
+
+URL_DEFAULT="https://storage.googleapis.com/dart-archive/channels/$CHANNEL/release/$VERSION/sdk/dartsdk-$OS-$ARCH-release.zip"
 URL="${1:-$URL_DEFAULT}"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -11,7 +38,7 @@ DART_BIN="$SDK_DIR/bin/dart"
 ENV_LOCAL="$ROOT_DIR/.env.local"
 
 CACHE_DIR="$ROOT_DIR/.cache"
-ZIP_PATH="$CACHE_DIR/dartsdk-linux-x64-release.zip"
+ZIP_PATH="$CACHE_DIR/dartsdk-$OS-$ARCH-release.zip"
 
 mkdir -p "$INSTALL_DIR" "$CACHE_DIR"
 
