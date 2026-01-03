@@ -19,15 +19,20 @@ final class ListboxHandle<T, O extends ListboxItem<T>> {
     this.element, {
     required this.activeIndex,
     required this.activeId,
+    required this.activeKey,
+    required this.setActiveKey,
     required this.setActiveIndex,
     required this.selectActive,
     required this.moveActive,
     required this.focusActive,
+    required this.handleKeyDown,
   });
 
   final web.HTMLElement element;
   final Signal<int> activeIndex;
   final String? Function() activeId;
+  final String? Function() activeKey;
+  final void Function(String? key) setActiveKey;
 
   /// Sets active index and updates option tabIndex/scrolling; focuses option if
   /// not in virtual focus mode.
@@ -41,6 +46,14 @@ final class ListboxHandle<T, O extends ListboxItem<T>> {
 
   /// Focuses the active option if not in virtual focus mode.
   final void Function() focusActive;
+
+  /// Handles keyboard navigation when the listbox itself isn't focused
+  /// (e.g., virtual focus listboxes driven by an input).
+  final void Function(
+    web.KeyboardEvent e, {
+    bool allowTypeAhead,
+    bool allowSpaceSelect,
+  }) handleKeyDown;
 }
 
 ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
@@ -116,6 +129,8 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     if (idx < 0 || idx >= opts.length) return null;
     return ids.idForIndex(opts, idx);
   }
+
+  String? activeKey() => activeId();
 
   void scrollElementIntoView(web.HTMLElement container, web.HTMLElement el) {
     try {
@@ -276,9 +291,12 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     });
   }
 
-  void onKeydown(web.Event e) {
+  void handleKeyDown(
+    web.KeyboardEvent e, {
+    bool allowTypeAhead = true,
+    bool allowSpaceSelect = true,
+  }) {
     if (!enableKeyboardNavigation) return;
-    if (e is! web.KeyboardEvent) return;
     if (e.key == "Tab") {
       onTabOut?.call();
       return;
@@ -330,13 +348,17 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
         if (baseKey != null) setActiveKey(del.getKeyPageAbove(baseKey));
         return;
       case "Enter":
+        e.preventDefault();
+        selectActive();
+        return;
       case " ":
+        if (!allowSpaceSelect) return;
         e.preventDefault();
         selectActive();
         return;
     }
 
-    if (!disallowTypeAhead) {
+    if (allowTypeAhead && !disallowTypeAhead) {
       final match = typeSelect.handleKey(
         e,
         currentKeys,
@@ -349,6 +371,11 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
         setActiveKey(match);
       }
     }
+  }
+
+  void onKeydown(web.Event e) {
+    if (e is! web.KeyboardEvent) return;
+    handleKeyDown(e);
   }
 
   on(listbox, "keydown", onKeydown);
@@ -501,9 +528,12 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     listbox,
     activeIndex: activeIndexSig,
     activeId: activeId,
+    activeKey: activeKey,
+    setActiveKey: setActiveKey,
     setActiveIndex: setActiveIndex,
     selectActive: selectActive,
     moveActive: moveActive,
     focusActive: focusActive,
+    handleKeyDown: handleKeyDown,
   );
 }
