@@ -1,10 +1,10 @@
 import "dart:async";
-import "dart:math";
-
 import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
 import "./listbox_core.dart";
+import "./selection/list_keyboard_delegate.dart";
+import "./selection/type_select.dart";
 import "./solid_dom.dart";
 
 typedef ListboxOptionBuilder<T, O extends ListboxItem<T>> = web.HTMLElement
@@ -104,6 +104,10 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
       );
 
   final optionEls = <web.HTMLElement>[];
+  final optionElByKey = <String, web.HTMLElement>{};
+  final indexByKey = <String, int>{};
+  final optionsByKey = <String, O>{};
+  var currentKeys = <String>[];
   var lastSyncedActive = -2;
 
   String? activeId() {
@@ -242,7 +246,22 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     onSelect(opt, idx);
   }
 
-  final typeahead = ListboxTypeahead();
+  final typeSelect = TypeSelect();
+
+  ListKeyboardDelegate delegate() => ListKeyboardDelegate(
+        keys: () => currentKeys,
+        isDisabled: (key) => optionsByKey[key]?.disabled ?? false,
+        getContainer: () => scrollContainer?.call() ?? listbox,
+        getItemElement: (key) => optionElByKey[key],
+        pageSize: pageSize,
+      );
+
+  void setActiveKey(String? key) {
+    if (key == null) return;
+    final idx = indexByKey[key];
+    if (idx == null) return;
+    setActiveIndex(idx);
+  }
 
   if (shouldUseVirtualFocus) {
     // When the focus target is external (e.g. combobox input), callers often
@@ -257,51 +276,9 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     });
   }
 
-  int computePageSize() {
-    try {
-      final fromProp = pageSize?.call();
-      if (fromProp != null && fromProp > 0) return fromProp;
-    } catch (_) {}
-
-    if (optionEls.isEmpty) return 5;
-    final container = scrollContainer?.call() ?? listbox;
-    final idx = activeIndexSig.value;
-    final base =
-        (idx >= 0 && idx < optionEls.length) ? optionEls[idx] : optionEls.first;
-    try {
-      final cH = container.getBoundingClientRect().height;
-      final eH = base.getBoundingClientRect().height;
-      if (cH <= 0 || eH <= 0) return 5;
-      return max(1, (cH / eH).floor() - 1);
-    } catch (_) {
-      return 5;
-    }
-  }
-
-  void moveActiveByPage(int direction) {
-    final opts = currentOptions();
-    if (opts.isEmpty) return;
-    final step = computePageSize();
-    final current = activeIndexSig.value < 0 ? 0 : activeIndexSig.value;
-    var next = current + (direction * step);
-    if (shouldFocusWrap) {
-      next = ((next % opts.length) + opts.length) % opts.length;
-      if (opts[next].disabled) {
-        next = nextEnabledIndex(opts, next, direction >= 0 ? 1 : -1);
-      }
-    } else {
-      next = next.clamp(0, opts.length - 1);
-      if (opts[next].disabled) {
-        next = nextEnabledIndexNoWrap(opts, next, direction >= 0 ? 1 : -1);
-      }
-    }
-    setActiveIndex(next);
-  }
-
   void onKeydown(web.Event e) {
     if (!enableKeyboardNavigation) return;
     if (e is! web.KeyboardEvent) return;
-    final opts = currentOptions();
     if (e.key == "Tab") {
       onTabOut?.call();
       return;
@@ -311,39 +288,46 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
       onEscape?.call();
       return;
     }
-    if (opts.isEmpty) return;
 
-    int? next;
+    if (currentKeys.isEmpty) return;
+
+    final del = delegate();
+    final focusedKey = activeId();
+    final baseKey = focusedKey ?? del.getFirstKey();
     switch (e.key) {
       case "ArrowDown":
-        if (shouldFocusWrap) {
-          next = nextEnabledIndex(opts, activeIndexSig.value, 1);
+        e.preventDefault();
+        final below = baseKey == null ? del.getFirstKey() : del.getKeyBelow(baseKey);
+        if (below == null && shouldFocusWrap) {
+          setActiveKey(del.getFirstKey());
         } else {
-          next = (activeIndexSig.value + 1).clamp(0, opts.length - 1);
-          if (opts[next].disabled) next = nextEnabledIndexNoWrap(opts, next, 1);
+          setActiveKey(below);
         }
-        break;
+        return;
       case "ArrowUp":
-        if (shouldFocusWrap) {
-          next = nextEnabledIndex(opts, activeIndexSig.value, -1);
+        e.preventDefault();
+        final above = baseKey == null ? del.getLastKey() : del.getKeyAbove(baseKey);
+        if (above == null && shouldFocusWrap) {
+          setActiveKey(del.getLastKey());
         } else {
-          next = (activeIndexSig.value - 1).clamp(0, opts.length - 1);
-          if (opts[next].disabled) next = nextEnabledIndexNoWrap(opts, next, -1);
+          setActiveKey(above);
         }
-        break;
+        return;
       case "Home":
-        next = firstEnabledIndex(opts);
-        break;
+        e.preventDefault();
+        setActiveKey(del.getFirstKey());
+        return;
       case "End":
-        next = lastEnabledIndex(opts);
-        break;
+        e.preventDefault();
+        setActiveKey(del.getLastKey());
+        return;
       case "PageDown":
         e.preventDefault();
-        moveActiveByPage(1);
+        if (baseKey != null) setActiveKey(del.getKeyPageBelow(baseKey));
         return;
       case "PageUp":
         e.preventDefault();
-        moveActiveByPage(-1);
+        if (baseKey != null) setActiveKey(del.getKeyPageAbove(baseKey));
         return;
       case "Enter":
       case " ":
@@ -352,23 +336,23 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
         return;
     }
 
-    if (next != null) {
-      e.preventDefault();
-      setActiveIndex(next);
-      return;
-    }
-
     if (!disallowTypeAhead) {
-      final match = typeahead.handleKey(e, opts, startIndex: activeIndexSig.value);
+      final match = typeSelect.handleKey(
+        e,
+        currentKeys,
+        startKey: focusedKey,
+        isDisabled: (k) => optionsByKey[k]?.disabled ?? false,
+        textValueForKey: (k) => optionsByKey[k]?.textValue ?? "",
+      );
       if (match != null) {
         e.preventDefault();
-        setActiveIndex(match);
+        setActiveKey(match);
       }
     }
   }
 
   on(listbox, "keydown", onKeydown);
-  onCleanup(typeahead.dispose);
+  onCleanup(typeSelect.dispose);
 
   web.HTMLElement buildOption(O option, int idx, bool selected, bool active) {
     final el = optionBuilder != null
@@ -379,6 +363,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
 
     el.setAttribute("role", "option");
     el.id = ids.idForOption(option);
+    el.setAttribute("data-key", el.id);
     el.setAttribute("aria-selected", selected ? "true" : "false");
     if (option.disabled) el.setAttribute("aria-disabled", "true");
     if (active) el.setAttribute("data-active", "true");
@@ -428,6 +413,10 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
 
     listbox.textContent = "";
     optionEls.clear();
+    optionElByKey.clear();
+    indexByKey.clear();
+    optionsByKey.clear();
+    currentKeys = <String>[];
     final opts = currentOptions();
     final sel = selected();
 
@@ -475,6 +464,10 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
           final isActive = flatIdx == active;
           final el = buildOption(opt, flatIdx, isSelected, isActive);
           optionEls.add(el);
+          optionElByKey[el.id] = el;
+          indexByKey[el.id] = flatIdx;
+          optionsByKey[el.id] = opt;
+          currentKeys.add(el.id);
           group.appendChild(el);
           flatIdx++;
         }
@@ -489,6 +482,10 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
         final isActive = i == active;
         final el = buildOption(opt, i, isSelected, isActive);
         optionEls.add(el);
+        optionElByKey[el.id] = el;
+        indexByKey[el.id] = i;
+        optionsByKey[el.id] = opt;
+        currentKeys.add(el.id);
         listbox.appendChild(el);
       }
     }

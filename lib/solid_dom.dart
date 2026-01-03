@@ -12,3 +12,8 @@ export "solid_dom/select.dart";
 export "solid_dom/combobox.dart";
 export "solid_dom/listbox_core.dart";
 export "solid_dom/listbox.dart";
+export "solid_dom/selection/types.dart";
+export "solid_dom/selection/selection_manager.dart";
+export "solid_dom/selection/keyboard_delegate.dart";
+export "solid_dom/selection/list_keyboard_delegate.dart";
+export "solid_dom/selection/type_select.dart";
