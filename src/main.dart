@@ -132,14 +132,12 @@ final class AppComponent extends Component {
           className: 'muted',
         ),
         dom.row(children: [
-          dom.actionButton(
+          dom.secondaryButton(
             'Toggle users endpoint',
-            kind: 'secondary',
             action: _AppActions.toggleUsersEndpoint,
           ),
-          dom.actionButton(
+          dom.secondaryButton(
             _showUsers ? 'Hide users' : 'Show users',
-            kind: 'secondary',
             action: _AppActions.toggleUsersVisible,
           ),
         ]),

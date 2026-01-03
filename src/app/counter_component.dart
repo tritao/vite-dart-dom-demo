@@ -25,8 +25,7 @@ final class CounterComponent extends Component {
         dom.row(children: [
           dom.actionButton('−1', action: _CounterDomActions.dec),
           dom.actionButton('+1', action: _CounterDomActions.inc),
-          dom.actionButton('Reset',
-              kind: 'secondary', action: _CounterDomActions.reset),
+          dom.secondaryButton('Reset', action: _CounterDomActions.reset),
         ]),
       ],
     );

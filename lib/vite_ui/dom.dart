@@ -157,6 +157,30 @@ web.HTMLButtonElement actionButton(
         action: action,
         dataId: dataId);
 
+web.HTMLButtonElement primaryButton(
+  String label, {
+  bool disabled = false,
+  required String action,
+  int? dataId,
+}) =>
+    actionButton(label, kind: 'primary', disabled: disabled, action: action, dataId: dataId);
+
+web.HTMLButtonElement secondaryButton(
+  String label, {
+  bool disabled = false,
+  required String action,
+  int? dataId,
+}) =>
+    actionButton(label, kind: 'secondary', disabled: disabled, action: action, dataId: dataId);
+
+web.HTMLButtonElement dangerButton(
+  String label, {
+  bool disabled = false,
+  required String action,
+  int? dataId,
+}) =>
+    actionButton(label, kind: 'danger', disabled: disabled, action: action, dataId: dataId);
+
 web.HTMLInputElement actionCheckbox({
   bool checked = false,
   String? className,

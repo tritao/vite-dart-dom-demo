@@ -62,9 +62,8 @@ final class TodosComponent extends Component {
   web.Element _buildControls(web.Element input) => dom.row(children: [
         input,
         dom.actionButton('Add', action: _TodosDomActions.add),
-        dom.actionButton(
+        dom.secondaryButton(
           'Clear done',
-          kind: 'secondary',
           disabled: !canClearDone,
           action: _TodosDomActions.clearDone,
         ),
@@ -182,9 +181,8 @@ final class TodosComponent extends Component {
     final label =
         dom.span(todo.text, className: todo.done ? 'todoText done' : 'todoText');
 
-    final remove = dom.actionButton(
+    final remove = dom.dangerButton(
       'Delete',
-      kind: 'danger',
       action: _TodosDomActions.remove,
       dataId: todo.id,
     );

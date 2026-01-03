@@ -94,9 +94,8 @@ final class UsersComponent extends Component {
           disabled: _store.state.isLoading,
           action: _UsersDomActions.load,
         ),
-        dom.actionButton(
+        dom.secondaryButton(
           'Clear',
-          kind: 'secondary',
           disabled: !canClear,
           action: _UsersDomActions.clear,
         ),
