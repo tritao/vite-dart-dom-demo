@@ -54,6 +54,12 @@ npm run debug:ui:dev
 npm run debug:ui:preview
 ```
 
+CI default (preview + longer timeout):
+
+```bash
+npm run debug:ui:ci
+```
+
 ## Build output / GitHub Pages
 
 - `npm run build` defaults to a relative `base` (`./`) so `dist/index.html` can be opened from a subpath.

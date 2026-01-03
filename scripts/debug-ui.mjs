@@ -9,13 +9,22 @@ import { setTimeout as delay } from "node:timers/promises";
 const HOST = "127.0.0.1";
 
 function parseArgs(argv) {
-  const args = { url: null, mode: "dev", timeoutMs: 120_000 };
+  const args = {
+    url: null,
+    mode: "dev",
+    timeoutMs: 120_000,
+    expectH1: "Dart + Vite",
+    expectSelector: "#app-root",
+  };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--url") args.url = argv[++i] ?? null;
     else if (a === "--mode") args.mode = argv[++i] ?? "dev";
     else if (a === "--timeout-ms")
       args.timeoutMs = Number(argv[++i] ?? args.timeoutMs);
+    else if (a === "--expect-h1") args.expectH1 = argv[++i] ?? args.expectH1;
+    else if (a === "--expect-selector")
+      args.expectSelector = argv[++i] ?? args.expectSelector;
   }
   return args;
 }
@@ -94,17 +103,28 @@ function isIgnorable404(url) {
   }
 }
 
-async function inspectUrl(url, { timeoutMs }) {
+function isIgnorableConsoleError(text) {
+  return (
+    /Failed to load resource/i.test(text) && /favicon\.ico/i.test(text)
+  );
+}
+
+async function inspectUrl(url, { timeoutMs, expectSelector, expectH1 }) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
 
   const consoleLines = [];
+  const consoleErrors = [];
   const failedRequests = [];
+  const badResponses = [];
   const pageErrors = [];
 
-  page.on("console", (msg) =>
-    consoleLines.push(`[console.${msg.type()}] ${msg.text()}`),
-  );
+  page.on("console", (msg) => {
+    const line = `[console.${msg.type()}] ${msg.text()}`;
+    consoleLines.push(line);
+    if (msg.type() === "error" && !isIgnorableConsoleError(msg.text()))
+      consoleErrors.push(line);
+  });
   page.on("pageerror", (err) => pageErrors.push(String(err)));
   page.on("requestfailed", (req) => {
     const record = {
@@ -114,22 +134,54 @@ async function inspectUrl(url, { timeoutMs }) {
     };
     if (!isIgnorable404(record.url)) failedRequests.push(record);
   });
+  page.on("response", (resp) => {
+    const status = resp.status();
+    if (status < 400) return;
+    const req = resp.request();
+    const resourceType = req.resourceType();
+    const responseUrl = resp.url();
+    if (isIgnorable404(responseUrl)) return;
+    try {
+      const originA = new URL(url).origin;
+      const originB = new URL(responseUrl).origin;
+      if (originA !== originB) return;
+    } catch {
+      return;
+    }
+    if (!["document", "script", "stylesheet"].includes(resourceType)) return;
+    badResponses.push({ url: responseUrl, status, resourceType });
+  });
 
-  const response = await page.goto(url, { waitUntil: "load", timeout: timeoutMs });
-  await page.waitForFunction(() => {
-    const mount = document.querySelector("#app");
-    return !!mount && mount.childNodes.length > 0;
-  }, { timeout: timeoutMs });
+  const response = await page.goto(url, {
+    waitUntil: "load",
+    timeout: timeoutMs,
+  });
+
+  await page.waitForFunction(
+    ({ sel, h1Text }) => {
+      const mount = document.querySelector("#app");
+      if (!mount || mount.childNodes.length === 0) return false;
+      const expected = document.querySelector(sel);
+      if (!expected) return false;
+      const h1 = document.querySelector("h1");
+      if (!h1) return false;
+      return (h1.textContent ?? "").includes(h1Text);
+    },
+    { sel: expectSelector, h1Text: expectH1 },
+    { timeout: timeoutMs },
+  );
   await page.waitForTimeout(250);
 
   const appInfo = await page.evaluate(() => {
     const mount = document.querySelector("#app");
+    const h1 = document.querySelector("h1");
     return {
       location: location.href,
       readyState: document.readyState,
       mountExists: !!mount,
       mountChildCount: mount?.childNodes?.length ?? 0,
       mountInnerTextPreview: (mount?.innerText ?? "").slice(0, 500),
+      h1Text: h1?.textContent ?? null,
     };
   });
 
@@ -140,10 +192,13 @@ async function inspectUrl(url, { timeoutMs }) {
   return {
     url,
     status: response?.status() ?? null,
+    expectations: { expectSelector, expectH1 },
     appInfo,
     pageErrors,
     failedRequests,
+    badResponses,
     consoleLines,
+    consoleErrors,
   };
 }
 
@@ -268,14 +323,20 @@ async function main() {
     }
 
     log(`\n==> playwright inspect ${url}`);
-    const report = await inspectUrl(url, { timeoutMs: args.timeoutMs });
+    const report = await inspectUrl(url, {
+      timeoutMs: args.timeoutMs,
+      expectSelector: args.expectSelector,
+      expectH1: args.expectH1,
+    });
 
     const reportPath = ".cache/debug-ui-report.json";
     await fs.promises.writeFile(reportPath, JSON.stringify(report, null, 2));
 
     const failures = [];
     if (report.pageErrors.length) failures.push("pageErrors");
+    if (report.consoleErrors.length) failures.push("consoleErrors");
     if (report.failedRequests.length) failures.push("failedRequests");
+    if (report.badResponses.length) failures.push("badResponses");
     if (!report.appInfo.mountExists) failures.push("#app missing");
     if (report.appInfo.mountChildCount === 0) failures.push("#app empty");
 

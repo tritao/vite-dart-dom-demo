@@ -40,7 +40,7 @@ jobs:
         if: runner.os == 'Linux'
         env:
           DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
-        run: npm run debug:ui:preview -- --timeout-ms 240000
+        run: npm run debug:ui:ci
 
       - name: Upload UI debug artifacts (on failure)
         if: failure() && runner.os == 'Linux'
