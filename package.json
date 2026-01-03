@@ -19,7 +19,9 @@
     "debug:solid-dom:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-dom --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\""
     ,
     "debug:solid-for": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=1\" --scenario solid-for --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
-    "debug:solid-for:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-for --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\""
+    "debug:solid-for:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-for --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
+    "debug:solid-overlay": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=overlay\" --scenario solid-overlay --expect-h1 \"Solid Overlay Demo\" --expect-selector \"#overlay-root\"",
+    "debug:solid-overlay:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=overlay\" --scenario solid-overlay --expect-h1 \"Solid Overlay Demo\" --expect-selector \"#overlay-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

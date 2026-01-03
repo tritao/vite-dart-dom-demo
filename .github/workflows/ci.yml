@@ -54,6 +54,12 @@ jobs:
           DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
         run: npm run debug:solid-for:ci
 
+      - name: Solid DOM Overlay semantics smoke (Playwright)
+        if: runner.os == 'Linux'
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run debug:solid-overlay:ci
+
       - name: Upload UI debug artifacts (on failure)
         if: failure() && runner.os == 'Linux'
         uses: actions/upload-artifact@v4

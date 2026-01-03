@@ -191,7 +191,7 @@ web.Comment Portal({
   Map<String, String>? attrs,
 }) {
   final placeholder = web.Comment("solid:portal");
-  final target = mount ?? web.document.body!;
+  final target = mount ?? _ensurePortalRoot();
   final container = web.HTMLDivElement()
     ..setAttribute("data-solid-portal", "1");
   if (id != null) container.id = id;
@@ -220,6 +220,38 @@ web.Comment Portal({
 
   onCleanup(() => disposeSubtree?.call());
   return placeholder;
+}
+
+int _portalRootRefCount = 0;
+web.HTMLElement? _portalRoot;
+
+web.HTMLElement _ensurePortalRoot() {
+  final existing = web.document.querySelector("#solid-portal-root");
+  if (existing is web.HTMLElement) {
+    _portalRoot = existing;
+    _portalRootRefCount++;
+    onCleanup(_releasePortalRoot);
+    return existing;
+  }
+  final root = web.HTMLDivElement()
+    ..id = "solid-portal-root"
+    ..setAttribute("data-solid-portal-root", "1");
+  web.document.body!.appendChild(root);
+  _portalRoot = root;
+  _portalRootRefCount++;
+  onCleanup(_releasePortalRoot);
+  return root;
+}
+
+void _releasePortalRoot() {
+  _portalRootRefCount--;
+  if (_portalRootRefCount > 0) return;
+  _portalRootRefCount = 0;
+  final root = _portalRoot;
+  _portalRoot = null;
+  if (root == null) return;
+  final parent = root.parentNode;
+  if (parent != null) parent.removeChild(root);
 }
 
 web.DocumentFragment Show({

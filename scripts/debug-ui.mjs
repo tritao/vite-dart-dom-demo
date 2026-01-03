@@ -447,6 +447,131 @@ async function inspectUrl(
           details: { error: String(e) },
         });
       }
+    } else if (scenario === "solid-overlay") {
+      try {
+        const trigger = page.locator("#overlay-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-overlay",
+            ok: false,
+            details: { reason: "missing #overlay-trigger" },
+          });
+        } else {
+          const triggerHandle = await trigger.first().elementHandle();
+
+          const bodyOverflowBefore = await page.evaluate(
+            () => document.body?.style?.overflow ?? null,
+          );
+
+          await trigger.first().click({ timeout: timeoutMs });
+
+          await page.waitForFunction(
+            () => document.querySelector("#overlay-dialog") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(
+            () => document.querySelector("#solid-portal-root") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(
+            () => document.activeElement?.id === "overlay-close",
+            { timeout: timeoutMs },
+          );
+
+          const afterOpen = await page.evaluate(() => {
+            const dialog = document.querySelector("#overlay-dialog");
+            const app = document.querySelector("#app");
+            return {
+              dialogExists: !!dialog,
+              dialogInBody: document.body?.contains(dialog) ?? null,
+              appAriaHidden: app?.getAttribute("aria-hidden") ?? null,
+              bodyOverflow: document.body?.style?.overflow ?? null,
+              activeId: document.activeElement?.id ?? null,
+            };
+          });
+
+          // Tab should stay inside the dialog (focus trap).
+          await page.keyboard.press("Tab");
+          await page.waitForTimeout(100);
+          const activeAfterTab = await page.evaluate(
+            () => document.activeElement?.id ?? null,
+          );
+
+          // Escape should dismiss.
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#overlay-dialog") == null,
+            { timeout: timeoutMs },
+          );
+          // Presence exit delay: portal should still exist briefly, then go away.
+          await page.waitForTimeout(80);
+
+          const afterClose = await page.evaluate(() => {
+            const dialog = document.querySelector("#overlay-dialog");
+            const app = document.querySelector("#app");
+            return {
+              dialogExists: !!dialog,
+              portalRootExists: document.querySelector("#solid-portal-root") != null,
+              appAriaHidden: app?.getAttribute("aria-hidden") ?? null,
+              bodyOverflow: document.body?.style?.overflow ?? null,
+              activeId: document.activeElement?.id ?? null,
+            };
+          });
+
+          const focusRestored = triggerHandle
+            ? await triggerHandle.evaluate(
+                (el) => el === document.activeElement,
+              )
+            : false;
+
+          // Outside click dismissal path.
+          await trigger.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#overlay-dialog") != null,
+            { timeout: timeoutMs },
+          );
+          await page.click("body", { position: { x: 5, y: 5 } });
+          await page.waitForFunction(
+            () => document.querySelector("#overlay-dialog") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+          const statusText = (await page.locator("#overlay-status").textContent())?.trim() ?? "";
+
+          const ok =
+            afterOpen.dialogExists === true &&
+            afterOpen.dialogInBody === true &&
+            afterOpen.bodyOverflow === "hidden" &&
+            afterOpen.appAriaHidden === "true" &&
+            afterOpen.activeId === "overlay-close" &&
+            activeAfterTab != null &&
+            activeAfterTab.startsWith("overlay-") &&
+            afterClose.dialogExists === false &&
+            afterClose.bodyOverflow === bodyOverflowBefore &&
+            afterClose.appAriaHidden == null &&
+            focusRestored === true &&
+            statusText.includes("outside");
+
+          interactionResults.push({
+            name: "solid-overlay",
+            ok,
+            details: {
+              bodyOverflowBefore,
+              afterOpen,
+              activeAfterTab,
+              afterClose,
+              focusRestored,
+              statusText,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-overlay",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
     } else {
       // Default scenario: existing app.
       try {
