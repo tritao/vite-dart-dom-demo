@@ -11,6 +11,7 @@ import './solid_popover_demo.dart';
 import './solid_roving_demo.dart';
 import './solid_toast_demo.dart';
 import './solid_menu_demo.dart';
+import './solid_tooltip_demo.dart';
 
 void main() {
   final mount = web.document.querySelector('#app');
@@ -39,6 +40,10 @@ void main() {
   }
   if (search.contains('solid=menu')) {
     mountSolidMenuDemo(mount);
+    return;
+  }
+  if (search.contains('solid=tooltip')) {
+    mountSolidTooltipDemo(mount);
     return;
   }
   if (search.contains('solid=1')) {

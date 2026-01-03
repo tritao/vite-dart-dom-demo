@@ -35,7 +35,9 @@
     "debug:solid-toast": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\"",
     "debug:solid-toast:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast\" --scenario solid-toast --expect-h1 \"Solid Toast Demo\" --expect-selector \"#toast-root\"",
     "debug:solid-menu": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=menu\" --scenario solid-menu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
-    "debug:solid-menu:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=menu\" --scenario solid-menu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\""
+    "debug:solid-menu:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=menu\" --scenario solid-menu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
+    "debug:solid-tooltip": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=tooltip\" --scenario solid-tooltip --expect-h1 \"Solid Tooltip Demo\" --expect-selector \"#tooltip-root\"",
+    "debug:solid-tooltip:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=tooltip\" --scenario solid-tooltip --expect-h1 \"Solid Tooltip Demo\" --expect-selector \"#tooltip-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

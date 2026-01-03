@@ -1268,6 +1268,121 @@ async function inspectUrl(
           details: { error: String(e) },
         });
       }
+    } else if (scenario === "solid-tooltip") {
+      try {
+        const trigger = page.locator("#tooltip-trigger");
+        const focusTrigger = page.locator("#tooltip-focus-trigger");
+        if (!(await trigger.count()) || !(await focusTrigger.count())) {
+          interactionResults.push({
+            name: "solid-tooltip",
+            ok: false,
+            details: { reason: "missing tooltip triggers" },
+          });
+        } else {
+          // Hover opens after delay.
+          await page.hover("#tooltip-trigger");
+          await page.waitForFunction(
+            () => document.querySelector("#tooltip-panel") != null,
+            { timeout: timeoutMs },
+          );
+
+          const afterHoverOpen = await page.evaluate(() => {
+            const trigger = document.querySelector("#tooltip-trigger");
+            const panel = document.querySelector("#tooltip-panel");
+            // @ts-ignore
+            const left = panel?.style?.left ?? "";
+            // @ts-ignore
+            const top = panel?.style?.top ?? "";
+            return {
+              describedBy: trigger?.getAttribute("aria-describedby") ?? null,
+              tooltipId: panel?.id ?? null,
+              left,
+              top,
+            };
+          });
+
+          // Leaving closes after delay.
+          await page.mouse.move(5, 5);
+          await page.waitForFunction(
+            () => document.querySelector("#tooltip-panel") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(50);
+          const afterHoverClose = await page.evaluate(() => ({
+            describedBy: document
+              .querySelector("#tooltip-trigger")
+              ?.getAttribute("aria-describedby") ?? null,
+          }));
+
+          // Focus opens, Escape closes.
+          await page.focus("#tooltip-focus-trigger");
+          await page.waitForFunction(
+            () => document.querySelector("#tooltip-focus-panel") != null,
+            { timeout: timeoutMs },
+          );
+          const afterFocusOpen = await page.evaluate(() => ({
+            activeId: document.activeElement?.id ?? null,
+            describedBy: document
+              .querySelector("#tooltip-focus-trigger")
+              ?.getAttribute("aria-describedby") ?? null,
+            tooltipId: document.querySelector("#tooltip-focus-panel")?.id ?? null,
+          }));
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#tooltip-focus-panel") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(50);
+          const afterEscapeClose = await page.evaluate(() => ({
+            describedBy: document
+              .querySelector("#tooltip-focus-trigger")
+              ?.getAttribute("aria-describedby") ?? null,
+            status: document.querySelector("#tooltip-status")?.textContent ?? null,
+          }));
+
+          const hoverDescribedOk =
+            afterHoverOpen.tooltipId != null &&
+            typeof afterHoverOpen.describedBy === "string" &&
+            afterHoverOpen.describedBy.includes(afterHoverOpen.tooltipId);
+          const hasPos =
+            typeof afterHoverOpen.left === "string" &&
+            typeof afterHoverOpen.top === "string" &&
+            afterHoverOpen.left.endsWith("px") &&
+            afterHoverOpen.top.endsWith("px");
+          const describedRemoved = afterHoverClose.describedBy == null;
+
+          const focusActiveOk = afterFocusOpen.activeId === "tooltip-focus-trigger";
+          const focusDescribedOk =
+            typeof afterFocusOpen.describedBy === "string" &&
+            afterFocusOpen.describedBy.includes(afterFocusOpen.tooltipId ?? "");
+          const focusRemoved = afterEscapeClose.describedBy == null;
+          const statusOk = (afterEscapeClose.status ?? "").includes("escape");
+
+          interactionResults.push({
+            name: "solid-tooltip",
+            ok:
+              hoverDescribedOk &&
+              hasPos &&
+              describedRemoved &&
+              focusActiveOk &&
+              focusDescribedOk &&
+              focusRemoved &&
+              statusOk,
+            details: {
+              afterHoverOpen,
+              afterHoverClose,
+              afterFocusOpen,
+              afterEscapeClose,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-tooltip",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
     } else if (scenario === "solid-toast") {
       try {
         const trigger = page.locator("#toast-trigger");

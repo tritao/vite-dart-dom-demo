@@ -137,6 +137,7 @@ final class AppComponent extends Component {
             dom.linkButton('Menu', href: '?solid=menu'),
             dom.linkButton('Dialog', href: '?solid=dialog'),
             dom.linkButton('Popover', href: '?solid=popover'),
+            dom.linkButton('Tooltip', href: '?solid=tooltip'),
             dom.linkButton('Toast', href: '?solid=toast'),
             dom.linkButton('Roving', href: '?solid=roving'),
             dom.linkButton('Overlay', href: '?solid=overlay'),
