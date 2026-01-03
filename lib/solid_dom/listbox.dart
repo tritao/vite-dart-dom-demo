@@ -352,13 +352,13 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
       });
     }
 
-    on(el, "pointermove", (_) {
+    on(el, "pointerenter", (_) {
       if (!shouldFocusOnHover) return;
       if (option.disabled) return;
+      if (activeIndexSig.value == idx) return;
       activeIndexSig.value = idx;
       scheduleMicrotask(() {
         syncTabIndex();
-        scrollActiveIntoView();
         focusActive();
       });
     });
@@ -401,7 +401,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     }
 
     // Clamp active index to range and make sure it's enabled.
-    var active = activeIndexSig.value;
+    var active = untrack(() => activeIndexSig.value);
     if (active < 0) active = firstEnabledIndex(opts);
     if (active >= opts.length) active = opts.length - 1;
     if (active >= 0 && opts[active].disabled) active = nextEnabledIndex(opts, active, 1);
@@ -428,7 +428,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
 
         for (final opt in section.options) {
           final isSelected = sel != null && eq(opt.value, sel);
-          final isActive = flatIdx == activeIndexSig.value;
+          final isActive = flatIdx == active;
           final el = buildOption(opt, flatIdx, isSelected, isActive);
           optionEls.add(el);
           group.appendChild(el);
@@ -442,7 +442,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
       for (var i = 0; i < opts.length; i++) {
         final opt = opts[i];
         final isSelected = sel != null && eq(opt.value, sel);
-        final isActive = i == activeIndexSig.value;
+        final isActive = i == active;
         final el = buildOption(opt, i, isSelected, isActive);
         optionEls.add(el);
         listbox.appendChild(el);
