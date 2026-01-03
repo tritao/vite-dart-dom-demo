@@ -1,33 +1,9 @@
-import 'dart:convert';
-
 import 'package:web/web.dart' as web;
 
+import './todo.dart';
 import '../ui/component.dart';
 import '../ui/dom.dart' as dom;
 import '../ui/events.dart' as events;
-
-final class _Todo {
-  _Todo({
-    required this.id,
-    required this.text,
-    this.done = false,
-  });
-
-  final int id;
-  final String text;
-  final bool done;
-
-  _Todo copyWith({String? text, bool? done}) =>
-      _Todo(id: id, text: text ?? this.text, done: done ?? this.done);
-
-  Map<String, Object?> toJson() => {"id": id, "text": text, "done": done};
-
-  static _Todo fromJson(Map<String, Object?> json) => _Todo(
-        id: (json["id"] as num).toInt(),
-        text: (json["text"] as String?) ?? "",
-        done: (json["done"] as bool?) ?? false,
-      );
-}
 
 abstract final class _TodosActions {
   static const add = 'todos-add';
@@ -42,9 +18,18 @@ final class TodosComponent extends Component {
   static const _storageKey = 'todos_v1';
 
   int _nextId = 1;
-  final List<_Todo> _todos = [];
+  final List<Todo> _todos = [];
 
   web.HTMLInputElement? _input;
+
+  int get remainingCount => _todos.where((t) => !t.done).length;
+
+  bool get canClearDone => _todos.any((t) => t.done);
+
+  bool get isEmpty => _todos.isEmpty;
+
+  String get summaryText =>
+      '${_todos.length} total • $remainingCount remaining • persists to localStorage';
 
   @override
   web.Element render() {
@@ -55,15 +40,13 @@ final class TodosComponent extends Component {
     );
 
     final list = dom.ul(className: 'list');
-    if (_todos.isEmpty) {
+    if (isEmpty) {
       list.append(dom.li(className: 'muted', text: 'No todos yet.'));
     } else {
       for (final todo in _todos) {
         list.append(_todoItem(todo));
       }
     }
-
-    final remaining = _todos.where((t) => !t.done).length;
 
     final row = dom.div(className: 'row');
     row
@@ -72,16 +55,13 @@ final class TodosComponent extends Component {
       ..append(dom.actionButton(
         'Clear done',
         kind: 'secondary',
-        disabled: _todos.every((t) => !t.done),
+        disabled: !canClearDone,
         action: _TodosActions.clearDone,
       ));
 
     return dom.card(title: 'Todos', children: [
       row,
-      dom.p(
-        '${_todos.length} total • $remaining remaining • persists to localStorage',
-        className: 'muted',
-      ),
+      dom.p(summaryText, className: 'muted'),
       list,
     ]);
   }
@@ -172,7 +152,7 @@ final class TodosComponent extends Component {
     if (text.isEmpty) return;
 
     setState(() {
-      _todos.insert(0, _Todo(id: _nextId++, text: text));
+      _todos.insert(0, Todo(id: _nextId++, text: text));
       _saveTodos();
     });
 
@@ -180,37 +160,23 @@ final class TodosComponent extends Component {
   }
 
   void _loadTodos() {
-    final storage = web.window.localStorage;
-    if (storage == null) return;
+    final loaded = loadTodosFromLocalStorage(key: _storageKey);
+    if (loaded.isEmpty) return;
 
-    final raw = storage.getItem(_storageKey);
-    if (raw == null || raw.isEmpty) return;
+    _todos
+      ..clear()
+      ..addAll(loaded);
 
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! List) return;
-      _todos
-        ..clear()
-        ..addAll(decoded.whereType<Map>().map((e) {
-          final map = e.map((k, v) => MapEntry(k.toString(), v));
-          return _Todo.fromJson(map);
-        }));
-      final maxId =
-          _todos.isEmpty ? 0 : _todos.map((t) => t.id).reduce((a, b) => a > b ? a : b);
-      _nextId = maxId + 1;
-    } catch (_) {
-      _todos.clear();
-      _nextId = 1;
-    }
+    final maxId =
+        _todos.map((t) => t.id).reduce((a, b) => a > b ? a : b);
+    _nextId = maxId + 1;
   }
 
   void _saveTodos() {
-    final storage = web.window.localStorage;
-    if (storage == null) return;
-    storage.setItem(_storageKey, jsonEncode(_todos.map((t) => t.toJson()).toList()));
+    saveTodosToLocalStorage(key: _storageKey, todos: _todos);
   }
 
-  web.HTMLLIElement _todoItem(_Todo todo) {
+  web.HTMLLIElement _todoItem(Todo todo) {
     final item = dom.li(
       className: 'item',
       attrs: {'data-key': 'todos-${todo.id}'},

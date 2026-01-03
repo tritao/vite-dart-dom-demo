@@ -33,6 +33,17 @@ final class UsersComponent extends Component {
   String? _error;
   List<Map<String, Object?>> _users = const [];
 
+  bool get canClear => !_isLoading && _users.isNotEmpty;
+
+  String get endpointLabel => 'Endpoint: $_endpoint';
+
+  String get statusText {
+    if (_isLoading) return 'Loading users…';
+    if (_error != null) return _error!;
+    if (_users.isEmpty) return 'Click “Load users” to fetch JSON from the network.';
+    return 'Loaded ${_users.length} users.';
+  }
+
   @override
   web.Element render() {
     final requestToken = useRef<int>('requestToken', 0);
@@ -52,18 +63,8 @@ final class UsersComponent extends Component {
       return null;
     });
 
-    final status = dom.p('', className: 'muted');
-    if (_isLoading) {
-      status.textContent = 'Loading users…';
-    } else if (_error != null) {
-      status
-        ..className = 'muted error'
-        ..textContent = _error!;
-    } else if (_users.isEmpty) {
-      status.textContent = 'Click “Load users” to fetch JSON from the network.';
-    } else {
-      status.textContent = 'Loaded ${_users.length} users.';
-    }
+    final status = dom.p('', className: _error != null ? 'muted error' : 'muted')
+      ..textContent = statusText;
 
     final row = dom.div(className: 'row');
     row
@@ -75,7 +76,7 @@ final class UsersComponent extends Component {
       ..append(dom.actionButton(
         'Clear',
         kind: 'secondary',
-        disabled: _isLoading && _users.isEmpty,
+        disabled: !canClear,
         action: _UsersActions.clear,
       ));
 
@@ -96,7 +97,7 @@ final class UsersComponent extends Component {
       row,
       status,
       if (_users.isNotEmpty) list,
-      dom.p('Endpoint: $_endpoint', className: 'muted'),
+      dom.p(endpointLabel, className: 'muted'),
     ]);
   }
 
