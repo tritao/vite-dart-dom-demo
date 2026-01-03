@@ -17,4 +17,3 @@ void dispatchAction(
 
   handler(actionEl);
 }
-

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:web/web.dart' as web;
 
-import '../morph_patch.dart';
+import './morph_patch.dart';
 
 typedef Cleanup = void Function();
 

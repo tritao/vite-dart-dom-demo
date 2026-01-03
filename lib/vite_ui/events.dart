@@ -32,4 +32,3 @@ int? actionIdFromEvent(web.Event event) {
   if (el == null) return null;
   return actionIdFromElement(el);
 }
-

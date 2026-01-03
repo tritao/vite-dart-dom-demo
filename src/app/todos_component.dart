@@ -1,10 +1,10 @@
 import 'package:web/web.dart' as web;
 
 import './todo.dart';
-import '../ui/component.dart';
-import '../ui/action_dispatch.dart';
-import '../ui/dom.dart' as dom;
-import '../ui/events.dart' as events;
+import 'package:dart_web_test/vite_ui/component.dart';
+import 'package:dart_web_test/vite_ui/action_dispatch.dart';
+import 'package:dart_web_test/vite_ui/dom.dart' as dom;
+import 'package:dart_web_test/vite_ui/events.dart' as events;
 
 abstract final class _TodosActions {
   static const add = 'todos-add';
