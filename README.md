@@ -36,3 +36,11 @@ Open the URL Vite prints and you should see: **Hello from Dart (compiled by Vite
 ## Troubleshooting
 
 - If you have Flutter but not standalone Dart, set `DART` to Flutter's Dart binary, e.g. `DART="$(flutter sdk-path)/bin/dart" npm run dev`.
+
+## Demo UI
+
+The demo app is plain `dart:html` (no framework) and includes:
+
+- Counter tab (state + re-render)
+- Todos tab (CRUD + `localStorage`)
+- Fetch tab (async network call + loading/error states)
