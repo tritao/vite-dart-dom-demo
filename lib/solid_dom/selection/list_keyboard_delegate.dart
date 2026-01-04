@@ -4,10 +4,11 @@ import "package:web/web.dart" as web;
 
 import "./keyboard_delegate.dart";
 
-final class ListKeyboardDelegate implements KeyboardDelegate {
+final class ListKeyboardDelegate extends KeyboardDelegate {
   ListKeyboardDelegate({
     required this.keys,
     required this.isDisabled,
+    required this.textValueForKey,
     required this.getContainer,
     this.getItemElement,
     this.pageSize,
@@ -15,6 +16,7 @@ final class ListKeyboardDelegate implements KeyboardDelegate {
 
   final List<String> Function() keys;
   final bool Function(String key) isDisabled;
+  final String Function(String key) textValueForKey;
   final web.HTMLElement? Function() getContainer;
   final web.HTMLElement? Function(String key)? getItemElement;
   final int Function()? pageSize;
@@ -44,10 +46,11 @@ final class ListKeyboardDelegate implements KeyboardDelegate {
   }
 
   @override
-  String? getFirstKey() => _firstEnabledFrom(0, 1);
+  String? getFirstKey([String? key, bool global = false]) =>
+      _firstEnabledFrom(0, 1);
 
   @override
-  String? getLastKey() {
+  String? getLastKey([String? key, bool global = false]) {
     final list = keys();
     return _firstEnabledFrom(list.length - 1, -1);
   }
@@ -146,5 +149,29 @@ final class ListKeyboardDelegate implements KeyboardDelegate {
       final nextIdx = max(0, startIdx - _fallbackPageStep());
       return _firstEnabledFrom(nextIdx, -1) ?? list.first;
     }
+  }
+
+  @override
+  String? getKeyForSearch(String search, [String? fromKey]) {
+    final query = search.trim().toLowerCase();
+    if (query.isEmpty) return null;
+    final list = keys();
+    if (list.isEmpty) return null;
+
+    var start = 0;
+    if (fromKey != null) {
+      final idx = list.indexOf(fromKey);
+      if (idx != -1) start = (idx + 1) % list.length;
+    }
+
+    for (var i = 0; i < list.length; i++) {
+      final idx = (start + i) % list.length;
+      final key = list[idx];
+      if (isDisabled(key)) continue;
+      final text = textValueForKey(key).trim().toLowerCase();
+      if (text.isEmpty) continue;
+      if (text.startsWith(query)) return key;
+    }
+    return null;
   }
 }

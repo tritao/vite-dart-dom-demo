@@ -1672,6 +1672,88 @@ async function inspectUrl(
           details: { error: String(e), step },
         });
       }
+    } else if (scenario === "solid-selection") {
+      let step = "init";
+      try {
+        const list = page.locator("#selection-list");
+        const status = page.locator("#selection-status");
+        const first = page.locator("#selection-item-solid");
+        if (!(await list.count()) || !(await status.count()) || !(await first.count())) {
+          interactionResults.push({
+            name: "solid-selection",
+            ok: false,
+            details: { reason: "missing selection elements" },
+          });
+        } else {
+          step = "focus first item";
+          await first.first().click({ timeout: timeoutMs });
+          await page.waitForTimeout(60);
+
+          step = "space selects focused item";
+          await page.keyboard.press(" ");
+          await page.waitForTimeout(60);
+          const afterSpace = (await status.first().textContent())?.trim() ?? "";
+
+          step = "shift+arrowdown extends selection";
+          await page.keyboard.press("Shift+ArrowDown");
+          await page.waitForTimeout(60);
+          const afterExtend = (await status.first().textContent())?.trim() ?? "";
+
+          step = "ctrl+a selects all (except disabled)";
+          await page.keyboard.press("Control+a");
+          await page.waitForTimeout(60);
+          const afterSelectAll = (await status.first().textContent())?.trim() ?? "";
+
+          step = "pressUp selection happens on pointerup";
+          await page.locator("#selection-pressup").check();
+          await page.locator("#selection-pressorigin").check();
+          await page.waitForTimeout(50);
+
+          const pressTarget = page.locator("#selection-item-dart");
+          const box = await pressTarget.boundingBox();
+          if (!box) throw new Error("missing bounding box for selection item");
+
+          const beforePressUp = (await status.first().textContent())?.trim() ?? "";
+          await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+          await page.mouse.down();
+          await page.waitForTimeout(40);
+          const afterDown = (await status.first().textContent())?.trim() ?? "";
+          await page.mouse.up();
+          await page.waitForTimeout(60);
+          const afterUp = (await status.first().textContent())?.trim() ?? "";
+
+          const pressUp = { ok: true, before: beforePressUp, afterDown, afterUp };
+
+          const selectedPart = (s) => {
+            const idx = (s ?? "").indexOf("Selected:");
+            if (idx === -1) return "";
+            return (s ?? "").slice(idx).trim();
+          };
+
+          const ok =
+            afterSpace.includes("Selected: solid") &&
+            afterExtend.includes("solid") &&
+            afterExtend.includes("react") &&
+            afterSelectAll.includes("dart") &&
+            !afterSelectAll.includes("vue") &&
+            pressUp.ok === true &&
+            selectedPart(pressUp.before) === selectedPart(pressUp.afterDown) &&
+            selectedPart(pressUp.afterUp) !== selectedPart(pressUp.afterDown) &&
+            pressUp.afterUp.includes("Selected: dart");
+
+          interactionResults.push({
+            name: "solid-selection",
+            ok,
+            details: { afterSpace, afterExtend, afterSelectAll, pressUp },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-selection",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
     } else if (scenario === "solid-toast") {
       try {
         const trigger = page.locator("#toast-trigger");

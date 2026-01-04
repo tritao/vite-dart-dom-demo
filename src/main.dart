@@ -15,53 +15,61 @@ import './solid_tooltip_demo.dart';
 import './solid_select_demo.dart';
 import './solid_combobox_demo.dart';
 import './solid_listbox_demo.dart';
+import './solid_selection_demo.dart';
 
 void main() {
   final mount = web.document.querySelector('#app');
   if (mount == null) return;
 
   final search = web.window.location.search;
-  if (search.contains('solid=overlay')) {
+  final query = search.startsWith("?") ? search.substring(1) : search;
+  final solid = Uri.splitQueryString(query)["solid"];
+
+  if (solid == 'overlay') {
     mountSolidOverlayDemo(mount);
     return;
   }
-  if (search.contains('solid=dialog')) {
+  if (solid == 'dialog') {
     mountSolidDialogDemo(mount);
     return;
   }
-  if (search.contains('solid=popover')) {
+  if (solid == 'popover') {
     mountSolidPopoverDemo(mount);
     return;
   }
-  if (search.contains('solid=roving')) {
+  if (solid == 'roving') {
     mountSolidRovingDemo(mount);
     return;
   }
-  if (search.contains('solid=toast')) {
+  if (solid == 'toast') {
     mountSolidToastDemo(mount);
     return;
   }
-  if (search.contains('solid=menu')) {
+  if (solid == 'menu') {
     mountSolidMenuDemo(mount);
     return;
   }
-  if (search.contains('solid=tooltip')) {
+  if (solid == 'tooltip') {
     mountSolidTooltipDemo(mount);
     return;
   }
-  if (search.contains('solid=select')) {
+  if (solid == 'select') {
     mountSolidSelectDemo(mount);
     return;
   }
-  if (search.contains('solid=combobox')) {
+  if (solid == 'combobox') {
     mountSolidComboboxDemo(mount);
     return;
   }
-  if (search.contains('solid=listbox')) {
+  if (solid == 'listbox') {
     mountSolidListboxDemo(mount);
     return;
   }
-  if (search.contains('solid=1')) {
+  if (solid == 'selection') {
+    mountSolidSelectionDemo(mount);
+    return;
+  }
+  if (solid == '1') {
     mountSolidDomDemo(mount);
     return;
   }

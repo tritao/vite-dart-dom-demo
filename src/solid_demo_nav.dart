@@ -25,6 +25,8 @@ web.HTMLElement solidDemoNav({required String active}) {
   row.appendChild(link("Listbox", "/?solid=listbox", current: active == "listbox"));
   row.appendChild(
       link("Combobox", "/?solid=combobox", current: active == "combobox"));
+  row.appendChild(
+      link("Selection", "/?solid=selection", current: active == "selection"));
   row.appendChild(link("Toast", "/?solid=toast", current: active == "toast"));
   row.appendChild(link("Roving", "/?solid=roving", current: active == "roving"));
   row.appendChild(link("Overlay", "/?solid=overlay", current: active == "overlay"));

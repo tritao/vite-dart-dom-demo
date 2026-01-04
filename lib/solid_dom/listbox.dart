@@ -266,6 +266,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
   ListKeyboardDelegate delegate() => ListKeyboardDelegate(
         keys: () => currentKeys,
         isDisabled: (key) => optionsByKey[key]?.disabled ?? false,
+        textValueForKey: (key) => optionsByKey[key]?.textValue ?? "",
         getContainer: () => scrollContainer?.call() ?? listbox,
         getItemElement: (key) => optionElByKey[key],
         pageSize: pageSize,

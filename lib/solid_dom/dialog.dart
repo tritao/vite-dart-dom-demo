@@ -42,6 +42,7 @@ web.DocumentFragment Dialog({
 
         final dialog = builder(close);
         dialog.setAttribute("role", role);
+        dialog.setAttribute("data-solid-dialog-content", "1");
         if (modal) dialog.setAttribute("aria-modal", "true");
         if (labelledBy != null) {
           dialog.setAttribute("aria-labelledby", labelledBy);
@@ -51,27 +52,9 @@ web.DocumentFragment Dialog({
         }
         dialog.tabIndex = -1;
 
+        final usesWrapper = modal || backdrop;
         final wrapper = web.HTMLDivElement()
           ..setAttribute("data-solid-dialog-wrapper", "1");
-        if (modal || backdrop) {
-          wrapper.style.position = "fixed";
-          wrapper.style.inset = "0";
-          wrapper.style.display = "flex";
-          wrapper.style.alignItems = "center";
-          wrapper.style.justifyContent = "center";
-          wrapper.style.padding = "24px";
-          wrapper.style.boxSizing = "border-box";
-
-          // Reasonable defaults so dialogs don't stretch full-viewport by default.
-          if (dialog.style.width.isEmpty) dialog.style.width = "100%";
-          if (dialog.style.maxWidth.isEmpty) {
-            dialog.style.maxWidth = "min(640px, calc(100vw - 48px))";
-          }
-          if (dialog.style.maxHeight.isEmpty) {
-            dialog.style.maxHeight = "calc(100vh - 48px)";
-          }
-          if (dialog.style.overflow.isEmpty) dialog.style.overflow = "auto";
-        }
 
         web.HTMLElement? backdropEl;
         if (backdrop) {
@@ -79,17 +62,16 @@ web.DocumentFragment Dialog({
             ..setAttribute("data-solid-backdrop", "1");
           if (backdropId != null) el.id = backdropId;
           if (backdropClassName != null) el.className = backdropClassName;
-          el.style.position = "fixed";
-          el.style.inset = "0";
-          el.style.background = "transparent";
           backdropEl = el;
         }
-        if (backdropEl != null) wrapper.appendChild(backdropEl);
-        wrapper.appendChild(dialog);
+        if (usesWrapper) {
+          if (backdropEl != null) wrapper.appendChild(backdropEl);
+          wrapper.appendChild(dialog);
+        }
 
         dismissableLayer(
           dialog,
-          stackElement: wrapper,
+          stackElement: usesWrapper ? wrapper : dialog,
           disableOutsidePointerEvents: modal,
           dismissOnFocusOutside: false,
           onDismiss: (reason) => close(reason),

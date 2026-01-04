@@ -9,3 +9,12 @@ enum SelectionBehavior {
   toggle,
 }
 
+enum FocusStrategy {
+  first,
+  last,
+}
+
+enum Orientation {
+  vertical,
+  horizontal,
+}
