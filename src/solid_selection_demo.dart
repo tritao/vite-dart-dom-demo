@@ -24,7 +24,18 @@ void mountSolidSelectionDemo(web.Element mount) {
           "This page is a Kobalte-style port target: createSelectableCollection + createSelectableItem.",
           "Arrow keys move the focused item; Enter/Space selects the focused item.",
           "Shift extends selection in multiple mode; Ctrl/Meta toggles selection; Ctrl+A selects all.",
-          "Toggle “select on press up” to mirror menu-style selection timing.",
+          "Use it as a reference when porting Menu/Listbox/Select/Combobox behavior.",
+        ],
+      ),
+    );
+
+    root.appendChild(
+      solidDemoHelp(
+        title: "Option meanings",
+        bullets: const [
+          "Replace vs Toggle: Replace clears previous selection; Toggle adds/removes items from the selected set (checkbox-style).",
+          "Select on press up: selection happens on pointer up/click (not pointer down). Useful for menus where selection may close immediately.",
+          "Allow different press origin: only relevant with “select on press up”. Press on one item, drag, release on another → selects the release target.",
         ],
       ),
     );
@@ -209,4 +220,3 @@ void mountSolidSelectionDemo(web.Element mount) {
     return root;
   });
 }
-
