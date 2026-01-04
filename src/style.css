@@ -266,7 +266,8 @@ a.btn {
 }
 
 .listbox .menuItem:focus {
-  box-shadow: inset 0 0 0 2px rgba(124, 92, 255, 0.6);
+  background: rgba(124, 92, 255, 0.06);
+  box-shadow: inset 0 0 0 3px rgba(124, 92, 255, 0.65);
 }
 
 .menuItem.destructive:focus {
@@ -275,5 +276,6 @@ a.btn {
 }
 
 .listbox .menuItem.destructive:focus {
-  box-shadow: inset 0 0 0 2px rgba(255, 77, 77, 0.55);
+  background: rgba(255, 77, 77, 0.06);
+  box-shadow: inset 0 0 0 3px rgba(255, 77, 77, 0.6);
 }
