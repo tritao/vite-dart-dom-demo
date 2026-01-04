@@ -463,7 +463,9 @@ SelectableCollectionResult createSelectableCollection({
   });
 
   final tabIndexMemo = createMemo<int?>(() {
-    if (shouldUseVirtualFocusAccessor()) return null;
+    // In virtual focus mode, the collection itself should stay programmatically
+    // focusable (e.g. Select listbox), but should not be tabbable by default.
+    if (shouldUseVirtualFocusAccessor()) return -1;
     return managerAccessor().focusedKey() == null ? 0 : -1;
   });
 
