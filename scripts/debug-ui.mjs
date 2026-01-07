@@ -2284,18 +2284,31 @@ async function inspectUrl(
           "#tooltip-panel-overlap-on",
         );
 
+        const overflowsRight = (m) => m && m.right > m.vw - padding + 0.5;
+        const overflowsBottom = (m) => m && m.bottom > m.vh - padding + 0.5;
+        const inViewport = (m) =>
+          m &&
+          m.left >= padding - 0.5 &&
+          m.top >= padding - 0.5 &&
+          m.right <= m.vw - padding + 0.5 &&
+          m.bottom <= m.vh - padding + 0.5;
+
         const ok =
           slideOff != null &&
+          overflowsBottom(slideOff) &&
           slideOff.placement?.startsWith("right") === true &&
           slideOff.transform !== "none" &&
           slideOn != null &&
+          inViewport(slideOn) &&
           slideOn.placement?.startsWith("right") === true &&
           slideOn.transform !== "none" &&
           overlapOff != null &&
-          overlapOff.placement?.startsWith("bottom") === true &&
+          overflowsRight(overlapOff) &&
+          overlapOff.placement?.startsWith("right") === true &&
           overlapOff.transform !== "none" &&
           overlapOn != null &&
-          overlapOn.placement?.startsWith("bottom") === true &&
+          inViewport(overlapOn) &&
+          overlapOn.placement?.startsWith("right") === true &&
           overlapOn.transform !== "none";
 
         interactionResults.push({

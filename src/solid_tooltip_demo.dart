@@ -32,6 +32,8 @@ void mountSolidTooltipDemo(web.Element mount) {
           "Hover \"Hover me\": opens after a small delay, closes on leave.",
           "Tab to \"Focus me\": opens on focus, closes on blur/Escape.",
           "Move between triggers quickly: only the hovered/focused tooltip should be open.",
+          "Slide (bottom-left): shrink viewport height; slide=true keeps it from overflowing bottom (it 'slides' along the trigger).",
+          "Overlap (top-right): shrink viewport width; overlap=true allows it to shift horizontally and stay visible (it may overlap the trigger).",
         ],
       ),
     );
@@ -91,8 +93,8 @@ void mountSolidTooltipDemo(web.Element mount) {
       ..className = "btn secondary"
       ..textContent = "Slide off";
     slideOffTrigger.style.position = "fixed";
-    slideOffTrigger.style.right = "16px";
-    slideOffTrigger.style.bottom = "200px";
+    slideOffTrigger.style.left = "16px";
+    slideOffTrigger.style.bottom = "104px";
     root.appendChild(slideOffTrigger);
 
     final slideOnTrigger = web.HTMLButtonElement()
@@ -101,8 +103,8 @@ void mountSolidTooltipDemo(web.Element mount) {
       ..className = "btn secondary"
       ..textContent = "Slide on";
     slideOnTrigger.style.position = "fixed";
-    slideOnTrigger.style.right = "16px";
-    slideOnTrigger.style.bottom = "160px";
+    slideOnTrigger.style.left = "16px";
+    slideOnTrigger.style.bottom = "64px";
     root.appendChild(slideOnTrigger);
 
     final overlapOffTrigger = web.HTMLButtonElement()
@@ -112,7 +114,7 @@ void mountSolidTooltipDemo(web.Element mount) {
       ..textContent = "Overlap off";
     overlapOffTrigger.style.position = "fixed";
     overlapOffTrigger.style.right = "16px";
-    overlapOffTrigger.style.bottom = "120px";
+    overlapOffTrigger.style.top = "64px";
     root.appendChild(overlapOffTrigger);
 
     final overlapOnTrigger = web.HTMLButtonElement()
@@ -122,7 +124,7 @@ void mountSolidTooltipDemo(web.Element mount) {
       ..textContent = "Overlap on";
     overlapOnTrigger.style.position = "fixed";
     overlapOnTrigger.style.right = "16px";
-    overlapOnTrigger.style.bottom = "80px";
+    overlapOnTrigger.style.top = "104px";
     root.appendChild(overlapOnTrigger);
 
     root.appendChild(
@@ -248,9 +250,10 @@ void mountSolidTooltipDemo(web.Element mount) {
             ..className = "card";
           el.style.padding = "8px 10px";
           el.style.fontSize = "13px";
-          el.style.width = "360px";
+          el.style.width = "240px";
+          el.style.height = "220px";
           el.textContent =
-              "Slide off (right-start; should overflow on narrow viewport).";
+              "Slide off (right-start; shrink viewport height: this can overflow the bottom).";
           return el;
         },
       ),
@@ -276,8 +279,10 @@ void mountSolidTooltipDemo(web.Element mount) {
             ..className = "card";
           el.style.padding = "8px 10px";
           el.style.fontSize = "13px";
-          el.style.width = "360px";
-          el.textContent = "Slide on (right-start; should stay within viewport).";
+          el.style.width = "240px";
+          el.style.height = "220px";
+          el.textContent =
+              "Slide on (right-start; shrink viewport height: this should slide up to stay visible).";
           return el;
         },
       ),
@@ -289,7 +294,7 @@ void mountSolidTooltipDemo(web.Element mount) {
         setOpen: (next) => overlapOffOpen.value = next,
         trigger: overlapOffTrigger,
         portalId: "tooltip-overlap-off-portal",
-        placement: "bottom-start",
+        placement: "right-start",
         offset: 8,
         flip: false,
         slide: false,
@@ -305,7 +310,7 @@ void mountSolidTooltipDemo(web.Element mount) {
           el.style.fontSize = "13px";
           el.style.width = "360px";
           el.textContent =
-              "Overlap off (bottom-start; should overflow on narrow viewport).";
+              "Overlap off (right-start; shrink viewport width: this can overflow to the right).";
           return el;
         },
       ),
@@ -317,7 +322,7 @@ void mountSolidTooltipDemo(web.Element mount) {
         setOpen: (next) => overlapOnOpen.value = next,
         trigger: overlapOnTrigger,
         portalId: "tooltip-overlap-on-portal",
-        placement: "bottom-start",
+        placement: "right-start",
         offset: 8,
         flip: false,
         slide: false,
@@ -332,7 +337,8 @@ void mountSolidTooltipDemo(web.Element mount) {
           el.style.padding = "8px 10px";
           el.style.fontSize = "13px";
           el.style.width = "360px";
-          el.textContent = "Overlap on (bottom-start; should stay within viewport).";
+          el.textContent =
+              "Overlap on (right-start; shrink viewport width: this should shift left and stay visible).";
           return el;
         },
       ),
