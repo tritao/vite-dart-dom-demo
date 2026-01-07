@@ -73,7 +73,7 @@ void mountSolidTooltipDemo(web.Element mount) {
       ..textContent = "Edge trigger";
     edgeTrigger.style.position = "fixed";
     edgeTrigger.style.right = "8px";
-    edgeTrigger.style.top = "120px";
+    edgeTrigger.style.top = "160px";
     root.appendChild(edgeTrigger);
 
     final arrowTrigger = web.HTMLButtonElement()
