@@ -55,6 +55,12 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
           (() => {
             const shiftOpts = {
               padding: viewportPadding,
+              // Explicitly clamp against the viewport. In our setup (portals +
+              // fixed strategy), relying on default clipping ancestor detection
+              // can result in no overflow being detected, which makes `slide`
+              // appear ineffective.
+              rootBoundary: "viewport",
+              boundary: document.documentElement,
               // Floating UI only applies crossAxis shifting meaningfully when it
               // can also shift the main axis; keep overlap-only meaningful by
               // enabling mainAxis shift when overlap is true.

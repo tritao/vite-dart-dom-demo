@@ -40,8 +40,10 @@ void mountSolidPopoverDemo(web.Element mount) {
           "Press Escape while open to dismiss.",
           "Tab/Shift+Tab are not trapped: focus can move anywhere on the page.",
           "Scroll the page: the popover should reposition with the anchor.",
-          "Use Edge/Slide/Overlap/Flip H triggers (top-right), then resize the viewport narrow to observe clamping vs overflow; inspect data-solid-placement in DevTools.",
-          "HideWhenDetached: open it, then toggle the anchor's display to see the panel become visibility:hidden.",
+          "Slide (bottom-left): shrink viewport height; slide=true keeps it from overflowing bottom (it 'slides' along the trigger).",
+          "Overlap (top-right): shrink viewport width; overlap=true allows it to shift horizontally and stay visible (it may overlap the trigger).",
+          "Flip H (top-right): shrink viewport width; flip=true switches right-* to left-* (inspect data-solid-placement).",
+          "HideWhenDetached (bottom-left): open it, then toggle the anchor's display to see the panel become visibility:hidden.",
         ],
       ),
     );
@@ -77,8 +79,8 @@ void mountSolidPopoverDemo(web.Element mount) {
       ..className = "btn secondary"
       ..textContent = "Slide off";
     slideOffTrigger.style.position = "fixed";
-    slideOffTrigger.style.right = "16px";
-    slideOffTrigger.style.top = "64px";
+    slideOffTrigger.style.left = "16px";
+    slideOffTrigger.style.bottom = "104px";
     on(slideOffTrigger, "click", (_) => slideOffOpen.value = !slideOffOpen.value);
     root.appendChild(slideOffTrigger);
 
@@ -88,8 +90,8 @@ void mountSolidPopoverDemo(web.Element mount) {
       ..className = "btn secondary"
       ..textContent = "Slide on";
     slideOnTrigger.style.position = "fixed";
-    slideOnTrigger.style.right = "16px";
-    slideOnTrigger.style.top = "104px";
+    slideOnTrigger.style.left = "16px";
+    slideOnTrigger.style.bottom = "64px";
     on(slideOnTrigger, "click", (_) => slideOnOpen.value = !slideOnOpen.value);
     root.appendChild(slideOnTrigger);
 
@@ -282,10 +284,11 @@ void mountSolidPopoverDemo(web.Element mount) {
           final panel = web.HTMLDivElement()
             ..id = "popover-panel-slide-off"
             ..className = "card";
-          panel.style.width = "360px";
+          panel.style.width = "240px";
+          panel.style.height = "220px";
           panel.appendChild(web.HTMLParagraphElement()
             ..textContent =
-                "Slide off (right-start; should overflow on narrow viewport).");
+                "Slide off (right-start; shrink viewport height: this can overflow the bottom).");
           final closeBtn = web.HTMLButtonElement()
             ..type = "button"
             ..className = "btn secondary"
@@ -313,10 +316,11 @@ void mountSolidPopoverDemo(web.Element mount) {
           final panel = web.HTMLDivElement()
             ..id = "popover-panel-slide-on"
             ..className = "card";
-          panel.style.width = "360px";
+          panel.style.width = "240px";
+          panel.style.height = "220px";
           panel.appendChild(web.HTMLParagraphElement()
             ..textContent =
-                "Slide on (right-start; should stay within viewport).");
+                "Slide on (right-start; shrink viewport height: this should slide up to stay visible).");
           final closeBtn = web.HTMLButtonElement()
             ..type = "button"
             ..className = "btn secondary"
@@ -334,7 +338,7 @@ void mountSolidPopoverDemo(web.Element mount) {
         setOpen: (next) => overlapOffOpen.value = next,
         portalId: "popover-overlap-off-portal",
         anchor: overlapOffTrigger,
-        placement: "bottom-start",
+        placement: "right-start",
         offset: 8,
         flip: false,
         slide: false,
@@ -347,7 +351,7 @@ void mountSolidPopoverDemo(web.Element mount) {
           panel.style.width = "360px";
           panel.appendChild(web.HTMLParagraphElement()
             ..textContent =
-                "Overlap off (bottom-start; should overflow on narrow viewport).");
+                "Overlap off (right-start; shrink viewport width: this can overflow to the right).");
           final closeBtn = web.HTMLButtonElement()
             ..type = "button"
             ..className = "btn secondary"
@@ -365,7 +369,7 @@ void mountSolidPopoverDemo(web.Element mount) {
         setOpen: (next) => overlapOnOpen.value = next,
         portalId: "popover-overlap-on-portal",
         anchor: overlapOnTrigger,
-        placement: "bottom-start",
+        placement: "right-start",
         offset: 8,
         flip: false,
         slide: false,
@@ -378,7 +382,7 @@ void mountSolidPopoverDemo(web.Element mount) {
           panel.style.width = "360px";
           panel.appendChild(web.HTMLParagraphElement()
             ..textContent =
-                "Overlap on (bottom-start; should stay within viewport).");
+                "Overlap on (right-start; shrink viewport width: this should shift left and stay visible).");
           final closeBtn = web.HTMLButtonElement()
             ..type = "button"
             ..className = "btn secondary"

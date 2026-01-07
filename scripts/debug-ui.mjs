@@ -1679,7 +1679,7 @@ async function inspectUrl(
       let step = "init";
       try {
         const padding = 8;
-        await page.setViewportSize({ width: 420, height: 520 });
+        await page.setViewportSize({ width: 420, height: 320 });
         await page.waitForTimeout(80);
 
         const openAndRead = async (triggerSel, panelSel) => {
@@ -1699,6 +1699,7 @@ async function inspectUrl(
               if (!panel) return null;
               const r = panel.getBoundingClientRect();
               const cs = getComputedStyle(panel);
+              const style = panel.style;
               return {
                 vw: window.innerWidth,
                 vh: window.innerHeight,
@@ -1708,6 +1709,8 @@ async function inspectUrl(
                 bottom: r.bottom,
                 placement: panel.getAttribute("data-solid-placement"),
                 transform: cs.transform,
+                availableWidth: style.getPropertyValue("--solid-popper-content-available-width") || null,
+                availableHeight: style.getPropertyValue("--solid-popper-content-available-height") || null,
               };
             },
             { panelSel },
@@ -1757,6 +1760,7 @@ async function inspectUrl(
         );
 
         const overflowsRight = (m) => m && m.right > m.vw - padding + 0.5;
+        const overflowsBottom = (m) => m && m.bottom > m.vh - padding + 0.5;
         const inViewport = (m) =>
           m &&
           m.left >= padding - 0.5 &&
@@ -1765,24 +1769,25 @@ async function inspectUrl(
           m.bottom <= m.vh - padding + 0.5;
 
         const ok =
-          // slide=false: allow main-axis overflow for right-start.
+          // slide=false: allow vertical overflow for right-start.
           slideOff != null &&
-          overflowsRight(slideOff) &&
+          overflowsBottom(slideOff) &&
           slideOff.placement?.startsWith("right") === true &&
           slideOff.transform !== "none" &&
-          // slide=true: main-axis shift keeps it in viewport.
+          // slide=true: main-axis shift keeps it in viewport vertically.
           slideOn != null &&
+          inViewport(slideOn) &&
           slideOn.placement?.startsWith("right") === true &&
           slideOn.transform !== "none" &&
-          // overlap=false: cross-axis overflow allowed for bottom-start.
+          // overlap=false: allow horizontal overflow for right-start.
           overlapOff != null &&
           overflowsRight(overlapOff) &&
-          overlapOff.placement?.startsWith("bottom") === true &&
+          overlapOff.placement?.startsWith("right") === true &&
           overlapOff.transform !== "none" &&
-          // overlap=true: cross-axis shift keeps it in viewport.
+          // overlap=true: cross-axis shift keeps it in viewport horizontally.
           overlapOn != null &&
           inViewport(overlapOn) &&
-          overlapOn.placement?.startsWith("bottom") === true &&
+          overlapOn.placement?.startsWith("right") === true &&
           overlapOn.transform !== "none";
 
         interactionResults.push({
