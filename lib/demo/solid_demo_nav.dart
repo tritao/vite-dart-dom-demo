@@ -18,6 +18,9 @@ web.HTMLElement solidDemoNav({required String active}) {
   final row = web.HTMLDivElement()..className = "solid-demo-nav-row";
   row.appendChild(link("← Back", "/", current: false));
   row.appendChild(link("Menu", "/?solid=menu", current: active == "menu"));
+  row.appendChild(
+    link("ContextMenu", "/?solid=contextmenu", current: active == "contextmenu"),
+  );
   row.appendChild(link("Dialog", "/?solid=dialog", current: active == "dialog"));
   row.appendChild(link("Popover", "/?solid=popover", current: active == "popover"));
   row.appendChild(link("Tooltip", "/?solid=tooltip", current: active == "tooltip"));

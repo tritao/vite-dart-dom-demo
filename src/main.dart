@@ -11,6 +11,7 @@ import './solid_popover_demo.dart';
 import './solid_roving_demo.dart';
 import './solid_toast_demo.dart';
 import './solid_menu_demo.dart';
+import './solid_context_menu_demo.dart';
 import './solid_tooltip_demo.dart';
 import './solid_select_demo.dart';
 import './solid_combobox_demo.dart';
@@ -51,6 +52,10 @@ void main() {
   }
   if (solid == 'menu') {
     mountSolidMenuDemo(mount);
+    return;
+  }
+  if (solid == 'contextmenu') {
+    mountSolidContextMenuDemo(mount);
     return;
   }
   if (solid == 'tooltip') {

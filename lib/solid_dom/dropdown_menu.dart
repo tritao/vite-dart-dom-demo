@@ -27,6 +27,7 @@ web.DocumentFragment DropdownMenu({
     setOpen: setOpen,
     anchor: anchor,
     builder: builder,
+    restoreFocusTo: anchor is web.HTMLElement ? anchor as web.HTMLElement : null,
     onClose: onClose,
     onOpenAutoFocus: onOpenAutoFocus,
     onCloseAutoFocus: onCloseAutoFocus,
@@ -39,4 +40,3 @@ web.DocumentFragment DropdownMenu({
     portalId: portalId,
   );
 }
-

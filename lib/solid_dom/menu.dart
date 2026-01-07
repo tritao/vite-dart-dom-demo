@@ -324,6 +324,7 @@ web.DocumentFragment Menu({
   required void Function(bool next) setOpen,
   required web.Element anchor,
   required MenuBuilder builder,
+  web.HTMLElement? restoreFocusTo,
   void Function(String reason)? onClose,
   void Function(FocusScopeAutoFocusEvent event)? onOpenAutoFocus,
   void Function(FocusScopeAutoFocusEvent event)? onCloseAutoFocus,
@@ -1127,9 +1128,9 @@ web.DocumentFragment Menu({
             if (e.defaultPrevented) return;
             // Always prevent autofocus because we either focus manually or want UA focus.
             e.preventDefault();
-            if ((closeReason == "select" || closeReason == "escape") &&
-                anchor is web.HTMLElement) {
-              scheduleMicrotask(() => focusWithoutScrolling(anchor as web.HTMLElement));
+            if (closeReason == "select" || closeReason == "escape") {
+              final el = restoreFocusTo ?? (anchor is web.HTMLElement ? anchor as web.HTMLElement : null);
+              if (el != null) scheduleMicrotask(() => focusWithoutScrolling(el));
             }
           },
         );

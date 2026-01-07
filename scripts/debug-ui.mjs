@@ -4217,6 +4217,86 @@ async function inspectUrl(
           details: { error: String(e) },
         });
       }
+    } else if (scenario === "solid-contextmenu") {
+      let step = "init";
+      try {
+        const target = page.locator("#contextmenu-target");
+        if (!(await target.count())) {
+          interactionResults.push({
+            name: "solid-contextmenu",
+            ok: false,
+            details: { reason: "missing #contextmenu-target" },
+          });
+        } else {
+          // Focus the target so we can assert focus restoration.
+          step = "focus target";
+          await target.first().focus();
+
+          // Open via right click.
+          step = "open via contextmenu";
+          await target.first().click({
+            button: "right",
+            position: { x: 60, y: 50 },
+            timeout: timeoutMs,
+          });
+          step = "wait open";
+          await page.waitForFunction(
+            () => document.querySelector("#contextmenu-content") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(50);
+
+          step = "position near pointer";
+          const pos = await page.evaluate(() => {
+            const menu = document.querySelector("#contextmenu-content");
+            if (!menu) return null;
+            const r = menu.getBoundingClientRect();
+            return {
+              left: Math.round(r.left),
+              top: Math.round(r.top),
+              right: Math.round(r.right),
+              bottom: Math.round(r.bottom),
+            };
+          });
+
+          // Keyboard select: ArrowDown to "Paste", Enter selects and closes.
+          step = "ArrowDown";
+          await page.keyboard.press("ArrowDown");
+          step = "Enter";
+          await page.keyboard.press("Enter");
+          step = "wait closed";
+          await page.waitForFunction(
+            () => document.querySelector("#contextmenu-content") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+
+          const after = await page.evaluate(() => ({
+            status: document.querySelector("#contextmenu-status")?.textContent ?? null,
+            activeId: document.activeElement?.id ?? null,
+          }));
+
+          const ok =
+            pos != null &&
+            pos.left >= 40 &&
+            pos.top >= 20 &&
+            (after.status ?? "").includes("Action: Paste") &&
+            (after.status ?? "").includes("Close: select") &&
+            after.activeId === "contextmenu-target";
+
+          interactionResults.push({
+            name: "solid-contextmenu",
+            ok,
+            details: { pos, after },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-contextmenu",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
     } else if (scenario === "solid-nesting") {
       try {
         const result = await runSolidNestingScenario(page, { timeoutMs, jitter });
