@@ -673,8 +673,28 @@ web.DocumentFragment DropdownMenu({
               if (ev.pointerType != "mouse") return;
               clearOpenTimer();
 
+              // Update pointer direction from this leave event. In practice, we
+              // can miss a final `pointermove` while the pointer crosses the
+              // gap between trigger and submenu; this keeps the safe-polygon
+              // check stable (Kobalte-equivalent behavior).
+              final leaveX = _pointerClientX(ev);
+              final dx = leaveX - rootController.lastPointerX;
+              if (dx.abs() > 0.0) {
+                rootController.pointerDir = dx > 0 ? "right" : "left";
+              }
+              rootController.lastPointerX = leaveX;
+
               final contentEl = submenuContent;
               if (contentEl != null) {
+                // If the popper hasn't computed its first position yet, the
+                // bounding rect can be off-screen (we mount pending off-screen
+                // to avoid first-frame flicker). Treat this transition as a
+                // "grace" move and avoid stealing focus back to the parent.
+                if (contentEl.getAttribute("data-solid-popper-pending") != null) {
+                  rootController.setPointerGraceIntent(null);
+                  rootController.clearPointerGraceLater();
+                  return;
+                }
                 final place = contentEl.getAttribute("data-solid-placement") ??
                     (_documentDirection() == "rtl" ? "left-start" : "right-start");
                 rootController.setPointerGraceIntent(
