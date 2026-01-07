@@ -1,4 +1,4 @@
-export async function runSolidWordprocScenario(page, { timeoutMs }) {
+export async function runSolidWordprocScenario(page, { timeoutMs, jitter }) {
   const root = page.locator("#wordproc-root");
   const outliner = page.locator("#wordproc-outliner");
   const editor = page.locator("#wordproc-editor");
@@ -37,6 +37,7 @@ export async function runSolidWordprocScenario(page, { timeoutMs }) {
 
   // Create a new section from the empty/default outline.
   await page.locator("#wordproc-add-section").click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelectorAll("[id^=wordproc-outline-item-]").length >= 2,
     undefined,
@@ -58,6 +59,7 @@ export async function runSolidWordprocScenario(page, { timeoutMs }) {
   );
   const proseMirror = page.locator("#wordproc-editor-mount .ProseMirror");
   await proseMirror.first().click({ timeout: timeoutMs });
+  await jitter?.();
   await proseMirror.first().type(" hello", { delay: 5 });
 
   // Local storage should reflect a persisted doc for the current section.
@@ -101,6 +103,7 @@ export async function runSolidWordprocScenario(page, { timeoutMs }) {
   );
   await page.locator("#wordproc-agent-input").fill("hello");
   await page.locator("#wordproc-agent-send").click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     ({ before }) =>
       document.querySelectorAll("#wordproc-agent-log .wordproc-agent-msg").length ===
@@ -114,12 +117,14 @@ export async function runSolidWordprocScenario(page, { timeoutMs }) {
 
   // Heavy subtree mount/unmount increments cleanup count on disposal.
   await page.locator("#wordproc-toggle-heavy").click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelector("#wordproc-heavy") != null,
     undefined,
     { timeout: timeoutMs },
   );
   await page.locator("#wordproc-toggle-heavy").click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelector("#wordproc-heavy") == null,
     undefined,

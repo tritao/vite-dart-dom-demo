@@ -9,8 +9,17 @@ import { setTimeout as delay } from "node:timers/promises";
 import { runSolidWordprocScenario } from "./scenarios/solid-wordproc.mjs";
 import { runSolidNestingScenario } from "./scenarios/solid-nesting.mjs";
 import { runSolidToastModalScenario } from "./scenarios/solid-toast-modal.mjs";
+import { runSolidOptionBuilderScenario } from "./scenarios/solid-optionbuilder.mjs";
 
 const HOST = "127.0.0.1";
+
+function makeRng(seed) {
+  let s = Number(seed) >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 2 ** 32;
+  };
+}
 
 function parseArgs(argv) {
   const args = {
@@ -22,6 +31,9 @@ function parseArgs(argv) {
     expectSelector: "#app-root",
     interactions: true,
     scenario: "app",
+    repeat: 1,
+    jitterMs: 0,
+    seed: null,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -35,6 +47,10 @@ function parseArgs(argv) {
       args.expectSelector = argv[++i] ?? args.expectSelector;
     else if (a === "--no-interactions") args.interactions = false;
     else if (a === "--scenario") args.scenario = argv[++i] ?? args.scenario;
+    else if (a === "--repeat") args.repeat = Number(argv[++i] ?? args.repeat);
+    else if (a === "--jitter-ms")
+      args.jitterMs = Number(argv[++i] ?? args.jitterMs);
+    else if (a === "--seed") args.seed = Number(argv[++i] ?? args.seed);
   }
   return args;
 }
@@ -121,10 +137,28 @@ function isIgnorableConsoleError(text) {
 
 async function inspectUrl(
   url,
-  { timeoutMs, expectSelector, expectH1, interactions, scenario },
+  {
+    timeoutMs,
+    expectSelector,
+    expectH1,
+    interactions,
+    scenario,
+    jitterMs = 0,
+    seed = null,
+    runIndex = 1,
+    screenshotPath = ".cache/debug-ui.png",
+  },
 ) {
   const browser = await launchBrowser();
   const page = await browser.newPage();
+
+  const baseSeed = seed == null ? (jitterMs > 0 ? 1 : 0) : Number(seed) >>> 0;
+  const rng = makeRng((baseSeed + (runIndex - 1)) >>> 0);
+  const jitter = async () => {
+    if (!jitterMs || jitterMs <= 0) return;
+    const ms = Math.floor(rng() * jitterMs);
+    if (ms > 0) await page.waitForTimeout(ms);
+  };
 
   const consoleLines = [];
   const consoleErrors = [];
@@ -2351,7 +2385,7 @@ async function inspectUrl(
       }
     } else if (scenario === "solid-wordproc") {
       try {
-        const result = await runSolidWordprocScenario(page, { timeoutMs });
+        const result = await runSolidWordprocScenario(page, { timeoutMs, jitter });
         interactionResults.push(result);
       } catch (e) {
         interactionResults.push({
@@ -2362,7 +2396,7 @@ async function inspectUrl(
       }
     } else if (scenario === "solid-nesting") {
       try {
-        const result = await runSolidNestingScenario(page, { timeoutMs });
+        const result = await runSolidNestingScenario(page, { timeoutMs, jitter });
         interactionResults.push(result);
       } catch (e) {
         interactionResults.push({
@@ -2373,11 +2407,22 @@ async function inspectUrl(
       }
     } else if (scenario === "solid-toast-modal") {
       try {
-        const result = await runSolidToastModalScenario(page, { timeoutMs });
+        const result = await runSolidToastModalScenario(page, { timeoutMs, jitter });
         interactionResults.push(result);
       } catch (e) {
         interactionResults.push({
           name: "solid-toast-modal",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
+    } else if (scenario === "solid-optionbuilder") {
+      try {
+        const result = await runSolidOptionBuilderScenario(page, { timeoutMs, jitter });
+        interactionResults.push(result);
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-optionbuilder",
           ok: false,
           details: { error: String(e) },
         });
@@ -2443,7 +2488,7 @@ async function inspectUrl(
     };
   });
 
-  await page.screenshot({ path: ".cache/debug-ui.png", fullPage: true });
+  await page.screenshot({ path: screenshotPath, fullPage: true });
 
   await browser.close();
 
@@ -2585,42 +2630,80 @@ async function main() {
       );
     }
 
-    log(`\n==> playwright inspect ${url}`);
-    const report = await inspectUrl(url, {
-      timeoutMs: args.timeoutMs,
-      expectSelector: args.expectSelector,
-      expectH1: args.expectH1,
-      interactions: args.interactions,
-      scenario: args.scenario,
-    });
-
-    const reportPath = ".cache/debug-ui-report.json";
-    await fs.promises.writeFile(reportPath, JSON.stringify(report, null, 2));
-
+    const repeat = Number(args.repeat ?? 1);
+    const reports = [];
     const failures = [];
-    if (report.pageErrors.length) failures.push("pageErrors");
-    if (report.consoleErrors.length) failures.push("consoleErrors");
-    if (report.failedRequests.length) failures.push("failedRequests");
-    if (report.badResponses.length) failures.push("badResponses");
-    if (!report.appInfo.mountExists) failures.push("#app missing");
-    if (report.appInfo.mountChildCount === 0) failures.push("#app empty");
-    if (args.interactions) {
-      const interactionFailures = report.interactionResults.filter((r) => !r.ok);
-      if (interactionFailures.length)
-        failures.push(
-          `interactions:${interactionFailures.map((r) => r.name).join(",")}`,
-        );
+
+    log(`\n==> playwright inspect ${url}`);
+    if (args.jitterMs > 0) {
+      const seedShown = args.seed == null ? 1 : args.seed;
+      log(`\n==> jitter enabled (max ${args.jitterMs}ms, seed ${seedShown})`);
     }
 
+    for (let i = 0; i < repeat; i++) {
+      if (repeat > 1) {
+        log(`\n==> run ${i + 1}/${repeat}`);
+      }
+      const screenshotPath =
+        repeat > 1 ? `.cache/debug-ui-run-${i + 1}.png` : ".cache/debug-ui.png";
+      const report = await inspectUrl(url, {
+        timeoutMs: args.timeoutMs,
+        expectSelector: args.expectSelector,
+        expectH1: args.expectH1,
+        interactions: args.interactions,
+        scenario: args.scenario,
+        jitterMs: args.jitterMs,
+        seed: args.seed,
+        runIndex: i + 1,
+        screenshotPath,
+      });
+      reports.push(report);
+
+      const runFailures = [];
+      if (report.pageErrors.length) runFailures.push("pageErrors");
+      if (report.consoleErrors.length) runFailures.push("consoleErrors");
+      if (report.failedRequests.length) runFailures.push("failedRequests");
+      if (report.badResponses.length) runFailures.push("badResponses");
+      if (!report.appInfo.mountExists) runFailures.push("#app missing");
+      if (report.appInfo.mountChildCount === 0) runFailures.push("#app empty");
+      if (args.interactions) {
+        const interactionFailures = report.interactionResults.filter((r) => !r.ok);
+        if (interactionFailures.length)
+          runFailures.push(
+            `interactions:${interactionFailures.map((r) => r.name).join(",")}`,
+          );
+      }
+      if (runFailures.length) failures.push({ run: i + 1, failures: runFailures });
+    }
+
+    const reportPath = ".cache/debug-ui-report.json";
+    const combinedReport =
+      repeat <= 1
+        ? reports[0]
+        : {
+            repeat,
+            jitterMs: args.jitterMs,
+            seed: args.seed == null ? (args.jitterMs > 0 ? 1 : null) : args.seed,
+            runs: reports,
+          };
+    await fs.promises.writeFile(reportPath, JSON.stringify(combinedReport, null, 2));
+
     log(`\n==> artifacts`);
-    log(`- .cache/debug-ui.png`);
+    if (repeat > 1) {
+      log(`- .cache/debug-ui-run-*.png`);
+    } else {
+      log(`- .cache/debug-ui.png`);
+    }
     log(`- ${reportPath}`);
 
     if (failures.length) {
-      log(`\n==> FAIL (${failures.join(", ")})`);
+      const formatted = failures
+        .map((f) => `run ${f.run}: ${f.failures.join(", ")}`)
+        .join(" | ");
+      log(`\n==> FAIL (${formatted})`);
       process.exitCode = 1;
     } else {
-      log(`\n==> OK (#app has ${report.appInfo.mountChildCount} child nodes)`);
+      log(`\n==> OK (${repeat} run${repeat === 1 ? "" : "s"})`);
     }
   } finally {
     await shutdownAsync();

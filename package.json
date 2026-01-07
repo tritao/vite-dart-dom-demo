@@ -50,7 +50,9 @@
     "debug:solid-nesting": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=nesting\" --scenario solid-nesting --expect-h1 \"Solid Nesting Demo\" --expect-selector \"#nesting-root\"",
     "debug:solid-nesting:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=nesting\" --scenario solid-nesting --expect-h1 \"Solid Nesting Demo\" --expect-selector \"#nesting-root\"",
     "debug:solid-toast-modal": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=toast-modal\" --scenario solid-toast-modal --expect-h1 \"Solid Toast + Modal Demo\" --expect-selector \"#toast-modal-root\"",
-    "debug:solid-toast-modal:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast-modal\" --scenario solid-toast-modal --expect-h1 \"Solid Toast + Modal Demo\" --expect-selector \"#toast-modal-root\""
+    "debug:solid-toast-modal:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast-modal\" --scenario solid-toast-modal --expect-h1 \"Solid Toast + Modal Demo\" --expect-selector \"#toast-modal-root\"",
+    "debug:solid-optionbuilder": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=optionbuilder\" --scenario solid-optionbuilder --expect-h1 \"Solid OptionBuilder Demo\" --expect-selector \"#optionbuilder-root\"",
+    "debug:solid-optionbuilder:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=optionbuilder\" --scenario solid-optionbuilder --expect-h1 \"Solid OptionBuilder Demo\" --expect-selector \"#optionbuilder-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

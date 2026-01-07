@@ -1,4 +1,5 @@
 import "package:dart_web_test/solid.dart";
+import "dart:js_util" as js_util;
 import "package:web/web.dart" as web;
 
 import "../solid_dom.dart";
@@ -47,22 +48,22 @@ final class SelectableItemResult {
     attr(el, "data-key", dataKey);
 
     on(el, "pointerdown", (e) {
-      onPointerDown(e as web.PointerEvent);
+      if (e is web.PointerEvent) onPointerDown(e);
     });
     on(el, "pointerup", (e) {
-      onPointerUp(e as web.PointerEvent);
+      if (e is web.PointerEvent) onPointerUp(e);
     });
     on(el, "click", (e) {
-      onClick(e as web.MouseEvent);
+      if (e is web.MouseEvent) onClick(e);
     });
     on(el, "keydown", (e) {
-      onKeyDown(e as web.KeyboardEvent);
+      if (e is web.KeyboardEvent) onKeyDown(e);
     });
     on(el, "mousedown", (e) {
-      onMouseDown(e as web.MouseEvent);
+      if (e is web.MouseEvent) onMouseDown(e);
     });
     on(el, "focus", (e) {
-      onFocus(e as web.FocusEvent);
+      if (e is web.FocusEvent) onFocus(e);
     });
   }
 }
@@ -88,6 +89,23 @@ SelectableItemResult createSelectableItem({
 
   final manager = selectionManager;
 
+  bool _boolProp(Object e, String name) {
+    try {
+      return js_util.getProperty(e, name) == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  String? _stringProp(Object e, String name) {
+    try {
+      final v = js_util.getProperty(e, name);
+      return v is String ? v : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   void onSelect(Object e) {
     final m = manager();
     if (m.selectionMode() == SelectionMode.none) return;
@@ -102,19 +120,14 @@ SelectableItemResult createSelectableItem({
       return;
     }
 
-    final shiftKey = switch (e) {
-      web.KeyboardEvent ev => ev.shiftKey,
-      web.MouseEvent ev => ev.shiftKey,
-      web.PointerEvent ev => ev.shiftKey,
-      _ => false,
-    };
+    final shiftKey = _boolProp(e, "shiftKey");
 
     if (shiftKey) {
       m.extendSelection(k);
       return;
     }
 
-    final isTouch = e is web.PointerEvent ? e.pointerType == "touch" : false;
+    final isTouch = _stringProp(e, "pointerType") == "touch";
     final toggleKey = isCtrlKeyPressed(e) || isTouch;
 
     if (m.selectionBehavior() == SelectionBehavior.toggle || toggleKey) {

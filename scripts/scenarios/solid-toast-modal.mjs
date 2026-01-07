@@ -1,4 +1,4 @@
-export async function runSolidToastModalScenario(page, { timeoutMs }) {
+export async function runSolidToastModalScenario(page, { timeoutMs, jitter }) {
   const root = page.locator("#toast-modal-root");
   const openModal = page.locator("#toast-modal-open");
   if (!(await root.count()) || !(await openModal.count())) {
@@ -11,6 +11,7 @@ export async function runSolidToastModalScenario(page, { timeoutMs }) {
 
   // Open modal.
   await openModal.first().click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelector("#toast-modal-panel") != null,
     { timeout: timeoutMs },
@@ -18,6 +19,7 @@ export async function runSolidToastModalScenario(page, { timeoutMs }) {
 
   // Show toast from within modal.
   await page.locator("#toast-modal-show-toast").click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelector("#toast-1") != null,
     { timeout: timeoutMs },
@@ -25,6 +27,7 @@ export async function runSolidToastModalScenario(page, { timeoutMs }) {
 
   // Toast dismiss should be clickable and must not dismiss the modal.
   await page.locator("#toast-1 button").first().click({ timeout: timeoutMs });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelector("#toast-1") == null,
     { timeout: timeoutMs },
@@ -41,6 +44,7 @@ export async function runSolidToastModalScenario(page, { timeoutMs }) {
     timeout: timeoutMs,
     position: { x: 5, y: 5 },
   });
+  await jitter?.();
   await page.waitForFunction(
     () => document.querySelector("#toast-modal-panel") == null,
     { timeout: timeoutMs },

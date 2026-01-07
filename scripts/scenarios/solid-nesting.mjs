@@ -1,4 +1,4 @@
-export async function runSolidNestingScenario(page, { timeoutMs }) {
+export async function runSolidNestingScenario(page, { timeoutMs, jitter }) {
   const root = page.locator("#nesting-root");
   const openDialog = page.locator("#nesting-dialog-trigger");
   if (!(await root.count()) || !(await openDialog.count())) {
@@ -31,41 +31,51 @@ export async function runSolidNestingScenario(page, { timeoutMs }) {
 
   // Open all layers.
   await openDialog.first().click({ timeout: timeoutMs });
+  await jitter?.();
   await expectOpen(["#nesting-dialog-panel"]);
 
   await page.locator("#nesting-popover-trigger").click({ timeout: timeoutMs });
+  await jitter?.();
   await expectOpen(["#nesting-popover-panel"]);
 
   await page.locator("#nesting-menu-trigger").click({ timeout: timeoutMs });
+  await jitter?.();
   await expectOpen(["#nesting-menu-content"]);
 
   // Escape should dismiss topmost only (menu → popover → dialog).
   await page.keyboard.press("Escape");
+  await jitter?.();
   await expectClosed(["#nesting-menu-content"]);
   await expectOpen(["#nesting-popover-panel", "#nesting-dialog-panel"]);
   const afterEscapeMenu = await page.locator("#nesting-status").textContent();
 
   await page.keyboard.press("Escape");
+  await jitter?.();
   await expectClosed(["#nesting-popover-panel"]);
   await expectOpen(["#nesting-dialog-panel"]);
   const afterEscapePopover = await page.locator("#nesting-status").textContent();
 
   await page.keyboard.press("Escape");
+  await jitter?.();
   await expectClosed(["#nesting-dialog-panel"]);
   const afterEscapeDialog = await page.locator("#nesting-status").textContent();
 
   // Outside click: clicking inside popover but outside menu closes only menu.
   await openDialog.first().click({ timeout: timeoutMs });
+  await jitter?.();
   await expectOpen(["#nesting-dialog-panel"]);
   await page.locator("#nesting-popover-trigger").click({ timeout: timeoutMs });
+  await jitter?.();
   await expectOpen(["#nesting-popover-panel"]);
   await page.locator("#nesting-menu-trigger").click({ timeout: timeoutMs });
+  await jitter?.();
   await expectOpen(["#nesting-menu-content"]);
 
   await page.click("#nesting-popover-panel", {
     timeout: timeoutMs,
     position: { x: 5, y: 5 },
   });
+  await jitter?.();
   await expectClosed(["#nesting-menu-content"]);
   await expectOpen(["#nesting-popover-panel", "#nesting-dialog-panel"]);
   const afterOutsideMenu = await page.locator("#nesting-status").textContent();
@@ -75,6 +85,7 @@ export async function runSolidNestingScenario(page, { timeoutMs }) {
     timeout: timeoutMs,
     position: { x: 5, y: 5 },
   });
+  await jitter?.();
   await expectClosed(["#nesting-popover-panel"]);
   await expectOpen(["#nesting-dialog-panel"]);
   const afterOutsidePopover = await page.locator("#nesting-status").textContent();
@@ -84,6 +95,7 @@ export async function runSolidNestingScenario(page, { timeoutMs }) {
     timeout: timeoutMs,
     position: { x: 5, y: 5 },
   });
+  await jitter?.();
   await expectClosed(["#nesting-dialog-panel"]);
   const afterOutsideDialog = await page.locator("#nesting-status").textContent();
 

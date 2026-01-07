@@ -19,6 +19,7 @@ import './solid_selection_demo.dart';
 import 'package:dart_web_test/wordproc/wordproc.dart';
 import './solid_nesting_demo.dart';
 import './solid_toast_modal_demo.dart';
+import './solid_optionbuilder_demo.dart';
 
 void main() {
   final mount = web.document.querySelector('#app');
@@ -82,6 +83,10 @@ void main() {
   }
   if (solid == 'toast-modal') {
     mountSolidToastModalDemo(mount);
+    return;
+  }
+  if (solid == 'optionbuilder') {
+    mountSolidOptionBuilderDemo(mount);
     return;
   }
   if (solid == '1') {

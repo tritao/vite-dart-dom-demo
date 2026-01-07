@@ -19,6 +19,13 @@ typedef ListboxOptionBuilder<T, O extends ListboxItem<T>> = web.HTMLElement
   required bool active,
 });
 
+typedef ListboxOptionBuilderReactive<T, O extends ListboxItem<T>> =
+    web.HTMLElement Function(
+  O option, {
+  required bool Function() selected,
+  required bool Function() active,
+});
+
 final class ListboxHandle<T, O extends ListboxItem<T>> {
   ListboxHandle._(
     this.element, {
@@ -98,6 +105,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
   void Function(int index)? scrollToIndex,
   int Function()? pageSize,
   ListboxOptionBuilder<T, O>? optionBuilder,
+  ListboxOptionBuilderReactive<T, O>? optionBuilderReactive,
 }) {
   final eq = equals ?? defaultListboxEquals<T>;
   if (options == null && sections == null) {
@@ -423,8 +431,18 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
         for (final opt in section.options) {
           final key = ids.idForOption(opt);
           final idx = indexByKey.length;
-          final el = optionBuilder != null
-              ? optionBuilder(opt, selected: false, active: false)
+          final el = optionBuilderReactive != null
+              ? optionBuilderReactive(
+                  opt,
+                  selected: () => selection.isSelected(key),
+                  active: () => selection.focusedKey() == key,
+                )
+              : optionBuilder != null
+                  ? optionBuilder(
+                      opt,
+                      selected: selection.isSelected(key),
+                      active: selection.focusedKey() == key,
+                    )
               : (web.HTMLDivElement()
                 ..className = "menuItem"
                 ..textContent = opt.label);
@@ -473,8 +491,18 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
         final opt = entry.option;
         final key = entry.key;
         final idx = entry.index;
-        final el = optionBuilder != null
-            ? optionBuilder(opt, selected: false, active: false)
+        final el = optionBuilderReactive != null
+            ? optionBuilderReactive(
+                opt,
+                selected: () => selection.isSelected(key),
+                active: () => selection.focusedKey() == key,
+              )
+            : optionBuilder != null
+                ? optionBuilder(
+                    opt,
+                    selected: selection.isSelected(key),
+                    active: selection.focusedKey() == key,
+                  )
             : (web.HTMLDivElement()
               ..className = "menuItem"
               ..textContent = opt.label);

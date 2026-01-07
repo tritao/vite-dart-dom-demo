@@ -33,6 +33,13 @@ web.HTMLElement solidDemoNav({required String active}) {
   row.appendChild(
     link("Toast+Modal", "/?solid=toast-modal", current: active == "toast-modal"),
   );
+  row.appendChild(
+    link(
+      "OptionBuilder",
+      "/?solid=optionbuilder",
+      current: active == "optionbuilder",
+    ),
+  );
   row.appendChild(link("Roving", "/?solid=roving", current: active == "roving"));
   row.appendChild(link("Overlay", "/?solid=overlay", current: active == "overlay"));
   row.appendChild(
