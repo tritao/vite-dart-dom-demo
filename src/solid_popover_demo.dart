@@ -36,11 +36,12 @@ void mountSolidPopoverDemo(web.Element mount) {
       solidDemoHelp(
         title: "What to try",
         bullets: const [
-          "Toggle the popover and click outside to dismiss.",
-          "Press Escape while open to dismiss (reason shows below).",
+          "Toggle the popover and click outside to dismiss (reason shows below).",
+          "Press Escape while open to dismiss.",
+          "Tab/Shift+Tab are not trapped: focus can move anywhere on the page.",
           "Scroll the page: the popover should reposition with the anchor.",
-          "Try the bottom trigger to exercise flip/fit-in-viewport behavior.",
-          "Popover is non-modal: Tab can move focus to any focusable element on the page.",
+          "Use Edge/Slide/Overlap/Flip H triggers (top-right), then resize the viewport narrow to observe clamping vs overflow; inspect data-solid-placement in DevTools.",
+          "HideWhenDetached: open it, then toggle the anchor's display to see the panel become visibility:hidden.",
         ],
       ),
     );
@@ -59,14 +60,6 @@ void mountSolidPopoverDemo(web.Element mount) {
       ..textContent = "Toggle popover";
     on(trigger, "click", (_) => open.value = !open.value);
     root.appendChild(trigger);
-
-    final outsideAction = web.HTMLButtonElement()
-      ..id = "popover-outside-action"
-      ..type = "button"
-      ..className = "btn secondary"
-      ..textContent = "Outside action (increments)";
-    on(outsideAction, "click", (_) => outsideClicks.value++);
-    root.appendChild(outsideAction);
 
     final shiftTrigger = web.HTMLButtonElement()
       ..id = "popover-trigger-shift"
@@ -166,6 +159,21 @@ void mountSolidPopoverDemo(web.Element mount) {
     on(hideTrigger, "click", (_) => hideOpen.value = !hideOpen.value);
     root.appendChild(hideTrigger);
 
+    var hideAnchorHidden = false;
+    final toggleHideAnchor = web.HTMLButtonElement()
+      ..id = "popover-toggle-hide-anchor"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Toggle anchor display";
+    toggleHideAnchor.style.position = "fixed";
+    toggleHideAnchor.style.left = "356px";
+    toggleHideAnchor.style.bottom = "16px";
+    on(toggleHideAnchor, "click", (_) {
+      hideAnchorHidden = !hideAnchorHidden;
+      hideTrigger.style.display = hideAnchorHidden ? "none" : "";
+    });
+    root.appendChild(toggleHideAnchor);
+
     final bottomTrigger = web.HTMLButtonElement()
       ..id = "popover-trigger-bottom"
       ..type = "button"
@@ -193,6 +201,14 @@ void mountSolidPopoverDemo(web.Element mount) {
       ),
     );
     root.appendChild(status);
+
+    final outsideAction = web.HTMLButtonElement()
+      ..id = "popover-outside-action"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Outside action (increments)";
+    on(outsideAction, "click", (_) => outsideClicks.value++);
+    root.appendChild(outsideAction);
 
     root.appendChild(
       Popover(
