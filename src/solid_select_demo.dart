@@ -233,7 +233,6 @@ void mountSolidSelectDemo(web.Element mount) {
     slideOffTrigger.style.right = "16px";
     slideOffTrigger.style.bottom = "96px";
     slideOffTrigger.style.minWidth = "220px";
-    on(slideOffTrigger, "click", (_) => slideOffOpen.value = !slideOffOpen.value);
     root.appendChild(slideOffTrigger);
 
     final slideOnTrigger = web.HTMLButtonElement()
@@ -245,7 +244,6 @@ void mountSolidSelectDemo(web.Element mount) {
     slideOnTrigger.style.right = "16px";
     slideOnTrigger.style.bottom = "56px";
     slideOnTrigger.style.minWidth = "220px";
-    on(slideOnTrigger, "click", (_) => slideOnOpen.value = !slideOnOpen.value);
     root.appendChild(slideOnTrigger);
 
     final overlapOffTrigger = web.HTMLButtonElement()
@@ -257,7 +255,6 @@ void mountSolidSelectDemo(web.Element mount) {
     overlapOffTrigger.style.right = "16px";
     overlapOffTrigger.style.bottom = "200px";
     overlapOffTrigger.style.minWidth = "260px";
-    on(overlapOffTrigger, "click", (_) => overlapOffOpen.value = !overlapOffOpen.value);
     root.appendChild(overlapOffTrigger);
 
     final overlapOnTrigger = web.HTMLButtonElement()
@@ -269,7 +266,6 @@ void mountSolidSelectDemo(web.Element mount) {
     overlapOnTrigger.style.right = "16px";
     overlapOnTrigger.style.bottom = "160px";
     overlapOnTrigger.style.minWidth = "260px";
-    on(overlapOnTrigger, "click", (_) => overlapOnOpen.value = !overlapOnOpen.value);
     root.appendChild(overlapOnTrigger);
 
     final matrixOpts = <SelectOption<String>>[

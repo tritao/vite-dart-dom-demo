@@ -519,16 +519,17 @@ DismissableLayerHandle dismissableLayer(
         Timer(const Duration(milliseconds: 700), clearClickBlocker);
   }
 
-  void maybeDismissOutside(web.Event e) {
-    if (!bypassTopMostLayerCheck && !_isTopMostLayer(entry)) return;
-    if (!isEventOutside(e)) return;
+  bool maybeDismissOutside(web.Event e) {
+    if (!bypassTopMostLayerCheck && !_isTopMostLayer(entry)) return false;
+    if (!isEventOutside(e)) return false;
     onPointerDownOutside?.call(e);
     onInteractOutside?.call(e);
-    if (e.defaultPrevented) return;
+    if (e.defaultPrevented) return false;
     if (e is web.PointerEvent && e.type == "pointerdown") {
       dismissedByPointerDown = true;
     }
     onDismiss("outside");
+    return true;
   }
 
   void maybeDismissFocusOutside(web.Event e) {
@@ -552,12 +553,13 @@ DismissableLayerHandle dismissableLayer(
 
   void onClick(web.Event e) {
     if (disposed) return;
-    if (preventClickThrough && isEventOutside(e)) {
-      // Avoid preventDefault here: it would set defaultPrevented and stop the
-      // dismissable layer from closing itself via maybeDismissOutside().
+    final dismissed = maybeDismissOutside(e);
+    if (preventClickThrough && dismissed) {
+      // Only block the click that dismisses the layer. This is closer to
+      // Kobalte's behavior and avoids blocking outside interaction when
+      // dismissal is prevented.
       stopPropagationOnly(e);
     }
-    maybeDismissOutside(e);
   }
 
   void onPointerDown(web.Event e) {
@@ -573,8 +575,9 @@ DismissableLayerHandle dismissableLayer(
       return;
     }
     dismissedByPointerDown = false;
-    maybeDismissOutside(e);
+    final dismissed = maybeDismissOutside(e);
     if (preventClickThrough &&
+        dismissed &&
         dismissedByPointerDown &&
         e is web.PointerEvent &&
         e.pointerType != "touch" &&

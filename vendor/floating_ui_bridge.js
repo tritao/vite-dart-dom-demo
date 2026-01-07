@@ -55,8 +55,13 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
           (() => {
             const shiftOpts = {
               padding: viewportPadding,
-              // Keep overlap-only meaningful: Floating UI's crossAxis shifting is
-              // only useful when the middleware can also shift the main axis.
+              // Floating UI only applies crossAxis shifting meaningfully when it
+              // can also shift the main axis; keep overlap-only meaningful by
+              // enabling mainAxis shift when overlap is true.
+              //
+              // Kobalte sets `mainAxis: slide, crossAxis: overlap`, but we
+              // intentionally diverge here so the `slide=false, overlap=true`
+              // combination still clamps within the viewport.
               mainAxis: slide || overlap,
               crossAxis: overlap,
             };
