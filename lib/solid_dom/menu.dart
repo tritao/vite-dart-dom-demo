@@ -84,7 +84,10 @@ final class MenuContent {
   final int initialActiveIndex;
 }
 
-typedef DropdownMenuBuilder = MenuContent Function(MenuCloseController close);
+typedef MenuBuilder = MenuContent Function(MenuCloseController close);
+
+// Back-compat + aligns with the public wrapper name.
+typedef DropdownMenuBuilder = MenuBuilder;
 
 typedef _Polygon = List<({double x, double y})>;
 
@@ -315,11 +318,12 @@ final class _MenuController {
   }
 }
 
-web.DocumentFragment DropdownMenu({
+/// Menu core primitive (used by DropdownMenu/ContextMenu/Menubar-style wrappers).
+web.DocumentFragment Menu({
   required bool Function() open,
   required void Function(bool next) setOpen,
   required web.Element anchor,
-  required DropdownMenuBuilder builder,
+  required MenuBuilder builder,
   void Function(String reason)? onClose,
   void Function(FocusScopeAutoFocusEvent event)? onOpenAutoFocus,
   void Function(FocusScopeAutoFocusEvent event)? onCloseAutoFocus,

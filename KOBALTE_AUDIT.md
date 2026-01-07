@@ -38,7 +38,8 @@ Audit in dependency order: **foundations → selection core → composed compone
    - Listbox: `lib/solid_dom/listbox.dart`
    - Select: `lib/solid_dom/select.dart`
    - Combobox: `lib/solid_dom/combobox.dart`
-   - Menu/DropdownMenu: `lib/solid_dom/menu.dart`
+   - Menu core: `lib/solid_dom/menu.dart`
+   - DropdownMenu wrapper: `lib/solid_dom/dropdown_menu.dart`
    - Popover/Tooltip: `lib/solid_dom/popover.dart`, `lib/solid_dom/tooltip.dart`
    - Dialog: `lib/solid_dom/dialog.dart`
    - Toast: `lib/solid_dom/toast.dart`
@@ -100,7 +101,7 @@ Use this as the “what file should I read?” index during the audit.
 
 - Menu / DropdownMenu
   - Kobalte: `.cache/refs/kobalte/packages/core/src/menu/*` and `.cache/refs/kobalte/packages/core/src/dropdown-menu/*`
-  - Dart: `lib/solid_dom/menu.dart`
+  - Dart: `lib/solid_dom/menu.dart` + `lib/solid_dom/dropdown_menu.dart`
   - Tests: `npm run debug:solid-menu`
 
 - Listbox
@@ -143,4 +144,3 @@ For each module in order:
 - Every foundation has at least one “nasty” scenario (nesting, mixed input types, timing variance) that passes reliably.
 - Selection components (Listbox/Select/Combobox/Menu) share one core behavior model (no bespoke re-implementations).
 - Positioning uses Floating UI by default (fallback only for debugging/offline), and positioning scenarios cover flip/scroll/resize.
-
