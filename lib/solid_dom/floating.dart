@@ -165,6 +165,21 @@ FloatingHandle floatToAnchor({
 
   _ensureOverlayZIndex(floating);
 
+  // Avoid 1-frame "tear" where the element paints in-flow before we apply fixed
+  // positioning/transform. Keep it off-screen until the first positioning pass
+  // completes (visibility:hidden can interfere with focus).
+  try {
+    if (floating.getAttribute("data-solid-popper-pending") == null) {
+      floating.setAttribute("data-solid-popper-pending", "1");
+    }
+    floating.style.position = "fixed";
+    floating.style.top = "0";
+    floating.style.left = "0";
+    if (floating.style.transform.isEmpty) {
+      floating.style.transform = "translate3d(-100000px, -100000px, 0)";
+    }
+  } catch (_) {}
+
   Object? jsHandle;
   void disposeJsHandle() {
     final h = jsHandle;
@@ -219,6 +234,14 @@ FloatingHandle floatToAnchor({
     return FloatingHandle._(dispose);
   }
 
+  void finalizeFirstPaint() {
+    try {
+      if (floating.getAttribute("data-solid-popper-pending") != null) {
+        floating.removeAttribute("data-solid-popper-pending");
+      }
+    } catch (_) {}
+  }
+
   void compute() {
     if (disposed) return;
     if (!floating.isConnected) return;
@@ -260,6 +283,7 @@ FloatingHandle floatToAnchor({
         floating.style.visibility = hidden ? "hidden" : "visible";
       } catch (_) {}
     }
+    finalizeFirstPaint();
   }
 
   void computeWhenConnected() {

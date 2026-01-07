@@ -96,6 +96,17 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
     ...(arrowEl ? [arrow({ element: arrowEl, padding: arrowPadding })] : []),
   ];
 
+  // Avoid a 1-frame flash in the wrong place: Dart marks newly-mounted poppers
+  // as pending until the first computePosition completes.
+  const isPending = () =>
+    floating?.getAttribute?.("data-solid-popper-pending") === "1";
+  const clearPending = () => {
+    try {
+      if (!isPending()) return;
+      floating.removeAttribute("data-solid-popper-pending");
+    } catch {}
+  };
+
   const update = async () => {
     if (!anchor || !floating) return;
     if (!anchor.isConnected || !floating.isConnected) return;
@@ -120,6 +131,7 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
       const hidden = pos.middlewareData?.hide?.referenceHidden;
       floating.style.visibility = hidden ? "hidden" : "visible";
     }
+    clearPending();
 
     if (arrowEl && pos.middlewareData?.arrow) {
       const { x: ax, y: ay } = pos.middlewareData.arrow;
