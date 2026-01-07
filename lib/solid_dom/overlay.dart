@@ -54,6 +54,13 @@ AriaHiddenHandle ariaHideOthers(web.Element keep) {
       final node = children.item(i);
       if (node == null) continue;
       if (identical(node, keep) || node.contains(keep)) continue;
+      // Never hide "top layer" UI (e.g. toast regions).
+      try {
+        if (node.getAttribute("data-solid-top-layer") != null ||
+            node.querySelector("[data-solid-top-layer]") != null) {
+          continue;
+        }
+      } catch (_) {}
       if (!hidden.containsKey(node)) {
         hidden[node] = (
           ariaHidden: node.getAttribute("aria-hidden"),
@@ -204,6 +211,10 @@ FocusTrapHandle focusTrap(
     final target = e.target;
     if (target is! web.Node) return;
     if (container.contains(target)) return;
+    if (target is web.Element &&
+        target.closest("[data-solid-top-layer]") != null) {
+      return;
+    }
     if (!container.isConnected) return;
     focusInitial();
   }
@@ -349,17 +360,27 @@ void _syncPointerBlocking() {
   _prevBodyPointerEvents = body.style.pointerEvents;
   body.style.pointerEvents = "none";
 
-  final startIndex = _layerStack.indexOf(blocker);
-  if (startIndex == -1) return;
-  for (var i = startIndex; i < _layerStack.length; i++) {
+  final blockerIndex = _layerStack.indexOf(blocker);
+  if (blockerIndex == -1) return;
+
+  // Mirror Kobalte's layer-stack behavior: anything "below" the top-most
+  // pointer-blocking layer is non-interactive; the blocker and anything above
+  // it stay interactive.
+  for (var i = 0; i < _layerStack.length; i++) {
     final entry = _layerStack[i];
     final el = entry.element;
     if (el is! web.HTMLElement) continue;
     entry._prevPointerEvents = el.style.pointerEvents;
     entry._prevPointerLayerAttr = el.getAttribute("data-solid-pointer-layer");
     entry._pointerPatched = true;
-    el.style.pointerEvents = "auto";
-    el.setAttribute("data-solid-pointer-layer", "1");
+
+    if (i < blockerIndex) {
+      el.style.pointerEvents = "none";
+      el.removeAttribute("data-solid-pointer-layer");
+    } else {
+      el.style.pointerEvents = "auto";
+      el.setAttribute("data-solid-pointer-layer", "1");
+    }
   }
 
   // Ensure "top layer" elements remain interactive even when the body is

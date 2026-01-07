@@ -15,6 +15,7 @@ void mountSolidOverlayDemo(web.Element mount) {
 
     final open = createSignal<bool>(false);
     final lastDismiss = createSignal<String>("none");
+    final underCount = createSignal<int>(0);
 
     final title = web.HTMLHeadingElement.h1()
       ..textContent = "Solid Overlay Demo";
@@ -38,12 +39,29 @@ void mountSolidOverlayDemo(web.Element mount) {
       ..className = "btn primary"
       ..textContent = "Open dialog";
     on(trigger, "click", (_) => open.value = true);
-    root.appendChild(trigger);
+    final underBtn = web.HTMLButtonElement()
+      ..id = "overlay-under-button"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Outside action (increments)";
+    underBtn.style.position = "fixed";
+    underBtn.style.left = "24px";
+    underBtn.style.bottom = "24px";
+    on(underBtn, "click", (_) => underCount.value++);
+
+    final row = web.HTMLDivElement()..className = "row";
+    row.appendChild(trigger);
+    root.appendChild(row);
+    root.appendChild(underBtn);
 
     final status = web.HTMLParagraphElement()
       ..id = "overlay-status"
       ..className = "muted";
-    status.appendChild(text(() => "Dismiss: ${lastDismiss.value}"));
+    status.appendChild(
+      text(
+        () => "Dismiss: ${lastDismiss.value} • Outside clicks: ${underCount.value}",
+      ),
+    );
     root.appendChild(status);
 
     root.appendChild(
@@ -57,6 +75,11 @@ void mountSolidOverlayDemo(web.Element mount) {
               ..id = "overlay-wrapper";
             wrapper.style.position = "fixed";
             wrapper.style.inset = "0";
+            wrapper.style.display = "flex";
+            wrapper.style.alignItems = "center";
+            wrapper.style.justifyContent = "center";
+            wrapper.style.padding = "24px";
+            wrapper.style.boxSizing = "border-box";
 
             final backdrop = web.HTMLDivElement()..id = "overlay-backdrop";
             backdrop.setAttribute("data-solid-backdrop", "1");
@@ -67,6 +90,7 @@ void mountSolidOverlayDemo(web.Element mount) {
             final dialog = web.HTMLDivElement()
               ..id = "overlay-dialog"
               ..className = "card";
+            dialog.style.width = "min(520px, 100%)";
 
             dialog.appendChild(
                 web.HTMLHeadingElement.h2()..textContent = "Dialog");

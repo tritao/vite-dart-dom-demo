@@ -488,8 +488,11 @@ async function inspectUrl(
         });
       }
     } else if (scenario === "solid-overlay") {
+      let step = "init";
+      let hitBeforeOutside = null;
       try {
         const trigger = page.locator("#overlay-trigger");
+        const under = page.locator("#overlay-under-button");
         if (!(await trigger.count())) {
           interactionResults.push({
             name: "solid-overlay",
@@ -498,21 +501,28 @@ async function inspectUrl(
           });
         } else {
           const triggerHandle = await trigger.first().elementHandle();
+          const underBox = (await under.count())
+            ? await under.first().boundingBox()
+            : null;
 
           const bodyOverflowBefore = await page.evaluate(
             () => document.body?.style?.overflow ?? null,
           );
 
+          step = "open (escape path)";
           await trigger.first().click({ timeout: timeoutMs });
 
+          step = "wait dialog open";
           await page.waitForFunction(
             () => document.querySelector("#overlay-dialog") != null,
             { timeout: timeoutMs },
           );
+          step = "wait portal root";
           await page.waitForFunction(
             () => document.querySelector("#solid-portal-root") != null,
             { timeout: timeoutMs },
           );
+          step = "wait focus close";
           await page.waitForFunction(
             () => document.activeElement?.id === "overlay-close",
             { timeout: timeoutMs },
@@ -531,6 +541,7 @@ async function inspectUrl(
           });
 
           // Tab should stay inside the dialog (focus trap).
+          step = "tab stays within";
           await page.keyboard.press("Tab");
           await page.waitForTimeout(100);
           const activeAfterTab = await page.evaluate(
@@ -538,7 +549,9 @@ async function inspectUrl(
           );
 
           // Escape should dismiss.
+          step = "escape dismiss";
           await page.keyboard.press("Escape");
+          step = "wait closed after escape";
           await page.waitForFunction(
             () => document.querySelector("#overlay-dialog") == null,
             { timeout: timeoutMs },
@@ -565,18 +578,67 @@ async function inspectUrl(
             : false;
 
           // Outside click dismissal path.
+          step = "open (outside path)";
           await trigger.first().click({ timeout: timeoutMs });
+          step = "wait open (outside path)";
           await page.waitForFunction(
             () => document.querySelector("#overlay-dialog") != null,
             { timeout: timeoutMs },
           );
-          await page.click("#overlay-backdrop", { timeout: timeoutMs });
+          // Click where the underlying button is. With pointer blocking, this
+          // should dismiss the overlay without incrementing the underlying counter.
+          step = "outside click over underlying button";
+          hitBeforeOutside = underBox
+            ? await page.evaluate(({ x, y }) => {
+                const el = document.elementFromPoint(x, y);
+                return {
+                  id: el?.id ?? null,
+                  tag: el?.tagName ?? null,
+                  dataBackdrop:
+                    el?.closest?.("#overlay-backdrop") != null ? true : false,
+                  dataDialog: el?.closest?.("#overlay-dialog") != null ? true : false,
+                  pointerEvents: el ? getComputedStyle(el).pointerEvents : null,
+                };
+              }, { x: underBox.x + underBox.width / 2, y: underBox.y + underBox.height / 2 })
+            : null;
+          if (underBox) {
+            const backdrop = page.locator("#overlay-backdrop");
+            const bb = await backdrop.first().boundingBox();
+            if (!bb) throw new Error("missing #overlay-backdrop bounding box");
+            const cx = underBox.x + underBox.width / 2;
+            const cy = underBox.y + underBox.height / 2;
+            await page.click("#overlay-backdrop", {
+              timeout: timeoutMs,
+              position: { x: cx - bb.x, y: cy - bb.y },
+            });
+          } else {
+            await page.click("#overlay-backdrop", { timeout: timeoutMs });
+          }
+          step = "wait closed after outside click";
           await page.waitForFunction(
             () => document.querySelector("#overlay-dialog") == null,
             { timeout: timeoutMs },
           );
           await page.waitForTimeout(80);
+          step = "read status";
           const statusText = (await page.locator("#overlay-status").textContent())?.trim() ?? "";
+          const afterOutsideCount = await page.evaluate(() => {
+            const text = document.querySelector("#overlay-status")?.textContent ?? "";
+            const m = text.match(/Outside clicks:\s*(\d+)/);
+            return m ? Number(m[1]) : null;
+          });
+
+          // Now the underlying button should be clickable.
+          if (await under.count()) {
+            step = "second click increments";
+            await under.first().click({ timeout: timeoutMs });
+          }
+          await page.waitForTimeout(50);
+          const afterSecondCount = await page.evaluate(() => {
+            const text = document.querySelector("#overlay-status")?.textContent ?? "";
+            const m = text.match(/Outside clicks:\s*(\d+)/);
+            return m ? Number(m[1]) : null;
+          });
 
           const ok =
             afterOpen.dialogExists === true &&
@@ -590,7 +652,9 @@ async function inspectUrl(
             afterClose.bodyOverflow === bodyOverflowBefore &&
             afterClose.appAriaHidden == null &&
             focusRestored === true &&
-            statusText.includes("outside");
+            statusText.includes("outside") &&
+            (afterOutsideCount ?? 0) === 0 &&
+            (afterSecondCount ?? 0) === 1;
 
           interactionResults.push({
             name: "solid-overlay",
@@ -602,6 +666,9 @@ async function inspectUrl(
               afterClose,
               focusRestored,
               statusText,
+              afterOutsideCount,
+              afterSecondCount,
+              hitBeforeOutside,
             },
           });
         }
@@ -609,7 +676,7 @@ async function inspectUrl(
         interactionResults.push({
           name: "solid-overlay",
           ok: false,
-          details: { error: String(e) },
+          details: { error: String(e), step, hitBeforeOutside },
         });
       }
     } else if (scenario === "solid-dialog") {
