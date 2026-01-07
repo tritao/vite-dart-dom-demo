@@ -158,23 +158,29 @@ void mountSolidNestingDemo(web.Element mount) {
                           ..id = id
                           ..type = "button"
                           ..className = "menuItem"
-                          ..textContent = label
-                          ..setAttribute("role", "menuitem");
-                        on(el, "click", (_) {
-                          last.value = "menu:select:$label";
-                          closeMenu("select");
-                        });
+                          ..textContent = label;
                         return el;
                       }
 
-                      final items = <web.HTMLElement>[
-                        item("One", id: "nesting-menu-item-one"),
-                        item("Two", id: "nesting-menu-item-two"),
-                      ];
-                      for (final el in items) {
-                        menu.appendChild(el);
-                      }
-                      return MenuContent(element: menu, items: items);
+                      final one = item("One", id: "nesting-menu-item-one");
+                      final two = item("Two", id: "nesting-menu-item-two");
+                      menu.appendChild(one);
+                      menu.appendChild(two);
+                      return MenuContent(
+                        element: menu,
+                        items: [
+                          MenuItem(
+                            element: one,
+                            key: "nesting-menu-item-one",
+                            onSelect: () => last.value = "menu:select:One",
+                          ),
+                          MenuItem(
+                            element: two,
+                            key: "nesting-menu-item-two",
+                            onSelect: () => last.value = "menu:select:Two",
+                          ),
+                        ],
+                      );
                     },
                   ),
                 );

@@ -4049,6 +4049,151 @@ async function inspectUrl(
           details: { error: String(e), step },
         });
       }
+    } else if (scenario === "solid-menu-submenu") {
+      let step = "init";
+      try {
+        const trigger = page.locator("#menu-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-menu-submenu",
+            ok: false,
+            details: { reason: "missing #menu-trigger" },
+          });
+        } else {
+          step = "open";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait open";
+          await page.waitForFunction(
+            () => document.querySelector("#menu-content") != null,
+            { timeout: timeoutMs },
+          );
+
+          // Hover open.
+          step = "hover sub trigger";
+          await page.locator("#menu-item-more").hover({ timeout: timeoutMs });
+          step = "wait submenu open";
+          await page.waitForFunction(
+            () => document.querySelector("#menu-sub-content") != null,
+            { timeout: timeoutMs },
+          );
+
+          // Move mouse into submenu and ensure it stays open.
+          step = "move mouse into submenu";
+          const rects = await page.evaluate(() => {
+            const trigger = document.querySelector("#menu-item-more");
+            const sub = document.querySelector("#menu-sub-content");
+            if (!trigger || !sub) return null;
+            const a = trigger.getBoundingClientRect();
+            const b = sub.getBoundingClientRect();
+            return {
+              ax: a.left + a.width / 2,
+              ay: a.top + a.height / 2,
+              bx: b.left + 12,
+              by: b.top + 12,
+            };
+          });
+          if (rects) {
+            await page.mouse.move(rects.ax, rects.ay);
+            await page.mouse.move(rects.bx, rects.by);
+          }
+          const stillOpenAfterMove = await page.evaluate(
+            () => document.querySelector("#menu-sub-content") != null,
+          );
+
+          // Checkbox in submenu should toggle without closing.
+          step = "toggle submenu checkbox";
+          const beforeChecked = await page.evaluate(
+            () => document.querySelector("#menu-sub-beta")?.getAttribute("aria-checked") ?? null,
+          );
+          await page.locator("#menu-sub-beta").click({ timeout: timeoutMs });
+          await page.waitForTimeout(50);
+          const afterChecked = await page.evaluate(
+            () => document.querySelector("#menu-sub-beta")?.getAttribute("aria-checked") ?? null,
+          );
+          const submenuStillOpenAfterToggle = await page.evaluate(
+            () => document.querySelector("#menu-sub-content") != null,
+          );
+
+          // Reset for keyboard-only open/close test.
+          step = "close root (Escape)";
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#menu-content") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(50);
+          step = "reopen";
+          await trigger.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#menu-content") != null,
+            { timeout: timeoutMs },
+          );
+
+          // Keyboard open/close: ArrowRight opens, ArrowLeft closes and returns focus.
+          step = "keyboard nav to sub trigger";
+          // Ensure menu has focus for keyboard navigation.
+          await page.locator("#menu-content").focus();
+          for (let i = 0; i < 30; i++) {
+            const id = await page.evaluate(() => document.activeElement?.id ?? "");
+            if (id === "menu-item-more") break;
+            await page.keyboard.press("ArrowDown");
+          }
+
+          const activeBeforeOpen = await page.evaluate(
+            () => document.activeElement?.id ?? "",
+          );
+
+          step = "ArrowRight open submenu";
+          await page.keyboard.press("ArrowRight");
+          await page.waitForFunction(
+            () => document.querySelector("#menu-sub-content") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(50);
+          const activeInSubmenu = await page.evaluate(
+            () => document.activeElement?.id ?? "",
+          );
+
+          step = "ArrowLeft close submenu";
+          await page.keyboard.press("ArrowLeft");
+          await page.waitForFunction(
+            () => document.querySelector("#menu-sub-content") == null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(50);
+          const activeAfterClose = await page.evaluate(
+            () => document.activeElement?.id ?? "",
+          );
+
+          const ok =
+            stillOpenAfterMove === true &&
+            submenuStillOpenAfterToggle === true &&
+            beforeChecked !== afterChecked &&
+            activeBeforeOpen === "menu-item-more" &&
+            activeInSubmenu === "menu-sub-invite" &&
+            activeAfterClose === "menu-item-more";
+
+          interactionResults.push({
+            name: "solid-menu-submenu",
+            ok,
+            details: {
+              stillOpenAfterMove,
+              beforeChecked,
+              afterChecked,
+              submenuStillOpenAfterToggle,
+              activeBeforeOpen,
+              activeInSubmenu,
+              activeAfterClose,
+            },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-menu-submenu",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
     } else if (scenario === "solid-wordproc") {
       try {
         const result = await runSolidWordprocScenario(page, { timeoutMs, jitter });

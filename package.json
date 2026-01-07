@@ -53,6 +53,8 @@
     "debug:solid-menu:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=menu\" --scenario solid-menu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
     "debug:solid-menu-clickthrough": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=menu\" --scenario solid-menu-clickthrough --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
     "debug:solid-menu-clickthrough:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=menu\" --scenario solid-menu-clickthrough --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
+    "debug:solid-menu-submenu": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=menu\" --scenario solid-menu-submenu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
+    "debug:solid-menu-submenu:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=menu\" --scenario solid-menu-submenu --expect-h1 \"Solid Menu Demo\" --expect-selector \"#menu-root\"",
     "debug:solid-tooltip": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=tooltip\" --scenario solid-tooltip --expect-h1 \"Solid Tooltip Demo\" --expect-selector \"#tooltip-root\"",
     "debug:solid-tooltip:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=tooltip\" --scenario solid-tooltip --expect-h1 \"Solid Tooltip Demo\" --expect-selector \"#tooltip-root\"",
     "debug:solid-tooltip-edge": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=tooltip\" --scenario solid-tooltip-edge --expect-h1 \"Solid Tooltip Demo\" --expect-selector \"#tooltip-root\"",
