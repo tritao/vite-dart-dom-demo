@@ -16,8 +16,9 @@
     "debug:ui:preview": "node scripts/debug-ui.mjs --mode preview",
     "debug:ui:ci": "node scripts/debug-ui.mjs --mode preview --timeout-ms 240000",
     "debug:solid-dom": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=1\" --scenario solid-dom --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
-    "debug:solid-dom:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-dom --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\""
-    ,
+    "debug:solid-dom:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-dom --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
+    "debug:solid-wordproc": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=wordproc\" --scenario solid-wordproc --expect-h1 \"Solid Wordproc Shell Demo\" --expect-selector \"#wordproc-root\"",
+    "debug:solid-wordproc:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=wordproc\" --scenario solid-wordproc --expect-h1 \"Solid Wordproc Shell Demo\" --expect-selector \"#wordproc-root\"",
     "debug:solid-for": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=1\" --scenario solid-for --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
     "debug:solid-for:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=1\" --scenario solid-for --expect-h1 \"Solid DOM Demo\" --expect-selector \"#solid-root\"",
     "debug:solid-overlay": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=overlay\" --scenario solid-overlay --expect-h1 \"Solid Overlay Demo\" --expect-selector \"#overlay-root\"",
@@ -57,6 +58,8 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.1",
+    "@tiptap/core": "^3.15.0",
+    "@tiptap/starter-kit": "^3.15.0",
     "morphdom": "^2.7.7"
   }
 }

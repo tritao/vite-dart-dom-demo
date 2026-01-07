@@ -16,6 +16,7 @@ import './solid_select_demo.dart';
 import './solid_combobox_demo.dart';
 import './solid_listbox_demo.dart';
 import './solid_selection_demo.dart';
+import 'package:dart_web_test/wordproc/wordproc.dart';
 
 void main() {
   final mount = web.document.querySelector('#app');
@@ -67,6 +68,10 @@ void main() {
   }
   if (solid == 'selection') {
     mountSolidSelectionDemo(mount);
+    return;
+  }
+  if (solid == 'wordproc') {
+    mountSolidWordprocShellDemo(mount);
     return;
   }
   if (solid == '1') {

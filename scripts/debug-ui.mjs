@@ -6,6 +6,8 @@ import { spawn } from "node:child_process";
 import { chromium } from "playwright";
 import { setTimeout as delay } from "node:timers/promises";
 
+import { runSolidWordprocScenario } from "./scenarios/solid-wordproc.mjs";
+
 const HOST = "127.0.0.1";
 
 function parseArgs(argv) {
@@ -2341,6 +2343,17 @@ async function inspectUrl(
       } catch (e) {
         interactionResults.push({
           name: "solid-menu",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
+    } else if (scenario === "solid-wordproc") {
+      try {
+        const result = await runSolidWordprocScenario(page, { timeoutMs });
+        interactionResults.push(result);
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-wordproc",
           ok: false,
           details: { error: String(e) },
         });

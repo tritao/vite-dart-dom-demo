@@ -349,3 +349,190 @@ a.btn {
   max-height: calc(100vh - 48px);
   overflow: auto;
 }
+
+/* Wordproc shell demo */
+.wordproc {
+  max-width: 100%;
+  margin: 24px auto;
+  padding: 0 18px 40px;
+  box-sizing: border-box;
+}
+
+.wordproc-chrome {
+  margin-top: 14px;
+}
+
+.wordproc-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+
+.wordproc .input {
+  box-sizing: border-box;
+  height: 42px;
+}
+
+.wordproc-layout {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  height: min(70vh, 760px);
+}
+
+.wordproc-panel {
+  box-sizing: border-box;
+  padding: 14px;
+  min-width: 0;
+}
+
+.wordproc-panel h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.wordproc-panel.outliner {
+  flex: 0 0 471px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+
+.wordproc-panel.agent {
+  flex: 0 0 472px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+}
+
+.wordproc-panel.editor {
+  flex: 1 1 auto;
+}
+
+.wordproc-outline-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.wordproc-outline-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  cursor: pointer;
+}
+
+.wordproc-outline-item.active {
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.12);
+}
+
+.wordproc-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.wordproc-editor-mount {
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 14px;
+  min-height: 360px;
+}
+
+.wordproc-editor-host .ProseMirror {
+  outline: none;
+  min-height: 360px;
+  line-height: 1.55;
+  font-size: 15px;
+}
+
+.wordproc-editor-host .ProseMirror p {
+  margin: 10px 0;
+}
+
+.wordproc-editor-host .ProseMirror h1,
+.wordproc-editor-host .ProseMirror h2,
+.wordproc-editor-host .ProseMirror h3 {
+  margin: 14px 0 8px;
+}
+
+.wordproc-editor-host .ProseMirror:focus {
+  outline: 2px solid rgba(124, 92, 255, 0.35);
+  outline-offset: 6px;
+  border-radius: 10px;
+}
+
+.wordproc-agent-log {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 10px;
+}
+
+.wordproc-agent-msg {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wordproc-agent-msg:last-child {
+  border-bottom: 0;
+}
+
+.wordproc-heavy {
+  margin-top: 14px;
+}
+
+.wordproc-heavy-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+@media (max-width: 1120px) {
+  .wordproc-layout {
+    flex-direction: column;
+    min-height: auto;
+    height: auto;
+  }
+  .wordproc-panel.outliner,
+  .wordproc-panel.agent {
+    flex: 0 0 auto;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .wordproc-panel.agent {
+    border-bottom: 0;
+    border-top: 1px solid var(--border);
+  }
+  .wordproc-outline-list {
+    height: 320px;
+    flex: 0 0 auto;
+  }
+  .wordproc-heavy-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

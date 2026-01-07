@@ -24,14 +24,20 @@ web.HTMLElement solidDemoNav({required String active}) {
   row.appendChild(link("Select", "/?solid=select", current: active == "select"));
   row.appendChild(link("Listbox", "/?solid=listbox", current: active == "listbox"));
   row.appendChild(
-      link("Combobox", "/?solid=combobox", current: active == "combobox"));
+    link("Combobox", "/?solid=combobox", current: active == "combobox"),
+  );
   row.appendChild(
-      link("Selection", "/?solid=selection", current: active == "selection"));
+    link("Selection", "/?solid=selection", current: active == "selection"),
+  );
   row.appendChild(link("Toast", "/?solid=toast", current: active == "toast"));
   row.appendChild(link("Roving", "/?solid=roving", current: active == "roving"));
   row.appendChild(link("Overlay", "/?solid=overlay", current: active == "overlay"));
+  row.appendChild(
+    link("Wordproc", "/?solid=wordproc", current: active == "wordproc"),
+  );
   row.appendChild(link("Solid DOM", "/?solid=1", current: active == "solid-dom"));
 
   nav.appendChild(row);
   return nav;
 }
+
