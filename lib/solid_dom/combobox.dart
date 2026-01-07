@@ -379,7 +379,6 @@ web.DocumentFragment Combobox<T>({
                   optionBuilder(opt, selected: selected, active: active),
         );
         listbox.element.style.padding = "6px";
-        listbox.element.style.minWidth = "240px";
         listboxRef = listbox.element;
         listboxHandleSig.value = listbox;
         onCleanup(() {
@@ -396,6 +395,7 @@ web.DocumentFragment Combobox<T>({
           offset: offset,
           viewportPadding: viewportPadding,
           flip: flip,
+          sameWidth: true,
           updateOnScrollParents: true,
         );
 

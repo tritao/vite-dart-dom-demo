@@ -18,6 +18,7 @@ void mountSolidPopoverDemo(web.Element mount) {
 
     final open = createSignal(false);
     final bottomOpen = createSignal(false);
+    final edgeOpen = createSignal(false);
     final lastDismiss = createSignal("none");
 
     root.appendChild(web.HTMLHeadingElement.h1()..textContent = "Solid Popover Demo");
@@ -49,6 +50,17 @@ void mountSolidPopoverDemo(web.Element mount) {
       ..textContent = "Toggle popover";
     on(trigger, "click", (_) => open.value = !open.value);
     root.appendChild(trigger);
+
+    final edgeTrigger = web.HTMLButtonElement()
+      ..id = "popover-trigger-edge"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Edge popover";
+    edgeTrigger.style.position = "fixed";
+    edgeTrigger.style.right = "16px";
+    edgeTrigger.style.top = "16px";
+    on(edgeTrigger, "click", (_) => edgeOpen.value = !edgeOpen.value);
+    root.appendChild(edgeTrigger);
 
     final bottomTrigger = web.HTMLButtonElement()
       ..id = "popover-trigger-bottom"
@@ -90,6 +102,34 @@ void mountSolidPopoverDemo(web.Element mount) {
             ..textContent = "Popover content");
           final closeBtn = web.HTMLButtonElement()
             ..id = "popover-close"
+            ..type = "button"
+            ..className = "btn secondary"
+            ..textContent = "Close";
+          on(closeBtn, "click", (_) => close());
+          panel.appendChild(closeBtn);
+          return panel;
+        },
+      ),
+    );
+
+    root.appendChild(
+      Popover(
+        open: () => edgeOpen.value,
+        setOpen: (next) => edgeOpen.value = next,
+        portalId: "popover-edge-portal",
+        anchor: edgeTrigger,
+        placement: "right-start",
+        offset: 8,
+        onClose: (reason) => lastDismiss.value = "edge:$reason",
+        builder: (close) {
+          final panel = web.HTMLDivElement()
+            ..id = "popover-panel-edge"
+            ..className = "card";
+          panel.style.width = "360px";
+          panel.appendChild(web.HTMLParagraphElement()
+            ..textContent = "Edge popover (resize to test shift).");
+          final closeBtn = web.HTMLButtonElement()
+            ..id = "popover-close-edge"
             ..type = "button"
             ..className = "btn secondary"
             ..textContent = "Close";

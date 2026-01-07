@@ -1381,6 +1381,86 @@ async function inspectUrl(
           details: { error: String(e) },
         });
       }
+    } else if (scenario === "solid-popover-resize") {
+      try {
+        const trigger = page.locator("#popover-trigger-edge");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-popover-resize",
+            ok: false,
+            details: { reason: "missing #popover-trigger-edge" },
+          });
+        } else {
+          await page.setViewportSize({ width: 860, height: 600 });
+          await page.waitForTimeout(80);
+
+          await trigger.first().click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel-edge") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+
+          const before = await page.evaluate(() => {
+            const panel = document.querySelector("#popover-panel-edge");
+            if (!panel) return null;
+            const r = panel.getBoundingClientRect();
+            return {
+              left: r.left,
+              right: r.right,
+              top: r.top,
+              bottom: r.bottom,
+              vw: window.innerWidth,
+              vh: window.innerHeight,
+            };
+          });
+
+          await page.setViewportSize({ width: 420, height: 600 });
+          await page.waitForTimeout(120);
+
+          const after = await page.evaluate(() => {
+            const panel = document.querySelector("#popover-panel-edge");
+            if (!panel) return null;
+            const r = panel.getBoundingClientRect();
+            return {
+              left: r.left,
+              right: r.right,
+              top: r.top,
+              bottom: r.bottom,
+              vw: window.innerWidth,
+              vh: window.innerHeight,
+            };
+          });
+
+          const padding = 8;
+          const inViewport =
+            (m) =>
+              m &&
+              m.left >= padding - 0.5 &&
+              m.top >= padding - 0.5 &&
+              m.right <= m.vw - padding + 0.5 &&
+              m.bottom <= m.vh - padding + 0.5;
+
+          const ok =
+            before != null &&
+            after != null &&
+            inViewport(before) &&
+            inViewport(after) &&
+            (before.left !== after.left || before.top !== after.top);
+
+          interactionResults.push({
+            name: "solid-popover-resize",
+            ok,
+            details: { before, after },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-popover-resize",
+          ok: false,
+          details: { error: String(e) },
+        });
+      }
     } else if (scenario === "solid-tooltip") {
       try {
         const trigger = page.locator("#tooltip-trigger");
@@ -1530,6 +1610,12 @@ async function inspectUrl(
             activeElId:
               document.querySelector("#select-listbox [data-active=true]")?.id ??
               null,
+            triggerWidth:
+              document.querySelector("#select-trigger")?.getBoundingClientRect()
+                ?.width ?? null,
+            listboxWidth:
+              document.querySelector("#select-listbox")?.getBoundingClientRect()
+                ?.width ?? null,
           }));
 
           // Arrow navigation + skip disabled (Vue).
@@ -1809,6 +1895,9 @@ async function inspectUrl(
             afterOpen.activeId === "select-listbox" &&
             afterOpen.activeDescendant === afterOpen.activeElId &&
             afterOpen.activeElId === "select-listbox-opt-0" &&
+            typeof afterOpen.triggerWidth === "number" &&
+            typeof afterOpen.listboxWidth === "number" &&
+            Math.abs(afterOpen.triggerWidth - afterOpen.listboxWidth) <= 2.5 &&
             afterDown1.activeDescendant === afterDown1.activeElId &&
             afterDown1.activeElId === "select-listbox-opt-1" &&
             afterDown2.activeDescendant === afterDown2.activeElId &&
@@ -2259,6 +2348,12 @@ async function inspectUrl(
             activeElId:
               document.querySelector("#combobox-listbox [data-active=true]")?.id ??
               null,
+            anchorWidth:
+              document.querySelector("#combobox-control")?.getBoundingClientRect()
+                ?.width ?? null,
+            listboxWidth:
+              document.querySelector("#combobox-listbox")?.getBoundingClientRect()
+                ?.width ?? null,
           }));
 
           step = "ArrowDown once";
@@ -2367,6 +2462,12 @@ async function inspectUrl(
             optionsCount: document.querySelectorAll(
               "#combobox-listbox-empty [role=option]",
             ).length,
+            anchorWidth:
+              document.querySelector("#combobox-control-empty")?.getBoundingClientRect()
+                ?.width ?? null,
+            listboxWidth:
+              document.querySelector("#combobox-listbox-empty")?.getBoundingClientRect()
+                ?.width ?? null,
           }));
 
           // Programmatic blur should close and reset.
@@ -2393,6 +2494,9 @@ async function inspectUrl(
             afterType.optionsCount >= 1 &&
             typeof afterType.activeDescendant === "string" &&
             afterType.activeDescendant === afterType.activeElId &&
+            typeof afterType.anchorWidth === "number" &&
+            typeof afterType.listboxWidth === "number" &&
+            Math.abs(afterType.anchorWidth - afterType.listboxWidth) <= 2.5 &&
             typeof afterDown1.activeDescendant === "string" &&
             afterDown1.activeDescendant === afterDown1.activeElId &&
             afterDown1.activeDescendant !== afterType.activeDescendant &&
@@ -2411,6 +2515,9 @@ async function inspectUrl(
             emptyStateOpen.expanded === "true" &&
             emptyStateOpen.optionsCount === 0 &&
             (emptyStateOpen.emptyText ?? "").includes("No matches.") &&
+            typeof emptyStateOpen.anchorWidth === "number" &&
+            typeof emptyStateOpen.listboxWidth === "number" &&
+            Math.abs(emptyStateOpen.anchorWidth - emptyStateOpen.listboxWidth) <= 2.5 &&
             ((emptyStateAfterBlur.status ?? "").includes("Last: blur") ||
               (emptyStateAfterBlur.status ?? "").includes("Last: focus-outside")) &&
             emptyStateAfterBlur.inputValue === "" &&

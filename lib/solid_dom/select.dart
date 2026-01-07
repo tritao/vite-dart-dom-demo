@@ -163,6 +163,7 @@ web.DocumentFragment Select<T>({
           offset: offset,
           viewportPadding: viewportPadding,
           flip: flip,
+          sameWidth: true,
           updateOnScrollParents: true,
         );
 
@@ -178,7 +179,6 @@ web.DocumentFragment Select<T>({
         // Use the created listbox element as our positioned element.
         // (createListbox already set id/role/className).
         // Ensure styles match previous defaults.
-        handle.element.style.minWidth = "220px";
         handle.element.style.padding = "6px";
 
         // Focus management: focus active option on mount, restore focus unless Tab-close.

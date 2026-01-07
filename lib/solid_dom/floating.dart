@@ -130,6 +130,8 @@ FloatingHandle floatToAnchor({
   double offset = 8,
   double viewportPadding = 8,
   bool flip = true,
+  bool sameWidth = false,
+  bool fitViewport = false,
   bool updateOnAnimationFrame = false,
   bool updateOnScrollParents = true,
   bool preferFloatingUi = true,
@@ -163,6 +165,8 @@ FloatingHandle floatToAnchor({
               "offset": offset,
               "viewportPadding": viewportPadding,
               "flip": flip,
+              "sameWidth": sameWidth,
+              "fitViewport": fitViewport,
               "updateOnAnimationFrame": updateOnAnimationFrame,
             }),
           ],
@@ -186,6 +190,24 @@ FloatingHandle floatToAnchor({
   void compute() {
     if (disposed) return;
     if (!floating.isConnected) return;
+    if (sameWidth) {
+      try {
+        if (floating.style.boxSizing.isEmpty) {
+          floating.style.boxSizing = "border-box";
+        }
+        final rect = anchor.getBoundingClientRect();
+        _setPx(floating, "width", rect.width);
+      } catch (_) {}
+    }
+    if (fitViewport) {
+      try {
+        if (floating.style.boxSizing.isEmpty) {
+          floating.style.boxSizing = "border-box";
+        }
+        _setPx(floating, "max-width", web.window.innerWidth.toDouble() - viewportPadding * 2);
+        _setPx(floating, "max-height", web.window.innerHeight.toDouble() - viewportPadding * 2);
+      } catch (_) {}
+    }
     _positionFixed(
       anchor: anchor,
       floating: floating,
