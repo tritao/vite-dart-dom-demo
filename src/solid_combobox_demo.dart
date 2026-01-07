@@ -99,7 +99,7 @@ void mountSolidComboboxDemo(web.Element mount) {
     final arrowSelected = createSignal<String?>(null);
     final arrowLast = createSignal("none");
 
-    root.appendChild(web.HTMLHeadingElement.h2()..textContent = "Combobox (arrow)");
+    root.appendChild(web.HTMLHeadingElement.h2()..textContent = "Combobox (popper arrow)");
 
     final arrowStatus = web.HTMLParagraphElement()
       ..id = "combobox-status-arrow"

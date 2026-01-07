@@ -103,6 +103,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
   Object? Function(O option)? getOptionKey,
   ListboxIdRegistry<T, O>? idRegistry,
   web.HTMLElement? Function()? scrollContainer,
+  bool useInnerScrollContainer = false,
   void Function(int index)? scrollToIndex,
   int Function()? pageSize,
   ListboxOptionBuilder<T, O>? optionBuilder,
@@ -118,7 +119,26 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     ..setAttribute("role", "listbox")
     ..tabIndex = -1
     ..className = "card listbox";
-  listbox.style.overflow = "auto";
+
+  final innerScroll = useInnerScrollContainer ? web.HTMLDivElement() : null;
+  web.HTMLElement getScrollEl() =>
+      scrollContainer?.call() ?? innerScroll ?? listbox;
+  web.Element getRenderTarget() => innerScroll ?? listbox;
+
+  if (innerScroll != null) {
+    // Allow popper arrows to render outside the border.
+    listbox.style.overflow = "visible";
+    listbox.style.display = "flex";
+    listbox.style.flexDirection = "column";
+
+    innerScroll.className = "listboxScroll";
+    innerScroll.style.flex = "1";
+    innerScroll.style.minHeight = "0";
+    innerScroll.style.overflow = "auto";
+    listbox.appendChild(innerScroll);
+  } else {
+    listbox.style.overflow = "auto";
+  }
 
   final ids = idRegistry ??
       ListboxIdRegistry<T, O>(listboxId: id, getOptionKey: getOptionKey);
@@ -147,7 +167,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     keys: () => keys,
     isDisabled: (k) => optionByKey[k]?.disabled ?? false,
     textValueForKey: (k) => optionByKey[k]?.textValue ?? "",
-    getContainer: () => scrollContainer?.call() ?? listbox,
+    getContainer: () => getScrollEl(),
     getItemElement: (k) => optionElByKey[k],
     pageSize: pageSize,
   );
@@ -319,7 +339,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
 
   // Scroll active item into view when focusedKey changes (non-virtualized).
   createEffect(() {
-    final scrollEl = scrollContainer?.call() ?? listbox;
+    final scrollEl = getScrollEl();
     final focusedKey = selection.focusedKey();
     if (focusedKey == null) return;
     final el = optionElByKey[focusedKey];
@@ -410,7 +430,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
 
     disposeItems();
 
-    listbox.textContent = "";
+    getRenderTarget().textContent = "";
     optionElByKey.clear();
     optionByKey.clear();
     indexByKey.clear();
@@ -491,7 +511,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
           group.appendChild(el);
         }
 
-        listbox.appendChild(group);
+        getRenderTarget().appendChild(group);
         sectionIdx++;
       }
     } else {
@@ -556,7 +576,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
           });
         });
 
-        listbox.appendChild(el);
+        getRenderTarget().appendChild(el);
       }
     }
 
@@ -573,7 +593,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
           ..textContent = emptyText;
         empty.style.padding = "10px 12px";
         empty.style.opacity = "0.8";
-        listbox.appendChild(empty);
+        getRenderTarget().appendChild(empty);
       }
       return;
     }
@@ -587,7 +607,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     selectionManager: () => selection,
     keyboardDelegate: () => delegate,
     ref: () => listbox,
-    scrollRef: () => scrollContainer?.call() ?? listbox,
+    scrollRef: () => getScrollEl(),
     shouldFocusWrap: () => shouldFocusWrap,
     selectOnFocus: () => selectOnFocus,
     disallowTypeAhead: () => disallowTypeAhead,

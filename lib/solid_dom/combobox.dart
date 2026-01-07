@@ -358,6 +358,7 @@ web.DocumentFragment Combobox<T>({
           showEmptyState: showEmptyState,
           emptyText: emptyText,
           idRegistry: ids,
+          useInnerScrollContainer: showArrow,
           initialActiveIndex: () {
             final idx = pendingInitialIndex.value;
             if (idx != null) {
