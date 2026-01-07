@@ -29,6 +29,9 @@ web.DocumentFragment Popover({
   double shift = 0,
   bool slide = true,
   bool overlap = false,
+  bool hideWhenDetached = false,
+  double detachedPadding = 0,
+  double arrowPadding = 4,
   String role = "dialog",
   String? portalId,
 }) {
@@ -48,6 +51,7 @@ web.DocumentFragment Popover({
         popover.tabIndex = -1;
 
         if (anchor != null) {
+          final arrow = popover.querySelector("[data-solid-popper-arrow]");
           floatToAnchor(
             anchor: anchor,
             floating: popover,
@@ -58,6 +62,10 @@ web.DocumentFragment Popover({
             shift: shift,
             slide: slide,
             overlap: overlap,
+            hideWhenDetached: hideWhenDetached,
+            detachedPadding: detachedPadding,
+            arrow: arrow is web.HTMLElement ? arrow : null,
+            arrowPadding: arrowPadding,
           );
         }
 

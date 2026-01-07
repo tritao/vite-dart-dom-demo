@@ -131,6 +131,17 @@ a.btn {
   backdrop-filter: blur(10px);
 }
 
+.popperArrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  background: var(--card);
+  border: 1px solid var(--border);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
 .card h2 {
   margin: 0 0 12px;
   font-size: 20px;

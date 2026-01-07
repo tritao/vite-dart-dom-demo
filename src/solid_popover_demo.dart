@@ -25,6 +25,8 @@ void mountSolidPopoverDemo(web.Element mount) {
     final overlapOffOpen = createSignal(false);
     final overlapOnOpen = createSignal(false);
     final flipHOpen = createSignal(false);
+    final arrowOpen = createSignal(false);
+    final hideOpen = createSignal(false);
     final lastDismiss = createSignal("none");
 
     root.appendChild(web.HTMLHeadingElement.h1()..textContent = "Solid Popover Demo");
@@ -132,6 +134,28 @@ void mountSolidPopoverDemo(web.Element mount) {
     edgeTrigger.style.top = "16px";
     on(edgeTrigger, "click", (_) => edgeOpen.value = !edgeOpen.value);
     root.appendChild(edgeTrigger);
+
+    final arrowTrigger = web.HTMLButtonElement()
+      ..id = "popover-trigger-arrow"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Arrow popover";
+    arrowTrigger.style.position = "fixed";
+    arrowTrigger.style.left = "16px";
+    arrowTrigger.style.bottom = "16px";
+    on(arrowTrigger, "click", (_) => arrowOpen.value = !arrowOpen.value);
+    root.appendChild(arrowTrigger);
+
+    final hideTrigger = web.HTMLButtonElement()
+      ..id = "popover-trigger-hide"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "HideWhenDetached popover";
+    hideTrigger.style.position = "fixed";
+    hideTrigger.style.left = "160px";
+    hideTrigger.style.bottom = "16px";
+    on(hideTrigger, "click", (_) => hideOpen.value = !hideOpen.value);
+    root.appendChild(hideTrigger);
 
     final bottomTrigger = web.HTMLButtonElement()
       ..id = "popover-trigger-bottom"
@@ -385,6 +409,73 @@ void mountSolidPopoverDemo(web.Element mount) {
             ..textContent = "Edge popover (resize to test shift).");
           final closeBtn = web.HTMLButtonElement()
             ..id = "popover-close-edge"
+            ..type = "button"
+            ..className = "btn secondary"
+            ..textContent = "Close";
+          on(closeBtn, "click", (_) => close());
+          panel.appendChild(closeBtn);
+          return panel;
+        },
+      ),
+    );
+
+    root.appendChild(
+      Popover(
+        open: () => arrowOpen.value,
+        setOpen: (next) => arrowOpen.value = next,
+        portalId: "popover-arrow-portal",
+        anchor: arrowTrigger,
+        placement: "top-start",
+        offset: 10,
+        flip: true,
+        slide: true,
+        overlap: true,
+        onClose: (reason) => lastDismiss.value = "arrow:$reason",
+        builder: (close) {
+          final panel = web.HTMLDivElement()
+            ..id = "popover-panel-arrow"
+            ..className = "card";
+          final arrow = web.HTMLDivElement()
+            ..className = "popperArrow"
+            ..setAttribute("data-solid-popper-arrow", "1");
+          panel.appendChild(arrow);
+          panel.appendChild(web.HTMLParagraphElement()
+            ..textContent = "Popover with arrow.");
+          final closeBtn = web.HTMLButtonElement()
+            ..id = "popover-close-arrow"
+            ..type = "button"
+            ..className = "btn secondary"
+            ..textContent = "Close";
+          on(closeBtn, "click", (_) => close());
+          panel.appendChild(closeBtn);
+          return panel;
+        },
+      ),
+    );
+
+    root.appendChild(
+      Popover(
+        open: () => hideOpen.value,
+        setOpen: (next) => hideOpen.value = next,
+        portalId: "popover-hide-portal",
+        anchor: hideTrigger,
+        placement: "top-start",
+        offset: 10,
+        flip: true,
+        slide: true,
+        overlap: true,
+        hideWhenDetached: true,
+        detachedPadding: 4,
+        onClose: (reason) => lastDismiss.value = "hide:$reason",
+        builder: (close) {
+          final panel = web.HTMLDivElement()
+            ..id = "popover-panel-hide"
+            ..className = "card";
+          panel.appendChild(web.HTMLParagraphElement()
+            ..textContent =
+                "HideWhenDetached: if the anchor is hidden, this should become visibility:hidden.");
+          final closeBtn = web.HTMLButtonElement()
+            ..id = "popover-close-hide"
             ..type = "button"
             ..className = "btn secondary"
             ..textContent = "Close";

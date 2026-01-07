@@ -16,6 +16,7 @@ void mountSolidTooltipDemo(web.Element mount) {
     final open = createSignal(false);
     final focusOpen = createSignal(false);
     final edgeOpen = createSignal(false);
+    final arrowOpen = createSignal(false);
     final lastEvent = createSignal("none");
 
     root.appendChild(web.HTMLHeadingElement.h1()..textContent = "Solid Tooltip Demo");
@@ -34,7 +35,7 @@ void mountSolidTooltipDemo(web.Element mount) {
     final status = web.HTMLParagraphElement()
       ..id = "tooltip-status"
       ..className = "muted";
-    status.appendChild(text(() => "Open: ${open.value || focusOpen.value || edgeOpen.value} • Last: ${lastEvent.value}"));
+    status.appendChild(text(() => "Open: ${open.value || focusOpen.value || edgeOpen.value || arrowOpen.value} • Last: ${lastEvent.value}"));
     root.appendChild(status);
 
     final trigger = web.HTMLButtonElement()
@@ -63,6 +64,16 @@ void mountSolidTooltipDemo(web.Element mount) {
     edgeTrigger.style.right = "8px";
     edgeTrigger.style.top = "120px";
     root.appendChild(edgeTrigger);
+
+    final arrowTrigger = web.HTMLButtonElement()
+      ..id = "tooltip-arrow-trigger"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "Arrow tooltip";
+    arrowTrigger.style.position = "fixed";
+    arrowTrigger.style.left = "16px";
+    arrowTrigger.style.top = "120px";
+    root.appendChild(arrowTrigger);
 
     root.appendChild(
       Tooltip(
@@ -131,6 +142,37 @@ void mountSolidTooltipDemo(web.Element mount) {
           el.style.padding = "8px 10px";
           el.style.fontSize = "13px";
           el.textContent = "Edge tooltip (should flip left).";
+          return el;
+        },
+      ),
+    );
+
+    root.appendChild(
+      Tooltip(
+        open: () => arrowOpen.value,
+        setOpen: (next) => arrowOpen.value = next,
+        trigger: arrowTrigger,
+        portalId: "tooltip-arrow-portal",
+        placement: "top",
+        offset: 10,
+        shift: 0,
+        flip: true,
+        slide: true,
+        overlap: true,
+        openDelayMs: 30,
+        closeDelayMs: 30,
+        onClose: (reason) => lastEvent.value = "arrow:$reason",
+        builder: (close) {
+          final el = web.HTMLDivElement()
+            ..id = "tooltip-arrow-panel"
+            ..className = "card";
+          el.style.padding = "8px 10px";
+          el.style.fontSize = "13px";
+          final arrow = web.HTMLDivElement()
+            ..className = "popperArrow"
+            ..setAttribute("data-solid-popper-arrow", "1");
+          el.appendChild(arrow);
+          el.appendChild(web.HTMLSpanElement()..textContent = "Tooltip with arrow.");
           return el;
         },
       ),

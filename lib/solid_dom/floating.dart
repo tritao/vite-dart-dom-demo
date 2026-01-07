@@ -117,8 +117,11 @@ void _positionFixed({
       top, viewportPadding, viewportHeight - f.height - viewportPadding);
 
   floating.style.position = "fixed";
-  _setPx(floating, "left", left);
-  _setPx(floating, "top", top);
+  floating.style.left = "0";
+  floating.style.top = "0";
+  final x = left.roundToDouble();
+  final y = top.roundToDouble();
+  floating.style.transform = "translate3d(${x.toStringAsFixed(0)}px, ${y.toStringAsFixed(0)}px, 0)";
   try {
     floating.setAttribute("data-solid-placement", effective);
     floating.style.setProperty("--solid-popper-current-placement", effective);
@@ -150,6 +153,10 @@ FloatingHandle floatToAnchor({
   bool overlap = false,
   bool sameWidth = false,
   bool fitViewport = false,
+  bool hideWhenDetached = false,
+  double detachedPadding = 0,
+  web.HTMLElement? arrow,
+  double arrowPadding = 4,
   bool updateOnAnimationFrame = false,
   bool updateOnScrollParents = true,
   bool preferFloatingUi = true,
@@ -172,24 +179,28 @@ FloatingHandle floatToAnchor({
     try {
       final global = js_util.globalThis;
       if (js_util.hasProperty(global, "__solidFloatToAnchor")) {
+        final opts = js_util.newObject();
+        js_util.setProperty(opts, "placement", placement);
+        js_util.setProperty(opts, "offset", offset);
+        js_util.setProperty(opts, "shift", shift);
+        js_util.setProperty(opts, "viewportPadding", viewportPadding);
+        js_util.setProperty(opts, "flip", flip);
+        js_util.setProperty(opts, "slide", slide);
+        js_util.setProperty(opts, "overlap", overlap);
+        js_util.setProperty(opts, "sameWidth", sameWidth);
+        js_util.setProperty(opts, "fitViewport", fitViewport);
+        js_util.setProperty(opts, "hideWhenDetached", hideWhenDetached);
+        js_util.setProperty(opts, "detachedPadding", detachedPadding);
+        js_util.setProperty(opts, "updateOnAnimationFrame", updateOnAnimationFrame);
+        js_util.setProperty(opts, "arrowPadding", arrowPadding);
+        if (arrow != null) js_util.setProperty(opts, "arrow", arrow);
         jsHandle = js_util.callMethod(
           global,
           "__solidFloatToAnchor",
           [
             anchor,
             floating,
-            js_util.jsify({
-              "placement": placement,
-              "offset": offset,
-              "shift": shift,
-              "viewportPadding": viewportPadding,
-              "flip": flip,
-              "slide": slide,
-              "overlap": overlap,
-              "sameWidth": sameWidth,
-              "fitViewport": fitViewport,
-              "updateOnAnimationFrame": updateOnAnimationFrame,
-            }),
+            opts,
           ],
         );
       }
@@ -238,6 +249,17 @@ FloatingHandle floatToAnchor({
       viewportPadding: viewportPadding,
       flip: flip,
     );
+    if (hideWhenDetached) {
+      try {
+        final r = anchor.getBoundingClientRect();
+        final hidden = r.bottom <= detachedPadding ||
+            r.right <= detachedPadding ||
+            r.top >= web.window.innerHeight.toDouble() - detachedPadding ||
+            r.left >= web.window.innerWidth.toDouble() - detachedPadding ||
+            (anchor is web.HTMLElement && anchor.style.display == "none");
+        floating.style.visibility = hidden ? "hidden" : "visible";
+      } catch (_) {}
+    }
   }
 
   void computeWhenConnected() {

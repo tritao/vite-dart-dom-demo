@@ -44,6 +44,9 @@ web.DocumentFragment Tooltip({
   bool flip = true,
   bool slide = true,
   bool overlap = false,
+  bool hideWhenDetached = false,
+  double detachedPadding = 0,
+  double arrowPadding = 4,
   bool interactive = false,
   int openDelayMs = 500,
   int closeDelayMs = 150,
@@ -117,6 +120,7 @@ web.DocumentFragment Tooltip({
         el.setAttribute("role", "tooltip");
         el.style.position = "fixed";
         if (!interactive) el.style.pointerEvents = "none";
+        final arrow = el.querySelector("[data-solid-popper-arrow]");
 
         final tooltipId = el.id.isNotEmpty ? el.id : _nextTooltipId();
         el.id = tooltipId;
@@ -131,6 +135,10 @@ web.DocumentFragment Tooltip({
           flip: flip,
           slide: slide,
           overlap: overlap,
+          hideWhenDetached: hideWhenDetached,
+          detachedPadding: detachedPadding,
+          arrow: arrow is web.HTMLElement ? arrow : null,
+          arrowPadding: arrowPadding,
           updateOnScrollParents: true,
         );
 

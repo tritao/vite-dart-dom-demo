@@ -1,4 +1,4 @@
-import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
+import { arrow, autoUpdate, computePosition, flip, hide, offset, shift, size } from "@floating-ui/dom";
 
 function toNumber(value, fallback) {
   const n = Number(value);
@@ -21,6 +21,10 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
   const updateOnAnimationFrame = toBool(opts.updateOnAnimationFrame, false);
   const sameWidth = toBool(opts.sameWidth, false);
   const fitViewport = toBool(opts.fitViewport, false);
+  const hideWhenDetached = toBool(opts.hideWhenDetached, false);
+  const detachedPadding = toNumber(opts.detachedPadding, 0);
+  const arrowEl = opts.arrow && typeof opts.arrow === "object" ? opts.arrow : null;
+  const arrowPadding = toNumber(opts.arrowPadding, 4);
   const fallbackPlacements =
     Array.isArray(opts.fallbackPlacements) && opts.fallbackPlacements.length > 0
       ? opts.fallbackPlacements.filter((p) => typeof p === "string")
@@ -85,22 +89,47 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
         }
       },
     }),
+    ...(hideWhenDetached ? [hide({ padding: detachedPadding })] : []),
+    ...(arrowEl ? [arrow({ element: arrowEl, padding: arrowPadding })] : []),
   ];
 
   const update = async () => {
     if (!anchor || !floating) return;
-    const { x, y, placement: computedPlacement } = await computePosition(anchor, floating, {
+    if (!anchor.isConnected || !floating.isConnected) return;
+    const pos = await computePosition(anchor, floating, {
       placement,
       strategy: "fixed",
       middleware,
     });
+    const x = Math.round(pos.x);
+    const y = Math.round(pos.y);
+
     floating.style.position = "fixed";
-    floating.style.left = `${x}px`;
-    floating.style.top = `${y}px`;
+    floating.style.top = "0";
+    floating.style.left = "0";
+    floating.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     try {
-      floating.setAttribute("data-solid-placement", computedPlacement);
-      floating.style.setProperty("--solid-popper-current-placement", computedPlacement);
+      floating.setAttribute("data-solid-placement", pos.placement);
+      floating.style.setProperty("--solid-popper-current-placement", pos.placement);
     } catch {}
+
+    if (hideWhenDetached) {
+      const hidden = pos.middlewareData?.hide?.referenceHidden;
+      floating.style.visibility = hidden ? "hidden" : "visible";
+    }
+
+    if (arrowEl && pos.middlewareData?.arrow) {
+      const { x: ax, y: ay } = pos.middlewareData.arrow;
+      const base = String(pos.placement).split("-")[0];
+      // reset
+      arrowEl.style.left = "";
+      arrowEl.style.top = "";
+      arrowEl.style.right = "";
+      arrowEl.style.bottom = "";
+      if (ax != null) arrowEl.style.left = `${ax}px`;
+      if (ay != null) arrowEl.style.top = `${ay}px`;
+      arrowEl.style[base] = "100%";
+    }
   };
 
   const cleanup = autoUpdate(anchor, floating, update, {

@@ -1282,13 +1282,16 @@ async function inspectUrl(
             await page.evaluate(() => {
               const el = document.querySelector("#popover-panel");
               if (!el) return null;
+              const cs = getComputedStyle(el);
+              const r = el.getBoundingClientRect();
               // @ts-ignore
-              const left = el.style.left ?? "";
-              // @ts-ignore
-              const top = el.style.top ?? "";
-              // @ts-ignore
-              const pos = el.style.position ?? "";
-              return { left, top, pos };
+              const pos = cs.position ?? "";
+              return {
+                pos,
+                transform: cs.transform,
+                left: r.left,
+                top: r.top,
+              };
             });
 
           const before = await readPos();
@@ -1304,10 +1307,9 @@ async function inspectUrl(
           const ok =
             before != null &&
             before.pos === "fixed" &&
-            typeof before.left === "string" &&
-            typeof before.top === "string" &&
-            before.left.endsWith("px") &&
-            before.top.endsWith("px") &&
+            typeof before.transform === "string" &&
+            before.transform !== "" &&
+            before.transform !== "none" &&
             after != null &&
             (after.top !== before.top || after.left !== before.left);
 
@@ -1342,6 +1344,14 @@ async function inspectUrl(
             () => document.querySelector("#popover-panel-bottom") != null,
             { timeout: timeoutMs },
           );
+          await page.waitForFunction(
+            () =>
+              document
+                .querySelector("#popover-panel-bottom")
+                ?.getAttribute("data-solid-placement") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
 
           const metrics = await page.evaluate(() => {
             const anchor = document.querySelector("#popover-trigger-bottom");
@@ -1354,17 +1364,14 @@ async function inspectUrl(
               anchorBottom: a.bottom,
               panelTop: p.top,
               panelBottom: p.bottom,
-              panelStyleTop: // @ts-ignore
-                panel.style.top ?? "",
-              panelStyleLeft: // @ts-ignore
-                panel.style.left ?? "",
+              placement: panel.getAttribute("data-solid-placement"),
             };
           });
 
           const ok =
             metrics != null &&
-            typeof metrics.panelStyleTop === "string" &&
-            metrics.panelStyleTop.endsWith("px") &&
+            typeof metrics.placement === "string" &&
+            metrics.placement.startsWith("top") &&
             // If flipped/clamped, panel should be above the anchor.
             metrics.panelTop < metrics.anchorTop;
 
@@ -1723,6 +1730,158 @@ async function inspectUrl(
           details: { error: String(e), step },
         });
       }
+    } else if (scenario === "solid-popover-hide-detached") {
+      let step = "init";
+      try {
+        const trigger = page.locator("#popover-trigger-hide");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-popover-hide-detached",
+            ok: false,
+            details: { reason: "missing #popover-trigger-hide" },
+          });
+        } else {
+          await page.setViewportSize({ width: 720, height: 520 });
+          await page.waitForTimeout(60);
+
+          step = "open";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait panel";
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel-hide") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+
+          const visibleBefore = await page.evaluate(() => {
+            const panel = document.querySelector("#popover-panel-hide");
+            if (!panel) return null;
+            return getComputedStyle(panel).visibility;
+          });
+
+          step = "hide anchor";
+          await page.evaluate(() => {
+            const t = document.querySelector("#popover-trigger-hide");
+            if (t) t.style.display = "none";
+          });
+          await page.waitForTimeout(150);
+
+          const hiddenAfter = await page.evaluate(() => {
+            const panel = document.querySelector("#popover-panel-hide");
+            if (!panel) return null;
+            return getComputedStyle(panel).visibility;
+          });
+
+          step = "restore anchor";
+          await page.evaluate(() => {
+            const t = document.querySelector("#popover-trigger-hide");
+            if (t) t.style.display = "";
+          });
+          await page.waitForTimeout(150);
+
+          const visibleAgain = await page.evaluate(() => {
+            const panel = document.querySelector("#popover-panel-hide");
+            if (!panel) return null;
+            return getComputedStyle(panel).visibility;
+          });
+
+          // close
+          step = "close";
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel-hide") == null,
+            { timeout: timeoutMs },
+          );
+
+          const ok =
+            visibleBefore === "visible" &&
+            hiddenAfter === "hidden" &&
+            visibleAgain === "visible";
+
+          interactionResults.push({
+            name: "solid-popover-hide-detached",
+            ok,
+            details: { visibleBefore, hiddenAfter, visibleAgain },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-popover-hide-detached",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
+    } else if (scenario === "solid-popover-arrow") {
+      let step = "init";
+      try {
+        const trigger = page.locator("#popover-trigger-arrow");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-popover-arrow",
+            ok: false,
+            details: { reason: "missing #popover-trigger-arrow" },
+          });
+        } else {
+          await page.setViewportSize({ width: 720, height: 520 });
+          await page.waitForTimeout(60);
+
+          step = "open";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait panel";
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel-arrow") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+
+          const metrics = await page.evaluate(() => {
+            const panel = document.querySelector("#popover-panel-arrow");
+            const arrow = panel?.querySelector("[data-solid-popper-arrow]");
+            if (!panel || !arrow) return null;
+            const pr = panel.getBoundingClientRect();
+            const ar = arrow.getBoundingClientRect();
+            const placement = panel.getAttribute("data-solid-placement") ?? "";
+            const base = placement.split("-")[0] || "";
+            // @ts-ignore
+            const baseSide = arrow.style?.[base] ?? "";
+            return {
+              placement,
+              base,
+              baseSide,
+              panel: { left: pr.left, right: pr.right, top: pr.top, bottom: pr.bottom },
+              arrow: { left: ar.left, right: ar.right, top: ar.top, bottom: ar.bottom },
+            };
+          });
+
+          step = "close";
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#popover-panel-arrow") == null,
+            { timeout: timeoutMs },
+          );
+
+          const ok =
+            metrics != null &&
+            typeof metrics.placement === "string" &&
+            metrics.placement.length > 0 &&
+            metrics.baseSide === "100%" &&
+            // Arrow should sit horizontally within the panel bounds.
+            metrics.arrow.left >= metrics.panel.left - 1 &&
+            metrics.arrow.right <= metrics.panel.right + 1;
+
+          interactionResults.push({
+            name: "solid-popover-arrow",
+            ok,
+            details: { metrics },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-popover-arrow",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
     } else if (scenario === "solid-tooltip") {
       try {
         const trigger = page.locator("#tooltip-trigger");
@@ -1748,11 +1907,13 @@ async function inspectUrl(
             const left = panel?.style?.left ?? "";
             // @ts-ignore
             const top = panel?.style?.top ?? "";
+            const transform = panel ? getComputedStyle(panel).transform : "";
             return {
               describedBy: trigger?.getAttribute("aria-describedby") ?? null,
               tooltipId: panel?.id ?? null,
               left,
               top,
+              transform,
             };
           });
 
@@ -1800,10 +1961,13 @@ async function inspectUrl(
             typeof afterHoverOpen.describedBy === "string" &&
             afterHoverOpen.describedBy.includes(afterHoverOpen.tooltipId);
           const hasPos =
-            typeof afterHoverOpen.left === "string" &&
-            typeof afterHoverOpen.top === "string" &&
-            afterHoverOpen.left.endsWith("px") &&
-            afterHoverOpen.top.endsWith("px");
+            (typeof afterHoverOpen.left === "string" &&
+              typeof afterHoverOpen.top === "string" &&
+              afterHoverOpen.left.endsWith("px") &&
+              afterHoverOpen.top.endsWith("px")) ||
+            (typeof afterHoverOpen.transform === "string" &&
+              afterHoverOpen.transform !== "" &&
+              afterHoverOpen.transform !== "none");
           const describedRemoved = afterHoverClose.describedBy == null;
 
           const focusActiveOk = afterFocusOpen.activeId === "tooltip-focus-trigger";
@@ -1912,6 +2076,74 @@ async function inspectUrl(
       } catch (e) {
         interactionResults.push({
           name: "solid-tooltip-edge",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
+    } else if (scenario === "solid-tooltip-arrow") {
+      let step = "init";
+      try {
+        const trigger = page.locator("#tooltip-arrow-trigger");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-tooltip-arrow",
+            ok: false,
+            details: { reason: "missing #tooltip-arrow-trigger" },
+          });
+        } else {
+          await page.setViewportSize({ width: 720, height: 320 });
+          await page.waitForTimeout(60);
+
+          step = "hover";
+          await trigger.first().hover({ timeout: timeoutMs });
+          step = "wait tooltip open";
+          await page.waitForFunction(
+            () => document.querySelector("#tooltip-arrow-panel") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(80);
+
+          const metrics = await page.evaluate(() => {
+            const panel = document.querySelector("#tooltip-arrow-panel");
+            const arrow = panel?.querySelector("[data-solid-popper-arrow]");
+            if (!panel || !arrow) return null;
+            const placement = panel.getAttribute("data-solid-placement") ?? "";
+            const base = placement.split("-")[0] || "";
+            // @ts-ignore
+            const baseSide = arrow.style?.[base] ?? "";
+            const pr = panel.getBoundingClientRect();
+            const ar = arrow.getBoundingClientRect();
+            return {
+              placement,
+              base,
+              baseSide,
+              panel: { left: pr.left, right: pr.right, top: pr.top, bottom: pr.bottom },
+              arrow: { left: ar.left, right: ar.right, top: ar.top, bottom: ar.bottom },
+            };
+          });
+
+          step = "move away to close";
+          await page.mouse.move(2, 2);
+          await page.waitForFunction(
+            () => document.querySelector("#tooltip-arrow-panel") == null,
+            { timeout: timeoutMs },
+          );
+
+          const ok =
+            metrics != null &&
+            typeof metrics.placement === "string" &&
+            metrics.placement.length > 0 &&
+            metrics.baseSide === "100%";
+
+          interactionResults.push({
+            name: "solid-tooltip-arrow",
+            ok,
+            details: { metrics },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-tooltip-arrow",
           ok: false,
           details: { error: String(e), step },
         });
