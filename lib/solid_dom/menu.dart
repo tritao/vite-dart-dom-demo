@@ -108,6 +108,33 @@ double _pointerClientY(web.PointerEvent e) {
 
 bool _isPointInPolygon(double x, double y, _Polygon polygon) {
   if (polygon.isEmpty) return false;
+
+  bool pointOnSegment(
+    double ax,
+    double ay,
+    double bx,
+    double by,
+    double px,
+    double py,
+  ) {
+    const eps = 1e-6;
+    final cross = (px - ax) * (by - ay) - (py - ay) * (bx - ax);
+    if (cross.abs() > eps) return false;
+    final dot = (px - ax) * (bx - ax) + (py - ay) * (by - ay);
+    if (dot < -eps) return false;
+    final lenSq = (bx - ax) * (bx - ax) + (by - ay) * (by - ay);
+    if (dot - lenSq > eps) return false;
+    return true;
+  }
+
+  // Treat points on the boundary as "inside" for more stable submenu grace
+  // behavior (mirrors @kobalte/utils polygon semantics).
+  for (var i = 0; i < polygon.length; i++) {
+    final a = polygon[i];
+    final b = polygon[(i + 1) % polygon.length];
+    if (pointOnSegment(a.x, a.y, b.x, b.y, x, y)) return true;
+  }
+
   var inside = false;
   for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     final xi = polygon[i].x;
