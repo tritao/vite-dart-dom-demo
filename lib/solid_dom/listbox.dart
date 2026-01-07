@@ -118,6 +118,7 @@ ListboxHandle<T, O> createListbox<T, O extends ListboxItem<T>>({
     ..setAttribute("role", "listbox")
     ..tabIndex = -1
     ..className = "card listbox";
+  listbox.style.overflow = "auto";
 
   final ids = idRegistry ??
       ListboxIdRegistry<T, O>(listboxId: id, getOptionKey: getOptionKey);

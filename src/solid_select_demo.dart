@@ -77,6 +77,67 @@ void mountSolidSelectDemo(web.Element mount) {
       ),
     );
 
+    root.appendChild(web.HTMLHRElement());
+
+    final longOpen = createSignal(false);
+    final longSelected = createSignal<String?>(null);
+    final longLast = createSignal("none");
+
+    root.appendChild(web.HTMLHeadingElement.h2()
+      ..textContent = "Select (long list / fit viewport)");
+
+    final longStatus = web.HTMLParagraphElement()
+      ..id = "select-status-long"
+      ..className = "muted";
+    longStatus.appendChild(
+      text(() =>
+          "Value: ${longSelected.value ?? "none"} • Last: ${longLast.value}"),
+    );
+    root.appendChild(longStatus);
+
+    final longTrigger = web.HTMLButtonElement()
+      ..id = "select-trigger-long"
+      ..type = "button"
+      ..className = "btn secondary";
+    longTrigger.appendChild(text(() => longSelected.value ?? "Choose (long list)"));
+
+    final longAfter = web.HTMLButtonElement()
+      ..id = "select-after-long"
+      ..type = "button"
+      ..className = "btn secondary"
+      ..textContent = "After";
+
+    final longRow = web.HTMLDivElement()..className = "row";
+    longRow.appendChild(longTrigger);
+    longRow.appendChild(longAfter);
+    root.appendChild(longRow);
+
+    final longOpts = <SelectOption<String>>[
+      const SelectOption(value: "Solid", label: "Solid"),
+      const SelectOption(value: "React", label: "React"),
+      const SelectOption(value: "Svelte", label: "Svelte"),
+      const SelectOption(value: "Vue", label: "Vue", disabled: true),
+      const SelectOption(value: "Dart", label: "Dart"),
+      for (var i = 1; i <= 60; i++)
+        SelectOption(value: "Extra $i", label: "Extra $i"),
+    ];
+
+    root.appendChild(
+      Select<String>(
+        open: () => longOpen.value,
+        setOpen: (next) => longOpen.value = next,
+        trigger: longTrigger,
+        options: () => longOpts,
+        value: () => longSelected.value,
+        setValue: (next) => longSelected.value = next,
+        portalId: "select-portal-long",
+        listboxId: "select-listbox-long",
+        placement: "bottom-start",
+        offset: 8,
+        onClose: (reason) => longLast.value = reason,
+      ),
+    );
+
     return root;
   });
 }

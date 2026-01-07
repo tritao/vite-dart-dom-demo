@@ -164,6 +164,7 @@ web.DocumentFragment Select<T>({
           viewportPadding: viewportPadding,
           flip: flip,
           sameWidth: true,
+          fitViewport: true,
           updateOnScrollParents: true,
         );
 

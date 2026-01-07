@@ -1948,6 +1948,89 @@ async function inspectUrl(
           details: { error: String(e), step },
         });
       }
+    } else if (scenario === "solid-select-fitviewport") {
+      let step = "init";
+      try {
+        const trigger = page.locator("#select-trigger-long");
+        if (!(await trigger.count())) {
+          interactionResults.push({
+            name: "solid-select-fitviewport",
+            ok: false,
+            details: { reason: "missing #select-trigger-long" },
+          });
+        } else {
+          step = "set small viewport";
+          await page.setViewportSize({ width: 520, height: 240 });
+          await page.waitForTimeout(50);
+
+          step = "open";
+          await trigger.first().click({ timeout: timeoutMs });
+          step = "wait listbox open";
+          await page.waitForFunction(
+            () => document.querySelector("#select-listbox-long") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(() => {
+            const el = document.querySelector("#select-listbox-long");
+            if (!el) return false;
+            const mh = getComputedStyle(el).maxHeight;
+            return mh && mh !== "none";
+          });
+          await page.waitForTimeout(80);
+
+          const metrics = await page.evaluate(() => {
+            const el = document.querySelector("#select-listbox-long");
+            if (!el) return null;
+            const rect = el.getBoundingClientRect();
+            const cs = getComputedStyle(el);
+            const maxHeight = cs.maxHeight;
+            const maxHeightPx = Number.parseFloat(maxHeight || "0") || 0;
+            const beforeScrollTop = el.scrollTop;
+            el.scrollTop = 9999;
+            const afterScrollTop = el.scrollTop;
+            return {
+              vw: window.innerWidth,
+              vh: window.innerHeight,
+              rect: {
+                left: Math.round(rect.left),
+                right: Math.round(rect.right),
+                top: Math.round(rect.top),
+                bottom: Math.round(rect.bottom),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
+              },
+              clientHeight: el.clientHeight,
+              scrollHeight: el.scrollHeight,
+              overflowY: cs.overflowY,
+              maxHeight,
+              maxHeightPx,
+              beforeScrollTop,
+              afterScrollTop,
+            };
+          });
+
+          const ok =
+            metrics != null &&
+            metrics.maxHeightPx > 0 &&
+            metrics.overflowY !== "visible" &&
+            metrics.rect.top >= 6 &&
+            metrics.rect.bottom <= metrics.vh - 6 &&
+            metrics.scrollHeight > metrics.clientHeight &&
+            metrics.afterScrollTop > metrics.beforeScrollTop;
+
+          interactionResults.push({
+            name: "solid-select-fitviewport",
+            ok,
+            details: { metrics },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-select-fitviewport",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
     } else if (scenario === "solid-listbox") {
       let step = "init";
       try {
@@ -2542,6 +2625,90 @@ async function inspectUrl(
       } catch (e) {
         interactionResults.push({
           name: "solid-combobox",
+          ok: false,
+          details: { error: String(e), step },
+        });
+      }
+    } else if (scenario === "solid-combobox-fitviewport") {
+      let step = "init";
+      try {
+        const input = page.locator("#combobox-input");
+        if (!(await input.count())) {
+          interactionResults.push({
+            name: "solid-combobox-fitviewport",
+            ok: false,
+            details: { reason: "missing #combobox-input" },
+          });
+        } else {
+          step = "set small viewport";
+          await page.setViewportSize({ width: 560, height: 240 });
+          await page.waitForTimeout(50);
+
+          step = "open list";
+          await input.focus({ timeout: timeoutMs });
+          await page.keyboard.press("Alt+ArrowDown");
+          step = "wait listbox open";
+          await page.waitForFunction(
+            () => document.querySelector("#combobox-listbox") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForFunction(() => {
+            const el = document.querySelector("#combobox-listbox");
+            if (!el) return false;
+            const mh = getComputedStyle(el).maxHeight;
+            return mh && mh !== "none";
+          });
+          await page.waitForTimeout(80);
+
+          const metrics = await page.evaluate(() => {
+            const el = document.querySelector("#combobox-listbox");
+            if (!el) return null;
+            const rect = el.getBoundingClientRect();
+            const cs = getComputedStyle(el);
+            const maxHeight = cs.maxHeight;
+            const maxHeightPx = Number.parseFloat(maxHeight || "0") || 0;
+            const beforeScrollTop = el.scrollTop;
+            el.scrollTop = 9999;
+            const afterScrollTop = el.scrollTop;
+            return {
+              vw: window.innerWidth,
+              vh: window.innerHeight,
+              rect: {
+                left: Math.round(rect.left),
+                right: Math.round(rect.right),
+                top: Math.round(rect.top),
+                bottom: Math.round(rect.bottom),
+                width: Math.round(rect.width),
+                height: Math.round(rect.height),
+              },
+              clientHeight: el.clientHeight,
+              scrollHeight: el.scrollHeight,
+              overflowY: cs.overflowY,
+              maxHeight,
+              maxHeightPx,
+              beforeScrollTop,
+              afterScrollTop,
+            };
+          });
+
+          const ok =
+            metrics != null &&
+            metrics.maxHeightPx > 0 &&
+            metrics.overflowY !== "visible" &&
+            metrics.rect.top >= 6 &&
+            metrics.rect.bottom <= metrics.vh - 6 &&
+            metrics.scrollHeight > metrics.clientHeight &&
+            metrics.afterScrollTop > metrics.beforeScrollTop;
+
+          interactionResults.push({
+            name: "solid-combobox-fitviewport",
+            ok,
+            details: { metrics },
+          });
+        }
+      } catch (e) {
+        interactionResults.push({
+          name: "solid-combobox-fitviewport",
           ok: false,
           details: { error: String(e), step },
         });

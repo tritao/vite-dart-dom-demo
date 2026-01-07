@@ -72,6 +72,8 @@ void mountSolidComboboxDemo(web.Element mount) {
       const ComboboxOption(value: "Three", label: "Three"),
       const ComboboxOption(value: "Disabled", label: "Disabled", disabled: true),
       const ComboboxOption(value: "Dart", label: "Dart"),
+      for (var i = 1; i <= 40; i++)
+        ComboboxOption(value: "Extra $i", label: "Extra $i"),
     ];
 
     root.appendChild(

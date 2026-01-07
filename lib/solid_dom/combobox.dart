@@ -396,6 +396,7 @@ web.DocumentFragment Combobox<T>({
           viewportPadding: viewportPadding,
           flip: flip,
           sameWidth: true,
+          fitViewport: true,
           updateOnScrollParents: true,
         );
 
