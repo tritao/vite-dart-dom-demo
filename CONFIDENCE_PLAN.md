@@ -2,6 +2,8 @@
 
 Goal: increase confidence in correctness/robustness (Kobalte-style behavior) beyond the current “happy-path” Playwright smoke checks.
 
+Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for the audit).
+
 ## Scope
 - Selection core (`createSelectableCollection/item`, `SelectionManager`)
 - Listbox core + virtual focus (`aria-activedescendant`)
@@ -115,4 +117,3 @@ Goal: increase confidence in correctness/robustness (Kobalte-style behavior) bey
 3. Nested layer stacking demo + test.
 4. Repeat + jitter harness enhancements.
 5. Multi-browser support (if CI/runtime supports it).
-
