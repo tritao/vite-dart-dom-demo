@@ -589,10 +589,14 @@ web.DocumentFragment DropdownMenu({
             runSelect();
           }
 
-          on(el, "pointermove", onPointerMove);
-          on(el, "pointerleave", onPointerLeave);
-          on(el, "pointerup", onPointerUp);
-          on(el, "keydown", onKeyDown);
+          if (item.kind != MenuItemKind.subTrigger) {
+            on(el, "pointermove", onPointerMove);
+          }
+          if (item.kind != MenuItemKind.subTrigger) {
+            on(el, "pointerleave", onPointerLeave);
+            on(el, "pointerup", onPointerUp);
+            on(el, "keydown", onKeyDown);
+          }
 
           // Submenu trigger.
           if (item.kind == MenuItemKind.subTrigger && item.submenuBuilder != null) {
