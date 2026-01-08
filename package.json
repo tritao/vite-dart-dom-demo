@@ -6,9 +6,10 @@
   "scripts": {
     "provision:dart": "bash scripts/provision-dart.sh",
     "dart:get": "node scripts/dart-pub-get.mjs",
-    "predev": "npm run dart:get",
+    "docs:build": "node scripts/dart-run.mjs run tool/build_docs.dart",
+    "predev": "npm run dart:get && npm run docs:build",
     "dev": "vite",
-    "prebuild": "npm run dart:get",
+    "prebuild": "npm run dart:get && npm run docs:build",
     "build": "vite build",
     "preview": "vite preview",
     "debug:ui": "node scripts/debug-ui.mjs",

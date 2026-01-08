@@ -7,3 +7,4 @@ build/
 .dart-sdk/
 .env.local
 dartsdk-*-release.zip
+assets/docs/
