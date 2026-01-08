@@ -292,6 +292,13 @@
     transform: translateY(-50%);
   }
 
+  .menuItem[role="menuitemcheckbox"][aria-checked="true"],
+  .menuItem[role="menuitemcheckbox"][aria-checked="mixed"],
+  .menuItem[role="menuitemradio"][aria-checked="true"] {
+    background: hsl(var(--primary) / 0.1);
+    border-color: hsl(var(--primary) / 0.22);
+  }
+
   .menuItem:hover {
     background: hsl(var(--accent));
   }

@@ -384,6 +384,96 @@ export async function runSolidDropdownmenuSubmenuScenario(page, { timeoutMs }) {
   );
 }
 
+export async function runSolidDropdownmenuRadioScenario(page, { timeoutMs }) {
+  const interactionResults = [];
+  let step = "init";
+  try {
+    const trigger = page.locator("#menu-trigger");
+    if (!(await trigger.count())) {
+      interactionResults.push({
+        name: "solid-dropdownmenu-radio",
+        ok: false,
+        details: { reason: "missing #menu-trigger" },
+      });
+    } else {
+      step = "open";
+      await trigger.first().click({ timeout: timeoutMs });
+      step = "wait open";
+      await page.waitForFunction(
+        () => document.querySelector("#menu-content") != null,
+        { timeout: timeoutMs },
+      );
+      await page.waitForTimeout(50);
+
+      const readChecks = async () =>
+        await page.evaluate(() => {
+          const light = document
+            .querySelector("#menu-item-theme-light")
+            ?.getAttribute("aria-checked");
+          const dark = document
+            .querySelector("#menu-item-theme-dark")
+            ?.getAttribute("aria-checked");
+          return { light, dark };
+        });
+
+      const before = await readChecks();
+
+      step = "click Theme: dark";
+      await page.locator("#menu-item-theme-dark").click({ timeout: timeoutMs });
+      await page.waitForTimeout(60);
+      const afterClick = await readChecks();
+      const statusAfterClick = await page.evaluate(
+        () => document.querySelector("#menu-status")?.textContent ?? "",
+      );
+
+      step = "close (Escape)";
+      await page.keyboard.press("Escape");
+      await page.waitForFunction(
+        () => document.querySelector("#menu-content") == null,
+        { timeout: timeoutMs },
+      );
+
+      step = "reopen";
+      await trigger.first().click({ timeout: timeoutMs });
+      await page.waitForFunction(
+        () => document.querySelector("#menu-content") != null,
+        { timeout: timeoutMs },
+      );
+      await page.waitForTimeout(60);
+      const afterReopen = await readChecks();
+
+      const ok =
+        before.light === "true" &&
+        before.dark === "false" &&
+        statusAfterClick.includes("Action: Theme: dark") &&
+        afterClick.light === "false" &&
+        afterClick.dark === "true" &&
+        afterReopen.light === "false" &&
+        afterReopen.dark === "true";
+
+      interactionResults.push({
+        name: "solid-dropdownmenu-radio",
+        ok,
+        details: { before, afterClick, afterReopen, statusAfterClick },
+      });
+    }
+  } catch (e) {
+    interactionResults.push({
+      name: "solid-dropdownmenu-radio",
+      ok: false,
+      details: { error: String(e), step },
+    });
+  }
+
+  return (
+    interactionResults[0] ?? {
+      name: "solid-dropdownmenu-radio",
+      ok: false,
+      details: { reason: "no result" },
+    }
+  );
+}
+
 export async function runSolidMenubarScenario(page, { timeoutMs }) {
   const interactionResults = [];
   let step = "init";
@@ -860,9 +950,9 @@ export const solidMenuUiScenarios = {
   "solid-dropdownmenu": runSolidDropdownmenuScenario,
   "solid-dropdownmenu-clickthrough": runSolidDropdownmenuClickthroughScenario,
   "solid-dropdownmenu-submenu": runSolidDropdownmenuSubmenuScenario,
+  "solid-dropdownmenu-radio": runSolidDropdownmenuRadioScenario,
   "solid-menubar": runSolidMenubarScenario,
   "solid-tabs": runSolidTabsScenario,
   "solid-accordion": runSolidAccordionScenario,
   "solid-contextmenu": runSolidContextmenuScenario,
 };
-
