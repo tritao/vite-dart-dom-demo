@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { spawnSync } from "child_process";
 import { readFileSync, mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join, parse } from "path";
@@ -54,6 +54,13 @@ const defaultConfig = {
 };
 
 const nonFlagBool = ["stdio"];
+
+function tailLines(text, maxLines = 200) {
+  if (!text) return "";
+  const lines = String(text).split(/\r?\n/);
+  if (lines.length <= maxLines) return lines.join("\n");
+  return lines.slice(lines.length - maxLines).join("\n");
+}
 
 /**
  * @param {Config} options
@@ -125,40 +132,81 @@ export default function dartPlugin(options = defaultConfig) {
       const compiledDartFilename = parsedPath.name + ".js";
       const compiledDartOutput = join(tmpFolder, compiledDartFilename);
 
-      // Construct the dart command & execute
-      const command = `"${options.dart}" compile js ${execArgs
-        .map((x) => `"${x}"`)
-        .join(" ")} -o "${compiledDartOutput}" "${path}"`;
+      const dartArgs = [
+        "compile",
+        "js",
+        ...execArgs,
+        "-o",
+        compiledDartOutput,
+        path,
+      ];
 
-      execSync(command, {
-        stdio: `${options.stdio === true ? "inherit" : "ignore"}`,
-      });
+      const prettyCommand = `"${options.dart}" ${dartArgs
+        .map((x) => (x.includes(" ") ? JSON.stringify(x) : x))
+        .join(" ")}`;
 
-      let compiledDart = readFileSync(compiledDartOutput, "utf8");
+      let compiledDart;
       let compiledDartMap = null;
-
-      if (options["no-source-maps"] === false) {
-        // Remove the included sourcemap (Vite handles it)
-        compiledDart = compiledDart.replace(
-          `//# sourceMappingURL=${encodeURIComponent(
-            compiledDartFilename
-          )}.map`,
-          ""
-        );
-        // Patch the sourcemap so it points to the correct files
-        compiledDartMap = JSON.parse(
-          readFileSync(compiledDartOutput + ".map", "utf8")
-        );
-        compiledDartMap.sources = compiledDartMap.sources.map((x) => {
-          if (!x.startsWith(".")) return;
-          x.replace(/^(?:\.\.(\/|\\))+/, "");
-          x = "file://" + x;
+      try {
+        const result = spawnSync(options.dart, dartArgs, {
+          encoding: "utf8",
+          stdio: ["ignore", "pipe", "pipe"],
         });
-        compiledDartMap = JSON.stringify(compiledDartMap);
-      }
 
-      // Delete the tmp folder
-      rmSync(tmpFolder, { recursive: true, force: true });
+        if (options.stdio === true) {
+          if (result.stdout) process.stdout.write(result.stdout);
+          if (result.stderr) process.stderr.write(result.stderr);
+        }
+
+        if (result.error) {
+          const out = tailLines(result.stdout);
+          const err = tailLines(result.stderr);
+          const msg =
+            `[vite-plugin-dart] Failed to run Dart compiler.\n` +
+            `Command: ${prettyCommand}\n` +
+            (result.error?.message ? `Error: ${result.error.message}\n` : "") +
+            (out ? `\nstdout (tail):\n${out}\n` : "") +
+            (err ? `\nstderr (tail):\n${err}\n` : "");
+          this.error(new Error(msg));
+        }
+
+        if (result.status !== 0) {
+          const out = tailLines(result.stdout);
+          const err = tailLines(result.stderr);
+          const msg =
+            `[vite-plugin-dart] Dart compilation failed (exit code ${result.status}).\n` +
+            `Entry: ${path}\n` +
+            `Command: ${prettyCommand}\n` +
+            (out ? `\nstdout (tail):\n${out}\n` : "") +
+            (err ? `\nstderr (tail):\n${err}\n` : "");
+          this.error(new Error(msg));
+        }
+        compiledDart = readFileSync(compiledDartOutput, "utf8");
+
+        if (options["no-source-maps"] === false) {
+          // Remove the included sourcemap (Vite handles it)
+          compiledDart = compiledDart.replace(
+            `//# sourceMappingURL=${encodeURIComponent(
+              compiledDartFilename
+            )}.map`,
+            ""
+          );
+          // Patch the sourcemap so it points to the correct files
+          compiledDartMap = JSON.parse(
+            readFileSync(compiledDartOutput + ".map", "utf8")
+          );
+          compiledDartMap.sources = compiledDartMap.sources.map((x) => {
+            if (!x.startsWith(".")) return x;
+            x = x.replace(/^(?:\.\.(\/|\\))+/, "");
+            x = "file://" + x;
+            return x;
+          });
+          compiledDartMap = JSON.stringify(compiledDartMap);
+        }
+      } finally {
+        // Delete the tmp folder even on failure.
+        rmSync(tmpFolder, { recursive: true, force: true });
+      }
 
       return {
         code: compiledDart,
