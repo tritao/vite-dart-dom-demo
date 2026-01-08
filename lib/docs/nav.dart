@@ -59,6 +59,24 @@ web.HTMLElement solidDocsNav({required String active}) {
 """).toJS;
   actions.appendChild(github);
 
+  final theme = web.HTMLButtonElement()
+    ..id = "docs-theme"
+    ..type = "button"
+    ..className = "docsTopbarIcon"
+    ..setAttribute("aria-label", "Theme");
+  theme.innerHTML = (r"""
+<svg class="docsThemeIcon docsThemeIcon--system" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+  <path fill="currentColor" d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5l1 2H8l1-2H6a2 2 0 0 1-2-2V5zm2 0v10h12V5H6z"/>
+</svg>
+<svg class="docsThemeIcon docsThemeIcon--light" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+  <path fill="currentColor" d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12zm0-16h0v3h0V2zm0 19h0v3h0v-3zM4.22 4.22h0l2.12 2.12h0L4.22 4.22zm13.44 13.44h0l2.12 2.12h0l-2.12-2.12zM2 12h3v0H2v0zm19 0h3v0h-3v0zM4.22 19.78h0l2.12-2.12h0l-2.12 2.12zM17.66 6.34h0l2.12-2.12h0l-2.12 2.12z"/>
+</svg>
+<svg class="docsThemeIcon docsThemeIcon--dark" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+  <path fill="currentColor" d="M21 14.5A8.5 8.5 0 0 1 9.5 3 6.5 6.5 0 1 0 21 14.5z"/>
+</svg>
+""").toJS;
+  actions.appendChild(theme);
+
   final back = web.HTMLAnchorElement()
     ..href = "./"
     ..className = "docsTopbarIcon"

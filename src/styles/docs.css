@@ -109,6 +109,16 @@
     background: hsl(var(--accent));
   }
 
+  .docsThemeIcon {
+    display: none;
+  }
+
+  #docs-theme[data-mode="system"] .docsThemeIcon--system,
+  #docs-theme[data-mode="light"] .docsThemeIcon--light,
+  #docs-theme[data-mode="dark"] .docsThemeIcon--dark {
+    display: block;
+  }
+
   .docsLayout {
     display: grid;
     grid-template-columns: 280px minmax(0, 1fr);

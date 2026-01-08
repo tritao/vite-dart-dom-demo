@@ -5,6 +5,7 @@ import "dart:js_interop";
 import "package:dart_web_test/solid.dart";
 import "package:dart_web_test/solid_dom.dart";
 import "package:dart_web_test/dom_ui/router.dart" as router;
+import "package:dart_web_test/dom_ui/theme.dart" as theme;
 import "package:http/http.dart" as http;
 import "package:web/web.dart" as web;
 
@@ -176,6 +177,7 @@ void mountSolidDocs(web.Element mount, String? page) {
     final propsData = createResource(_fetchProps);
 
     final searchQuery = createSignal("");
+    final themeMode = createSignal(theme.getThemePreference());
 
     final searchEl = topbar.querySelector("#docs-search");
     if (searchEl is web.HTMLInputElement) {
@@ -188,6 +190,35 @@ void mountSolidDocs(web.Element mount, String? page) {
           searchEl.value = "";
           searchQuery.value = "";
         }
+      });
+    }
+
+    final themeBtn = topbar.querySelector("#docs-theme");
+    if (themeBtn is web.HTMLButtonElement) {
+      void applyMode(String mode) {
+        theme.setThemePreference(mode);
+        theme.applyThemePreference(mode);
+        themeMode.value = mode;
+      }
+
+      applyMode(themeMode.value);
+
+      on(themeBtn, "click", (_) {
+        final current = themeMode.value;
+        final next = current == "system"
+            ? "light"
+            : current == "light"
+                ? "dark"
+                : "system";
+        applyMode(next);
+      });
+
+      createRenderEffect(() {
+        final m = themeMode.value;
+        themeBtn.setAttribute("data-mode", m);
+        final label = "Theme: $m (click to change)";
+        themeBtn.setAttribute("aria-label", label);
+        themeBtn.title = label;
       });
     }
 
