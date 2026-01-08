@@ -25,3 +25,18 @@ Start with:
 - [Dialog](/?docs=dialog)
 - [Selection core](/?docs=selection-core)
 - [Reactivity](/?docs=runtime-reactivity)
+
+Components:
+
+- [Popover](/?docs=popover)
+- [Tooltip](/?docs=tooltip)
+- [DropdownMenu](/?docs=dropdown-menu)
+- [Menubar](/?docs=menubar)
+- [ContextMenu](/?docs=context-menu)
+- [Toast](/?docs=toast)
+- [Select](/?docs=select)
+- [Combobox](/?docs=combobox)
+- [Listbox](/?docs=listbox)
+- [Tabs](/?docs=tabs)
+- [Accordion](/?docs=accordion)
+- [Switch](/?docs=switch)

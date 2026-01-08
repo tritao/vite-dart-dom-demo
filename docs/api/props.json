@@ -86,6 +86,649 @@
         "notes": "Optional id for the Portal container."
       }
     ]
+  },
+  "Popover": {
+    "title": "Popover",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controls visibility."
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called on dismiss/close; update your signal/state here."
+      },
+      {
+        "name": "anchor",
+        "type": "Element?",
+        "notes": "Anchor element used for Popper positioning (recommended)."
+      },
+      {
+        "name": "builder",
+        "type": "PopoverBuilder (close) → HTMLElement",
+        "required": true,
+        "notes": "Builds the panel element; call close(reason?) to dismiss."
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?",
+        "notes": "Dismiss reason: escape/outside/close/etc."
+      },
+      {
+        "name": "trapFocus",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, traps focus inside the panel (Popover becomes modal-like)."
+      },
+      {
+        "name": "initialFocus",
+        "type": "HTMLElement?",
+        "notes": "Element to focus on open (when trapFocus or autoFocus is used)."
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"bottom-start\"",
+        "notes": "Floating UI placement."
+      },
+      {
+        "name": "offset",
+        "type": "double",
+        "default": "8",
+        "notes": "Distance between anchor and panel."
+      },
+      {
+        "name": "viewportPadding",
+        "type": "double",
+        "default": "8",
+        "notes": "Padding when clamping/shift/flip near viewport edges."
+      },
+      {
+        "name": "flip",
+        "type": "bool",
+        "default": "true",
+        "notes": "Allow flipping to remain visible."
+      },
+      {
+        "name": "slide",
+        "type": "bool",
+        "default": "true",
+        "notes": "Keep popover within viewport by sliding along the anchor."
+      },
+      {
+        "name": "overlap",
+        "type": "bool",
+        "default": "false",
+        "notes": "Allow overlap with the anchor when shifting."
+      },
+      {
+        "name": "hideWhenDetached",
+        "type": "bool",
+        "default": "false",
+        "notes": "Hide the panel when the anchor is detached/offscreen."
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for animations."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container."
+      }
+    ]
+  },
+  "Tooltip": {
+    "title": "Tooltip",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controls visibility."
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called by hover/focus interactions; update your signal/state here."
+      },
+      {
+        "name": "trigger",
+        "type": "Element",
+        "required": true,
+        "notes": "The element that shows the tooltip on hover/focus."
+      },
+      {
+        "name": "builder",
+        "type": "TooltipBuilder (close) → HTMLElement",
+        "required": true,
+        "notes": "Builds the tooltip element."
+      },
+      {
+        "name": "openDelayMs",
+        "type": "int",
+        "default": "500",
+        "notes": "Delay before opening on hover."
+      },
+      {
+        "name": "closeDelayMs",
+        "type": "int",
+        "default": "150",
+        "notes": "Delay before closing on pointer leave."
+      },
+      {
+        "name": "interactive",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, tooltip can receive pointer events (useful for richer content)."
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"top\"",
+        "notes": "Floating UI placement."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container."
+      }
+    ]
+  },
+  "DropdownMenu": {
+    "title": "DropdownMenu",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controls visibility."
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called on dismiss/close; update your signal/state here."
+      },
+      {
+        "name": "anchor",
+        "type": "Element",
+        "required": true,
+        "notes": "Anchor element used for Popper positioning."
+      },
+      {
+        "name": "builder",
+        "type": "DropdownMenuBuilder (close) → MenuContent",
+        "required": true,
+        "notes": "Builds menu content + item registry (items power keyboard + typeahead)."
+      },
+      {
+        "name": "modal",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, blocks outside pointer events (modal-like)."
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"bottom-start\"",
+        "notes": "Floating UI placement."
+      },
+      {
+        "name": "offset",
+        "type": "double",
+        "default": "4",
+        "notes": "Distance between anchor and menu."
+      },
+      {
+        "name": "flip",
+        "type": "bool",
+        "default": "true",
+        "notes": "Allow flipping to remain visible."
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for animations."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container."
+      }
+    ]
+  },
+  "Menubar": {
+    "title": "Menubar",
+    "rows": [
+      {
+        "name": "openKey",
+        "type": "String? Function()",
+        "required": true,
+        "notes": "Key of the currently open top-level menu (or null)."
+      },
+      {
+        "name": "setOpenKey",
+        "type": "void Function(String? next)",
+        "required": true,
+        "notes": "Updates the open top-level menu key."
+      },
+      {
+        "name": "menus",
+        "type": "List<MenubarMenu>",
+        "required": true,
+        "notes": "Defines triggers + menu builders (each menu is built with Menu semantics)."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"menubar\"",
+        "notes": "CSS class for the menubar root."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container used by all menus."
+      }
+    ]
+  },
+  "ContextMenu": {
+    "title": "ContextMenu",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controls visibility."
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called on dismiss/close; update your signal/state here."
+      },
+      {
+        "name": "target",
+        "type": "Element",
+        "required": true,
+        "notes": "Element that receives right-click/long-press events."
+      },
+      {
+        "name": "builder",
+        "type": "MenuBuilder (close) → MenuContent",
+        "required": true,
+        "notes": "Builds menu content + items."
+      },
+      {
+        "name": "disabled",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, context menu won’t open."
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for animations."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container."
+      }
+    ]
+  },
+  "Toast": {
+    "title": "Toast",
+    "rows": [
+      {
+        "name": "createToaster.exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for toast animations."
+      },
+      {
+        "name": "createToaster.defaultDurationMs",
+        "type": "int",
+        "default": "2500",
+        "notes": "Default auto-dismiss duration for new toasts."
+      },
+      {
+        "name": "controller.show",
+        "type": "int Function(String message, {int? durationMs})",
+        "notes": "Push a new toast; returns an id."
+      },
+      {
+        "name": "controller.dismiss",
+        "type": "void Function(int id, {String reason})",
+        "notes": "Dismiss a toast (keeps it mounted for exitMs)."
+      },
+      {
+        "name": "controller.view.portalId",
+        "type": "String",
+        "default": "\"toast-portal-container\"",
+        "notes": "Portal id for the toast viewport."
+      },
+      {
+        "name": "controller.view.viewportId",
+        "type": "String",
+        "default": "\"toast-viewport\"",
+        "notes": "DOM id for the viewport element."
+      }
+    ]
+  },
+  "Select": {
+    "title": "Select",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controls popup visibility."
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called by trigger/outside interactions; update your state here."
+      },
+      {
+        "name": "trigger",
+        "type": "HTMLElement",
+        "required": true,
+        "notes": "Button element; remains focused (virtual focus)."
+      },
+      {
+        "name": "options",
+        "type": "Iterable<SelectOption<T>> Function()",
+        "required": true,
+        "notes": "Options list (disabled options are skipped)."
+      },
+      {
+        "name": "value",
+        "type": "T? Function()",
+        "required": true,
+        "notes": "Currently selected value (controlled)."
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(T? next)",
+        "required": true,
+        "notes": "Updates the selected value."
+      },
+      {
+        "name": "fitViewport",
+        "type": "bool",
+        "default": "true",
+        "notes": "Clamp maxHeight on short viewports and allow scrolling."
+      },
+      {
+        "name": "disallowEmptySelection",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, prevents clearing selection."
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"bottom-start\"",
+        "notes": "Floating UI placement."
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for animations."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container."
+      }
+    ]
+  },
+  "Combobox": {
+    "title": "Combobox",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controls popup visibility."
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called by input/outside interactions; update your state here."
+      },
+      {
+        "name": "anchor",
+        "type": "HTMLElement",
+        "required": true,
+        "notes": "Anchor element used for Popper positioning (often wraps the input)."
+      },
+      {
+        "name": "input",
+        "type": "HTMLInputElement",
+        "required": true,
+        "notes": "Text input (remains focused while navigating options)."
+      },
+      {
+        "name": "options",
+        "type": "Iterable<ComboboxOption<T>> Function()",
+        "required": true,
+        "notes": "Options list (can be filtered by input)."
+      },
+      {
+        "name": "value",
+        "type": "T? Function()",
+        "required": true,
+        "notes": "Currently selected value (controlled)."
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(T? next)",
+        "required": true,
+        "notes": "Updates the selected value."
+      },
+      {
+        "name": "filter",
+        "type": "ComboboxFilter<T>?",
+        "notes": "Custom filter; defaults to case-insensitive contains(textValue)."
+      },
+      {
+        "name": "closeOnSelection",
+        "type": "bool",
+        "default": "true",
+        "notes": "Close the popup when selecting an option."
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for animations."
+      },
+      {
+        "name": "portalId",
+        "type": "String?",
+        "notes": "Optional id for the Portal container."
+      }
+    ]
+  },
+  "Listbox": {
+    "title": "Listbox (createListbox)",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String",
+        "required": true,
+        "notes": "DOM id for the listbox element."
+      },
+      {
+        "name": "options",
+        "type": "List<O> Function()?",
+        "notes": "Flat options list (use sections for grouped lists)."
+      },
+      {
+        "name": "sections",
+        "type": "Iterable<ListboxSection<T,O>> Function()?",
+        "notes": "Optional grouped sections."
+      },
+      {
+        "name": "selected",
+        "type": "T? Function()",
+        "required": true,
+        "notes": "Currently selected value."
+      },
+      {
+        "name": "onSelect",
+        "type": "void Function(O option, int index)",
+        "required": true,
+        "notes": "Called on selection (Enter/Space/pointer)."
+      },
+      {
+        "name": "shouldUseVirtualFocus",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, uses aria-activedescendant and keeps focus on the root."
+      },
+      {
+        "name": "shouldSelectOnPressUp",
+        "type": "bool",
+        "default": "false",
+        "notes": "Select on pointer up (menu-like timing)."
+      },
+      {
+        "name": "allowsDifferentPressOrigin",
+        "type": "bool",
+        "default": "false",
+        "notes": "Allow press down on one item and release on another."
+      },
+      {
+        "name": "disallowEmptySelection",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, prevents clearing selection."
+      }
+    ]
+  },
+  "Tabs": {
+    "title": "Tabs",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<TabsItem>",
+        "required": true,
+        "notes": "Tab triggers + panels (ids are wired automatically)."
+      },
+      {
+        "name": "value",
+        "type": "String? Function()",
+        "required": true,
+        "notes": "Controlled selected tab key."
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)",
+        "required": true,
+        "notes": "Updates the selected tab."
+      },
+      {
+        "name": "activationMode",
+        "type": "TabsActivationMode Function()?",
+        "notes": "automatic selects on focus; manual selects on click/Enter/Space."
+      },
+      {
+        "name": "orientation",
+        "type": "Orientation Function()?",
+        "notes": "horizontal or vertical."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Optional aria-label for the tablist."
+      }
+    ]
+  },
+  "Accordion": {
+    "title": "Accordion",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<AccordionItem>",
+        "required": true,
+        "notes": "Accordion triggers + panels."
+      },
+      {
+        "name": "expandedKeys",
+        "type": "Set<String> Function()",
+        "required": true,
+        "notes": "Controlled set of expanded item keys."
+      },
+      {
+        "name": "setExpandedKeys",
+        "type": "void Function(Set<String> next)",
+        "required": true,
+        "notes": "Updates expanded item keys."
+      },
+      {
+        "name": "multiple",
+        "type": "bool Function()?",
+        "notes": "Allow multiple items expanded at once."
+      },
+      {
+        "name": "collapsible",
+        "type": "bool Function()?",
+        "notes": "Allow closing the last open item (single mode)."
+      }
+    ]
+  },
+  "Switch": {
+    "title": "Switch",
+    "rows": [
+      {
+        "name": "checked",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controlled checked state."
+      },
+      {
+        "name": "setChecked",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Updates checked state."
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?",
+        "notes": "Disable the switch."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Optional aria-label for the control."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"switch\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "thumbClassName",
+        "type": "String",
+        "default": "\"switchThumb\"",
+        "notes": "CSS class for the thumb element."
+      }
+    ]
   }
 }
-

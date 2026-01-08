@@ -244,7 +244,8 @@ a.btn {
   top: 16px;
   align-self: start;
   max-height: calc(100vh - 140px);
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding-right: 8px;
   display: flex;
   flex-direction: column;
@@ -253,6 +254,12 @@ a.btn {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.02);
+  scrollbar-width: none; /* Firefox: hide scrollbar, keep scrolling */
+}
+
+.docsSidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .docsGroupTitle {

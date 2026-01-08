@@ -8,6 +8,18 @@ import "./examples/focus_scope_basic.dart";
 import "./examples/interact_outside_basic.dart";
 import "./examples/popper_basic.dart";
 import "./examples/selection_core_basic.dart";
+import "./examples/popover_basic.dart";
+import "./examples/tooltip_basic.dart";
+import "./examples/dropdown_menu_basic.dart";
+import "./examples/menubar_basic.dart";
+import "./examples/context_menu_basic.dart";
+import "./examples/toast_basic.dart";
+import "./examples/select_basic.dart";
+import "./examples/combobox_basic.dart";
+import "./examples/listbox_basic.dart";
+import "./examples/tabs_basic.dart";
+import "./examples/accordion_basic.dart";
+import "./examples/switch_basic.dart";
 import "./examples/runtime_reactivity_basic.dart";
 import "./examples/runtime_ownership_basic.dart";
 import "./examples/runtime_dom_basic.dart";
@@ -23,6 +35,18 @@ final Map<String, DocsDemoMount> docsDemos = {
   "interact-outside-basic": mountDocsInteractOutsideBasic,
   "popper-basic": mountDocsPopperBasic,
   "selection-core-basic": mountDocsSelectionCoreBasic,
+  "popover-basic": mountDocsPopoverBasic,
+  "tooltip-basic": mountDocsTooltipBasic,
+  "dropdown-menu-basic": mountDocsDropdownMenuBasic,
+  "menubar-basic": mountDocsMenubarBasic,
+  "context-menu-basic": mountDocsContextMenuBasic,
+  "toast-basic": mountDocsToastBasic,
+  "select-basic": mountDocsSelectBasic,
+  "combobox-basic": mountDocsComboboxBasic,
+  "listbox-basic": mountDocsListboxBasic,
+  "tabs-basic": mountDocsTabsBasic,
+  "accordion-basic": mountDocsAccordionBasic,
+  "switch-basic": mountDocsSwitchBasic,
   "runtime-reactivity-basic": mountDocsRuntimeReactivityBasic,
   "runtime-ownership-basic": mountDocsRuntimeOwnershipBasic,
   "runtime-dom-basic": mountDocsRuntimeDomBasic,
