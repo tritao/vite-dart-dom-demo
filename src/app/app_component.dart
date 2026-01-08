@@ -115,7 +115,11 @@ final class AppComponent extends Component {
         title: 'Dart + Vite (DOM demo)',
         subtitle:
             'Counter + Todos (localStorage) + Fetch (async) to validate the integration.',
-        actions: const [],
+        actions: [
+          dom.linkButton('Home', href: './'),
+          dom.linkButton('Docs', href: '?docs=1'),
+          dom.linkButton('Labs', href: '?solid=catalog'),
+        ],
       ),
       dom.spacer(),
       dom.section(
@@ -125,6 +129,7 @@ final class AppComponent extends Component {
         children: [
           dom.spacer(),
           dom.row(children: [
+            dom.linkButton('Demos', href: '?demos=1'),
             dom.linkButton('Docs', href: '?docs=1'),
             dom.linkButton('Catalog', href: '?solid=catalog'),
             dom.linkButton('DropdownMenu', href: '?solid=dropdownmenu'),

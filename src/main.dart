@@ -2,6 +2,7 @@ import 'package:web/web.dart' as web;
 
 import './app/app_component.dart';
 import './app/counter_component.dart';
+import './app/intro_component.dart';
 import './app/todos_component.dart';
 import './app/users_component.dart';
 import './docs/router.dart';
@@ -39,6 +40,7 @@ void main() {
   final params = Uri.splitQueryString(query);
   final docs = params["docs"];
   final solid = params["solid"];
+  final demos = params["demos"];
 
   if (docs != null) {
     mountSolidDocs(mount, docs);
@@ -130,9 +132,14 @@ void main() {
     return;
   }
 
-  AppComponent(
-    counter: CounterComponent(),
-    todos: TodosComponent(),
-    usersFactory: () => UsersComponent(),
-  ).mountInto(mount);
+  if (demos == "1" || demos == "true") {
+    AppComponent(
+      counter: CounterComponent(),
+      todos: TodosComponent(),
+      usersFactory: () => UsersComponent(),
+    ).mountInto(mount);
+    return;
+  }
+
+  IntroComponent().mountInto(mount);
 }
