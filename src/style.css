@@ -88,6 +88,102 @@ a.btn {
   padding: 0 18px;
 }
 
+.containerWide {
+  max-width: 1240px;
+}
+
+.catalogLayout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 14px;
+}
+
+.catalogSidebar {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+  padding-right: 8px;
+}
+
+.catalogList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.catalogItem {
+  width: 100%;
+  text-align: left;
+}
+
+.catalogItem[data-active="true"] {
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.12);
+}
+
+.catalogMain {
+  min-width: 0;
+}
+
+.catalogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+
+.catalogHeader h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.catalogActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.catalogCmd {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  max-width: min(520px, 100%);
+  overflow: auto;
+}
+
+.catalogFrame {
+  display: block;
+  width: 100%;
+  height: min(72vh, 820px);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@media (max-width: 980px) {
+  .catalogLayout {
+    grid-template-columns: 1fr;
+  }
+  .catalogSidebar {
+    position: static;
+    max-height: none;
+    padding-right: 0;
+  }
+  .catalogActions {
+    align-items: stretch;
+  }
+}
+
 .spacer {
   height: 12px;
 }
@@ -282,6 +378,187 @@ a.btn {
 
 .user {
   font-weight: 600;
+}
+
+.menubar {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.menubarTrigger.btn {
+  padding: 8px 12px;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(720px, 100%);
+}
+
+.tabsList {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.tabsList[aria-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+  width: min(240px, 100%);
+}
+
+.tabsTrigger {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tabsTrigger[aria-disabled="true"],
+.tabsTrigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.tabsTrigger[aria-selected="true"] {
+  background: rgba(124, 92, 255, 0.08);
+  border-color: rgba(124, 92, 255, 0.45);
+}
+
+.tabsTrigger:focus {
+  outline: none;
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15);
+}
+
+.tabsPanels {
+  width: min(720px, 100%);
+}
+
+.tabsPanel {
+  width: 100%;
+}
+
+.accordion {
+  width: min(720px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accordionItem {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.accordionTrigger {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.accordionTrigger[aria-expanded="true"] {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.accordionTrigger:focus {
+  outline: none;
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15);
+}
+
+.accordionTrigger[aria-disabled="true"],
+.accordionTrigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.accordionPanel {
+  padding: 12px 14px;
+}
+
+.switchRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: min(720px, 100%);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.switch {
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.switch[data-state="checked"] {
+  background: rgba(124, 92, 255, 0.35);
+  border-color: rgba(124, 92, 255, 0.55);
+}
+
+.switch[data-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.switchThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #fff;
+  transform: translateX(0);
+  transition: transform 120ms ease;
+}
+
+.switch[data-state="checked"] .switchThumb {
+  transform: translateX(18px);
+}
+
+.switch:focus {
+  outline: none;
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15);
 }
 
 .menu {

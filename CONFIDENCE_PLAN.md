@@ -69,7 +69,7 @@ Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for th
 **Deliverables**
 - Add a `--repeat N` option to `scripts/debug-ui.mjs` (default 1).
 - Run key scenarios with `--repeat 50` locally:
-  - `solid-select`, `solid-combobox`, `solid-dialog`, `solid-overlay`, `solid-menu`.
+  - `solid-select`, `solid-combobox`, `solid-dialog`, `solid-overlay`, `solid-dropdownmenu`.
 
 ### 5) Seeded random jitter
 **Why:** microtask/effect ordering issues often need event timing variance.
@@ -106,7 +106,7 @@ Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for th
   - `npm run debug:solid-select`
   - `npm run debug:solid-combobox`
   - `npm run debug:solid-listbox`
-  - `npm run debug:solid-menu`
+  - `npm run debug:solid-dropdownmenu`
   - `npm run debug:solid-dialog`
   - `npm run debug:solid-toast`
   - `npm run debug:solid-overlay`

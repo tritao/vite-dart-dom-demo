@@ -325,6 +325,7 @@ web.DocumentFragment Menu({
   required web.Element anchor,
   required MenuBuilder builder,
   web.HTMLElement? restoreFocusTo,
+  List<web.Element? Function()>? additionalExcludedElements,
   void Function(String reason)? onClose,
   void Function(FocusScopeAutoFocusEvent event)? onOpenAutoFocus,
   void Function(FocusScopeAutoFocusEvent event)? onCloseAutoFocus,
@@ -476,6 +477,7 @@ web.DocumentFragment Menu({
           menu,
           excludedElements: <web.Element? Function()>[
             () => anchor,
+            ...?additionalExcludedElements,
           ],
           onDismiss: (reason) => closeRoot(reason),
           disableOutsidePointerEvents: modal,

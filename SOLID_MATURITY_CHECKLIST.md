@@ -17,7 +17,7 @@ Use this checklist to validate the Solid layer is “mature enough” for scalin
 - Baseline smoke + console/network/page error capture: `npm run debug:ui`
 - Solid primitives scenarios:
   - `npm run debug:solid-dialog`
-  - `npm run debug:solid-menu`
+- `npm run debug:solid-dropdownmenu`
   - `npm run debug:solid-select`
   - `npm run debug:solid-listbox`
   - `npm run debug:solid-combobox`
@@ -96,4 +96,3 @@ Use this checklist to validate the Solid layer is “mature enough” for scalin
   - list virtualization
   - a nesting overlay scenario
   - repeat/jitter harness support
-

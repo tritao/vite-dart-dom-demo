@@ -5,13 +5,13 @@ import "package:web/web.dart" as web;
 import "./solid_demo_help.dart";
 import "package:dart_web_test/demo/solid_demo_nav.dart";
 
-void mountSolidMenuDemo(web.Element mount) {
+void mountSolidDropdownMenuDemo(web.Element mount) {
   render(mount, () {
     final root = web.HTMLDivElement()
       ..id = "menu-root"
       ..className = "container";
 
-    root.appendChild(solidDemoNav(active: "menu"));
+    root.appendChild(solidDemoNav(active: "dropdownmenu"));
 
     final open = createSignal(false);
     final lastClose = createSignal("none");
@@ -21,7 +21,7 @@ void mountSolidMenuDemo(web.Element mount) {
     final theme = createSignal("light");
 
     root.appendChild(
-        web.HTMLHeadingElement.h1()..textContent = "Solid Menu Demo");
+        web.HTMLHeadingElement.h1()..textContent = "Solid DropdownMenu Demo");
 
     root.appendChild(
       solidDemoHelp(

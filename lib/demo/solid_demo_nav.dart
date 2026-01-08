@@ -1,6 +1,16 @@
 import "package:web/web.dart" as web;
 
 web.HTMLElement solidDemoNav({required String active}) {
+  // In embed mode (used by the catalog page), hide the per-demo nav to avoid
+  // nested navigation inside iframes.
+  final search = web.window.location.search;
+  final query = search.startsWith("?") ? search.substring(1) : search;
+  final params = Uri.splitQueryString(query);
+  final embed = params["embed"] == "1" || params["embed"] == "true";
+  if (embed) {
+    return web.HTMLDivElement()..style.display = "none";
+  }
+
   final nav = web.HTMLDivElement()
     ..className = "solid-demo-nav"
     ..setAttribute("role", "navigation")
@@ -17,7 +27,15 @@ web.HTMLElement solidDemoNav({required String active}) {
 
   final row = web.HTMLDivElement()..className = "solid-demo-nav-row";
   row.appendChild(link("← Back", "/", current: false));
-  row.appendChild(link("Menu", "/?solid=menu", current: active == "menu"));
+  row.appendChild(link("Catalog", "/?solid=catalog", current: active == "catalog"));
+  row.appendChild(
+    link(
+      "DropdownMenu",
+      "/?solid=dropdownmenu",
+      current: active == "dropdownmenu",
+    ),
+  );
+  row.appendChild(link("Menubar", "/?solid=menubar", current: active == "menubar"));
   row.appendChild(
     link("ContextMenu", "/?solid=contextmenu", current: active == "contextmenu"),
   );
@@ -29,6 +47,11 @@ web.HTMLElement solidDemoNav({required String active}) {
   row.appendChild(
     link("Combobox", "/?solid=combobox", current: active == "combobox"),
   );
+  row.appendChild(link("Tabs", "/?solid=tabs", current: active == "tabs"));
+  row.appendChild(
+    link("Accordion", "/?solid=accordion", current: active == "accordion"),
+  );
+  row.appendChild(link("Switch", "/?solid=switch", current: active == "switch"));
   row.appendChild(
     link("Selection", "/?solid=selection", current: active == "selection"),
   );

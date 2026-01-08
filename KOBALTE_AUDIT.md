@@ -58,7 +58,7 @@ Use this as the “what file should I read?” index during the audit.
 - Interact-outside
   - Kobalte: `.cache/refs/kobalte/packages/core/src/primitives/create-interact-outside/create-interact-outside.ts`
   - Dart: `lib/solid_dom/overlay.dart` (`dismissableLayer`)
-  - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-popover`, `npm run debug:solid-tooltip`, `npm run debug:solid-menu`, `npm run debug:solid-select`
+  - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-popover`, `npm run debug:solid-tooltip`, `npm run debug:solid-dropdownmenu`, `npm run debug:solid-select`
 
 - Dismissable layer stacking / pointer blocking
   - Kobalte: `.cache/refs/kobalte/packages/core/src/dismissable-layer/*`
@@ -80,7 +80,7 @@ Use this as the “what file should I read?” index during the audit.
 - Selection manager + selectable collection/item + typeahead
   - Kobalte: `.cache/refs/kobalte/packages/core/src/selection/*`
   - Dart: `lib/solid_dom/selection/*`
-  - Tests: `npm run debug:solid-selection`, `npm run debug:solid-listbox`, `npm run debug:solid-select`, `npm run debug:solid-combobox`, `npm run debug:solid-menu`
+  - Tests: `npm run debug:solid-selection`, `npm run debug:solid-listbox`, `npm run debug:solid-select`, `npm run debug:solid-combobox`, `npm run debug:solid-dropdownmenu`
 
 ### Components
 
@@ -102,7 +102,7 @@ Use this as the “what file should I read?” index during the audit.
 - Menu / DropdownMenu
   - Kobalte: `.cache/refs/kobalte/packages/core/src/menu/*` and `.cache/refs/kobalte/packages/core/src/dropdown-menu/*`
   - Dart: `lib/solid_dom/menu.dart` + `lib/solid_dom/dropdown_menu.dart`
-  - Tests: `npm run debug:solid-menu`
+  - Tests: `npm run debug:solid-dropdownmenu`
 
 - Listbox
   - Kobalte: `.cache/refs/kobalte/packages/core/src/listbox/*`

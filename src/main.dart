@@ -10,13 +10,18 @@ import './solid_dialog_demo.dart';
 import './solid_popover_demo.dart';
 import './solid_roving_demo.dart';
 import './solid_toast_demo.dart';
-import './solid_menu_demo.dart';
+import './solid_catalog_demo.dart';
+import './solid_dropdown_menu_demo.dart';
+import './solid_menubar_demo.dart';
 import './solid_context_menu_demo.dart';
 import './solid_tooltip_demo.dart';
 import './solid_select_demo.dart';
 import './solid_combobox_demo.dart';
 import './solid_listbox_demo.dart';
 import './solid_selection_demo.dart';
+import './solid_tabs_demo.dart';
+import './solid_accordion_demo.dart';
+import './solid_switch_demo.dart';
 import 'package:dart_web_test/wordproc/wordproc.dart';
 import './solid_nesting_demo.dart';
 import './solid_toast_modal_demo.dart';
@@ -50,8 +55,16 @@ void main() {
     mountSolidToastDemo(mount);
     return;
   }
-  if (solid == 'menu') {
-    mountSolidMenuDemo(mount);
+  if (solid == 'catalog') {
+    mountSolidCatalogDemo(mount);
+    return;
+  }
+  if (solid == 'dropdownmenu') {
+    mountSolidDropdownMenuDemo(mount);
+    return;
+  }
+  if (solid == 'menubar') {
+    mountSolidMenubarDemo(mount);
     return;
   }
   if (solid == 'contextmenu') {
@@ -76,6 +89,18 @@ void main() {
   }
   if (solid == 'selection') {
     mountSolidSelectionDemo(mount);
+    return;
+  }
+  if (solid == 'tabs') {
+    mountSolidTabsDemo(mount);
+    return;
+  }
+  if (solid == 'accordion') {
+    mountSolidAccordionDemo(mount);
+    return;
+  }
+  if (solid == 'switch') {
+    mountSolidSwitchDemo(mount);
     return;
   }
   if (solid == 'wordproc') {
