@@ -7,9 +7,9 @@ import "package:dart_web_test/solid_dom.dart";
 import "package:http/http.dart" as http;
 import "package:web/web.dart" as web;
 
-import "package:dart_web_test/demo/solid_docs_nav.dart";
-import "./solid_docs_examples.dart";
-import "./solid_docs_props.dart";
+import "package:dart_web_test/docs/nav.dart";
+import "./demos.dart";
+import "./props.dart";
 
 final class DocsManifestPage {
   DocsManifestPage({

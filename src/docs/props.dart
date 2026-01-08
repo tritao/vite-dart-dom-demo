@@ -180,3 +180,4 @@ web.HTMLElement renderDocsPropsTable(DocsPropsSpec spec) {
   wrap.appendChild(foot);
   return wrap;
 }
+

@@ -4,7 +4,7 @@ import './app/app_component.dart';
 import './app/counter_component.dart';
 import './app/todos_component.dart';
 import './app/users_component.dart';
-import './solid_docs_router.dart';
+import './docs/router.dart';
 import './solid_dom_demo.dart';
 import './solid_overlay_demo.dart';
 import './solid_dialog_demo.dart';

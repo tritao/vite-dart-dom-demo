@@ -34,7 +34,7 @@ Short description…
 :::
 ```
 
-This renders a placeholder `<div data-doc-demo="dialog-basic">…</div>` and the runtime mounts the matching demo from `src/solid_docs_examples.dart`.
+This renders a placeholder `<div data-doc-demo="dialog-basic">…</div>` and the runtime mounts the matching demo from `src/docs/demos.dart`.
 
 ### Code
 
@@ -59,4 +59,3 @@ The builder extracts a region between:
 ```
 
 Also supports `:::warning` and `:::tip`.
-
