@@ -193,7 +193,10 @@ String _expandDirectives(String input, {String? labHref}) {
       final openLab = (labHref ?? attrs["labHref"])?.trim();
       out.writeln('<div class="docDemo card">');
       out.writeln('  <div class="docDemoHeader">');
-      out.writeln('    <strong>${_escapeHtml(title)}</strong>');
+      out.writeln('    <div class="docDemoTitle">');
+      out.writeln('      <span class="docBadge">Example</span>');
+      out.writeln('      <strong>${_escapeHtml(title)}</strong>');
+      out.writeln("    </div>");
       if (openLab != null && openLab.isNotEmpty) {
         out.writeln('    <a class="btn secondary" href="${_escapeHtml(openLab)}">Open lab</a>');
       }
@@ -211,7 +214,10 @@ String _expandDirectives(String input, {String? labHref}) {
       final region = attrs["region"];
       final lang = attrs["lang"] ?? "text";
       final code = file == null ? "" : _readRegion(file, region: region);
-      out.writeln('<pre class="docCode"><code class="language-${_escapeHtml(lang)}">${_escapeHtml(code)}</code></pre>');
+      out.writeln('<details class="docCodeBlock">');
+      out.writeln('  <summary>Code</summary>');
+      out.writeln('  <pre class="docCode"><code class="language-${_escapeHtml(lang)}">${_escapeHtml(code)}</code></pre>');
+      out.writeln("</details>");
       continue;
     }
 

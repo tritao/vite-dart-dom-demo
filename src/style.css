@@ -249,25 +249,41 @@ a.btn {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .docsGroupTitle {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.docsLink {
-  display: block;
+.docsNavLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   width: 100%;
   box-sizing: border-box;
-  text-align: left;
+  padding: 8px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.2;
 }
 
-.docsLink[data-active="true"] {
-  border-color: rgba(124, 92, 255, 0.6);
-  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.12);
+.docsNavLink:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.docsNavLink[data-active="true"] {
+  background: rgba(124, 92, 255, 0.12);
+  box-shadow: inset 3px 0 0 rgba(124, 92, 255, 0.6);
 }
 
 .docsMain {
@@ -277,10 +293,32 @@ a.btn {
   gap: 14px;
 }
 
+.docsMain #docs-title {
+  margin: 0;
+  font-size: 34px;
+  letter-spacing: -0.03em;
+}
+
+.docsContent {
+  max-width: 78ch;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
 .docsContent h1,
 .docsContent h2,
 .docsContent h3 {
-  margin: 0 0 10px;
+  margin: 18px 0 10px;
+}
+
+.docsContent h2 {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+}
+
+.docsContent h2:first-child {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .docsContent h2 {
@@ -300,6 +338,26 @@ a.btn {
   padding-left: 18px;
 }
 
+.docsContent li {
+  margin: 8px 0;
+}
+
+.docsContent code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.95em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+
+.docsContent pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
 .docDemo {
   padding: 14px;
 }
@@ -311,6 +369,24 @@ a.btn {
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 10px;
+}
+
+.docDemoTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.docBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
 }
 
 .docDemoDesc p {
@@ -348,12 +424,41 @@ a.btn {
   border-color: rgba(0, 193, 255, 0.28);
 }
 
-.docCode {
-  margin: 10px 0 0;
-  padding: 12px 14px;
+.docCodeBlock {
+  margin: 12px 0 0;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.docCodeBlock summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 10px 12px;
+  user-select: none;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.docCodeBlock summary::-webkit-details-marker {
+  display: none;
+}
+
+.docCodeBlock summary::after {
+  content: "▾";
+  float: right;
+  opacity: 0.8;
+}
+
+.docCodeBlock[open] summary::after {
+  content: "▴";
+}
+
+.docCode {
+  margin: 0;
+  padding: 12px 14px;
   overflow: auto;
   font-size: 13px;
   line-height: 1.45;
@@ -405,6 +510,9 @@ a.btn {
     position: static;
     max-height: none;
     padding-right: 0;
+  }
+  .docsContent {
+    max-width: none;
   }
 }
 

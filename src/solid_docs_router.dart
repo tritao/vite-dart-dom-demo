@@ -170,7 +170,7 @@ void mountSolidDocs(web.Element mount, String? page) {
 
       final home = web.HTMLAnchorElement()
         ..href = "/?docs=1"
-        ..className = "btn secondary docsLink"
+        ..className = "docsNavLink"
         ..textContent = "Docs home";
       if (slug == "index") {
         home.setAttribute("data-active", "true");
@@ -190,7 +190,7 @@ void mountSolidDocs(web.Element mount, String? page) {
           ..textContent = "Docs manifest failed to load.");
         sidebar.appendChild(web.HTMLAnchorElement()
           ..href = "/?solid=catalog"
-          ..className = "btn secondary docsLink"
+          ..className = "docsNavLink"
           ..textContent = "Open labs");
         return;
       }
@@ -208,7 +208,7 @@ void mountSolidDocs(web.Element mount, String? page) {
           if (p.slug == "index") continue;
           final a = web.HTMLAnchorElement()
             ..href = "/?docs=${p.slug}"
-            ..className = "btn secondary docsLink"
+            ..className = "docsNavLink"
             ..textContent = p.title;
           if (slug == p.slug) {
             a.setAttribute("data-active", "true");
