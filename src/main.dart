@@ -4,6 +4,7 @@ import './app/app_component.dart';
 import './app/counter_component.dart';
 import './app/todos_component.dart';
 import './app/users_component.dart';
+import './solid_docs_router.dart';
 import './solid_dom_demo.dart';
 import './solid_overlay_demo.dart';
 import './solid_dialog_demo.dart';
@@ -33,7 +34,14 @@ void main() {
 
   final search = web.window.location.search;
   final query = search.startsWith("?") ? search.substring(1) : search;
-  final solid = Uri.splitQueryString(query)["solid"];
+  final params = Uri.splitQueryString(query);
+  final docs = params["docs"];
+  final solid = params["solid"];
+
+  if (docs != null) {
+    mountSolidDocs(mount, docs);
+    return;
+  }
 
   if (solid == 'overlay') {
     mountSolidOverlayDemo(mount);

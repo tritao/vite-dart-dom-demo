@@ -125,6 +125,7 @@ final class AppComponent extends Component {
         children: [
           dom.spacer(),
           dom.row(children: [
+            dom.linkButton('Docs', href: '?docs=1'),
             dom.linkButton('Catalog', href: '?solid=catalog'),
             dom.linkButton('DropdownMenu', href: '?solid=dropdownmenu'),
             dom.linkButton('Menubar', href: '?solid=menubar'),

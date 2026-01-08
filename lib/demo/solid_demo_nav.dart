@@ -27,6 +27,7 @@ web.HTMLElement solidDemoNav({required String active}) {
 
   final row = web.HTMLDivElement()..className = "solid-demo-nav-row";
   row.appendChild(link("← Back", "/", current: false));
+  row.appendChild(link("Docs", "/?docs=1", current: false));
   row.appendChild(link("Catalog", "/?solid=catalog", current: active == "catalog"));
   row.appendChild(
     link(
