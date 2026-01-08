@@ -80,6 +80,18 @@
     line-height: 1.65;
   }
 
+  .docsContent .docBrand {
+    margin: 0 0 12px;
+  }
+
+  .docsContent .docLogo {
+    display: block;
+    width: 120px;
+    height: auto;
+    opacity: 0.92;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.35));
+  }
+
   .docsContent h1,
   .docsContent h2,
   .docsContent h3 {
