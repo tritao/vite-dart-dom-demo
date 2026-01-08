@@ -1213,6 +1213,26 @@ export async function runSolidSelectionUiScenario(page, { timeoutMs, scenario })
             activeId: document.activeElement?.id ?? null,
           }));
 
+          // After selecting, clicking the input should open the full list (not
+          // a single-item list filtered to the committed selection text).
+          step = "reopen via click shows full list";
+          await input.click({ timeout: timeoutMs });
+          await page.waitForFunction(
+            () => document.querySelector("#combobox-listbox") != null,
+            { timeout: timeoutMs },
+          );
+          await page.waitForTimeout(60);
+          const afterReopenClick = await page.evaluate(() => ({
+            optionsCount: document.querySelectorAll(
+              "#combobox-listbox [role=option]",
+            ).length,
+          }));
+          await page.keyboard.press("Escape");
+          await page.waitForFunction(
+            () => document.querySelector("#combobox-listbox") == null,
+            { timeout: timeoutMs },
+          );
+
           // Escape while closed clears input.
           step = "Escape clears when closed";
           await page.keyboard.press("Escape");
@@ -1325,6 +1345,7 @@ export async function runSolidSelectionUiScenario(page, { timeoutMs, scenario })
             (afterSelect.status ?? "").includes("Last: select") &&
             (afterSelect.inputValue ?? "").length > 0 &&
             afterSelect.activeId === "combobox-input" &&
+            afterReopenClick.optionsCount > 5 &&
             afterEscapeClosed.inputValue === "" &&
             afterEmptyQuery.listboxOpen === false &&
             (afterEmptyQuery.inputValue ?? "").includes("Dart") &&
@@ -1350,6 +1371,7 @@ export async function runSolidSelectionUiScenario(page, { timeoutMs, scenario })
               afterDown1,
               afterDown2,
               afterSelect,
+              afterReopenClick,
               afterEscapeClosed,
               afterEmptyQuery,
               afterTab,

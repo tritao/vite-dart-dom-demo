@@ -8,6 +8,7 @@ import "./listbox.dart";
 import "./overlay.dart";
 import "./popper.dart";
 import "./presence.dart";
+import "./selection/utils.dart";
 import "./solid_dom.dart";
 
 final class ComboboxOption<T> implements ListboxItem<T> {
@@ -50,6 +51,7 @@ web.DocumentFragment Combobox<T>({
   required void Function(bool next) setOpen,
   required web.HTMLElement anchor,
   required web.HTMLInputElement input,
+  web.HTMLButtonElement? triggerButton,
   required Iterable<ComboboxOption<T>> Function() options,
   required T? Function() value,
   required void Function(T? next) setValue,
@@ -103,6 +105,15 @@ web.DocumentFragment Combobox<T>({
       }
     }
     inputValue.value = "";
+  }
+
+  String? selectedLabel() {
+    final v = value();
+    if (v == null) return null;
+    for (final opt in options()) {
+      if (eq(opt.value, v)) return opt.label;
+    }
+    return null;
   }
 
   // Keep input.value in sync with signal.
@@ -334,9 +345,45 @@ web.DocumentFragment Combobox<T>({
   on(input, "click", (_) {
     if (open()) return;
     if (triggerMode == "manual") return;
-    final opts = displayedOptions();
-    if (opts.isNotEmpty || allowEmpty) openNow(showAll: false);
+    // UX: clicking a closed combobox should generally show the full list,
+    // especially when the input is showing the committed selection.
+    final label = selectedLabel();
+    final current = inputValue.value;
+    final showAll = current.isEmpty || (label != null && current == label);
+    final opts = showAll
+        ? options().toList(growable: false)
+        : displayedOptions();
+    if (opts.isNotEmpty || allowEmpty) openNow(showAll: showAll);
   });
+
+  if (triggerButton != null) {
+    triggerButton
+      ..type = "button"
+      ..setAttribute("aria-haspopup", "listbox");
+    if ((triggerButton.getAttribute("aria-label") ?? "").isEmpty) {
+      triggerButton.setAttribute("aria-label", "Show options");
+    }
+    attr(triggerButton, "aria-expanded", () => open() ? "true" : "false");
+    attr(triggerButton, "aria-controls", () => open() ? resolvedListboxId : null);
+
+    void toggle() {
+      if (open()) {
+        closeNow("toggle");
+        resetInputToSelection();
+        return;
+      }
+      openNow(showAll: true);
+      scheduleMicrotask(() => focusWithoutScrolling(input));
+    }
+
+    on(triggerButton, "click", (_) => toggle());
+    on(triggerButton, "keydown", (e) {
+      if (e is! web.KeyboardEvent) return;
+      if (e.key != "Enter" && e.key != " ") return;
+      e.preventDefault();
+      toggle();
+    });
+  }
 
   return Presence(
     when: open,
