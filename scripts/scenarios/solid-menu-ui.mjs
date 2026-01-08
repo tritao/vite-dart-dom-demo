@@ -474,6 +474,84 @@ export async function runSolidDropdownmenuRadioScenario(page, { timeoutMs }) {
   );
 }
 
+export async function runSolidDropdownmenuCheckboxDarkScenario(page, { timeoutMs }) {
+  const interactionResults = [];
+  let step = "init";
+  try {
+    const trigger = page.locator("#menu-trigger");
+    if (!(await trigger.count())) {
+      interactionResults.push({
+        name: "solid-dropdownmenu-checkbox-dark",
+        ok: false,
+        details: { reason: "missing #menu-trigger" },
+      });
+    } else {
+      step = "force dark theme";
+      await page.evaluate(() => {
+        document.documentElement.setAttribute("data-theme", "dark");
+      });
+
+      step = "open";
+      await trigger.first().click({ timeout: timeoutMs });
+      step = "wait open";
+      await page.waitForFunction(
+        () => document.querySelector("#menu-content") != null,
+        { timeout: timeoutMs },
+      );
+      await page.waitForTimeout(50);
+
+      step = "toggle beta";
+      await page.locator("#menu-item-beta").click({ timeout: timeoutMs });
+      await page.waitForTimeout(50);
+
+      const styles = await page.evaluate(() => {
+        const item = document.querySelector("#menu-item-beta");
+        if (!item) return { ok: false, reason: "missing item" };
+
+        const after = getComputedStyle(item, "::after");
+        const expectedEl = document.createElement("div");
+        expectedEl.style.color = "hsl(var(--primary-foreground))";
+        document.body.appendChild(expectedEl);
+        const expected = getComputedStyle(expectedEl).color;
+        expectedEl.remove();
+
+        return {
+          ok: true,
+          ariaChecked: item.getAttribute("aria-checked"),
+          borderRightColor: after.borderRightColor,
+          borderBottomColor: after.borderBottomColor,
+          expected,
+        };
+      });
+
+      const ok =
+        styles.ok === true &&
+        styles.ariaChecked === "true" &&
+        styles.borderRightColor === styles.expected &&
+        styles.borderBottomColor === styles.expected;
+
+      interactionResults.push({
+        name: "solid-dropdownmenu-checkbox-dark",
+        ok,
+        details: { styles },
+      });
+    }
+  } catch (e) {
+    interactionResults.push({
+      name: "solid-dropdownmenu-checkbox-dark",
+      ok: false,
+      details: { error: String(e), step },
+    });
+  }
+  return (
+    interactionResults[0] ?? {
+      name: "solid-dropdownmenu-checkbox-dark",
+      ok: false,
+      details: { reason: "no result" },
+    }
+  );
+}
+
 export async function runSolidMenubarScenario(page, { timeoutMs }) {
   const interactionResults = [];
   let step = "init";
@@ -951,6 +1029,7 @@ export const solidMenuUiScenarios = {
   "solid-dropdownmenu-clickthrough": runSolidDropdownmenuClickthroughScenario,
   "solid-dropdownmenu-submenu": runSolidDropdownmenuSubmenuScenario,
   "solid-dropdownmenu-radio": runSolidDropdownmenuRadioScenario,
+  "solid-dropdownmenu-checkbox-dark": runSolidDropdownmenuCheckboxDarkScenario,
   "solid-menubar": runSolidMenubarScenario,
   "solid-tabs": runSolidTabsScenario,
   "solid-accordion": runSolidAccordionScenario,
