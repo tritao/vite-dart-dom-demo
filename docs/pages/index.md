@@ -20,3 +20,4 @@ Start with:
 - [Popper / Positioning](/?docs=popper)
 - [Dialog](/?docs=dialog)
 - [Selection core](/?docs=selection-core)
+- [Reactivity](/?docs=runtime-reactivity)
