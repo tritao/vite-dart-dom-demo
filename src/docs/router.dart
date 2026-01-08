@@ -66,7 +66,7 @@ Future<DocsManifest> _fetchManifest() async {
   if (res.statusCode < 200 || res.statusCode >= 300) {
     throw StateError("Failed to load docs manifest (${res.statusCode}).");
   }
-  final decoded = jsonDecode(res.body);
+  final decoded = jsonDecode(utf8.decode(res.bodyBytes));
   if (decoded is! Map) throw StateError("Invalid manifest JSON.");
 
   final groups = <DocsManifestGroup>[];
@@ -111,7 +111,7 @@ Future<String> _fetchPageHtml(String slug) async {
   if (res.statusCode < 200 || res.statusCode >= 300) {
     return "<p class=\"muted\">Missing docs page: <code>${_escapeHtml(slug)}</code></p>";
   }
-  return res.body;
+  return utf8.decode(res.bodyBytes);
 }
 
 Future<Map<String, DocsPropsSpec>> _fetchProps() async {
@@ -119,7 +119,7 @@ Future<Map<String, DocsPropsSpec>> _fetchProps() async {
   if (res.statusCode < 200 || res.statusCode >= 300) {
     return const {};
   }
-  final decoded = jsonDecode(res.body);
+  final decoded = jsonDecode(utf8.decode(res.bodyBytes));
   return parseDocsPropsJson(decoded);
 }
 
