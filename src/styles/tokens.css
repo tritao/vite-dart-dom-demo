@@ -1,7 +1,7 @@
 @layer tokens {
   :root {
     color-scheme: light dark;
-    --radius: 14px;
+    --radius: 0.5rem;
 
     /* Shadcn-like semantic tokens (HSL triples; consume with hsl(var(--token))). */
     --background: 0 0% 100%;
@@ -19,20 +19,24 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    /* Brand accent: violet-ish (kept on purpose vs shadcn's "near-black" primary). */
-    --primary: 252 83% 60%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary: shadcn default (neutral, high-contrast). */
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Optional brand (not used by default component styles). */
+    --brand: 252 83% 60%;
+    --brand-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --accent: 252 100% 97%;
-    --accent-foreground: 252 45% 20%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --ring: 252 83% 60%;
+    --ring: var(--primary);
 
     /* Compat aliases (legacy names used across the demos). */
     --bg: hsl(var(--background));
@@ -61,8 +65,8 @@
       --border: 217.2 32.6% 17.5%;
       --input: 217.2 32.6% 17.5%;
 
-      --primary: 252 92% 70%;
-      --primary-foreground: 252 45% 12%;
+      --primary: 210 40% 98%;
+      --primary-foreground: 222.2 47.4% 11.2%;
 
       --secondary: 217.2 32.6% 17.5%;
       --secondary-foreground: 210 40% 98%;
@@ -73,7 +77,7 @@
       --destructive: 0 62.8% 30.6%;
       --destructive-foreground: 210 40% 98%;
 
-      --ring: 252 92% 70%;
+      --ring: var(--primary);
     }
   }
 }
