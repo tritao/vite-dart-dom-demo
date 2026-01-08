@@ -48,7 +48,7 @@ web.HTMLElement solidDocsNav({required String active}) {
   final actions = web.HTMLDivElement()..className = "docsTopbarActions";
   final github = web.HTMLAnchorElement()
     ..className = "docsTopbarIcon"
-    ..href = "https://github.com/tritao/vite-dart-dom-demo"
+    ..href = "https://github.com/tritao/solidus"
     ..target = "_blank"
     ..rel = "noreferrer"
     ..setAttribute("aria-label", "GitHub");
