@@ -76,10 +76,10 @@ function log(line) {
   process.stdout.write(`${line}\n`);
 }
 
-function startProcess(cmd, args, { name, detached = false }) {
+function startProcess(cmd, args, { name, detached = false, env = process.env }) {
   const child = spawn(cmd, args, {
     stdio: ["ignore", "pipe", "pipe"],
-    env: process.env,
+    env,
     detached,
   });
   child.stdout.setEncoding("utf8");
@@ -339,6 +339,14 @@ async function main() {
   const viteBin = path.join(root, "node_modules", ".bin", "vite");
   await fs.promises.mkdir(path.join(root, ".cache"), { recursive: true });
 
+  // GitHub Actions sets a non-root base for Pages builds (e.g. "/repo/"). When
+  // running smoke tests against `vite preview`, serve from "/" so assets resolve
+  // correctly on the local preview server.
+  const viteChildEnv =
+    args.mode === "preview" && !args.url
+      ? { ...process.env, BASE: "/", VITE_BASE: "/" }
+      : process.env;
+
   const terminateChild = async (child) => {
     if (child.exitCode != null) return;
     const pid = child.pid;
@@ -396,6 +404,7 @@ async function main() {
         const build = startProcess(viteBin, ["build"], {
           name: "build",
           detached: true,
+          env: viteChildEnv,
         });
         started.push(build.child);
         await new Promise((resolve, reject) =>
@@ -443,6 +452,7 @@ async function main() {
       const server = startProcess(viteBin, serverArgs, {
         name: args.mode,
         detached: true,
+        env: viteChildEnv,
       });
       started.push(server.child);
 
