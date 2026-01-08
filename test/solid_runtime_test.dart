@@ -302,6 +302,35 @@ void main() {
       dispose();
     });
 
+    test("runWithOwner enables child roots in async callbacks", () async {
+      final log = <String>[];
+      late Dispose disposeRoot;
+      Owner? owner;
+      Dispose? disposeChild;
+
+      createRoot<void>((d) {
+        disposeRoot = d;
+        owner = getOwner();
+      });
+
+      scheduleMicrotask(() {
+        runWithOwner(owner, () {
+          disposeChild = createChildRoot<Dispose>((dispose) {
+            onCleanup(() => log.add("child-cleanup"));
+            return dispose;
+          });
+        });
+      });
+
+      await pump();
+      expect(disposeChild, isNotNull);
+
+      disposeChild?.call();
+      expect(log, ["child-cleanup"]);
+
+      disposeRoot();
+    });
+
     test("resource: starts loading, resolves value, notifies dependents",
         () async {
       final states = <String>[];

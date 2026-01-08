@@ -72,6 +72,27 @@ final Set<Computation> _queue = <Computation>{};
 final Set<Computation> _renderQueue = <Computation>{};
 ErrorHandler? _globalErrorHandler;
 
+/// Returns the currently active owner (if any).
+///
+/// This is mainly useful for bridging async callbacks/events back into an owner
+/// scope via [runWithOwner].
+Owner? getOwner() => _currentOwner;
+
+/// Runs [fn] with [owner] as the current owner.
+///
+/// Use this to ensure ownership-scoped APIs (like `createChildRoot`/`onCleanup`)
+/// work correctly when called from async callbacks or event handlers.
+T runWithOwner<T>(Owner? owner, T Function() fn) {
+  if (owner == null) return fn();
+  final previous = _currentOwner;
+  _currentOwner = owner;
+  try {
+    return fn();
+  } finally {
+    _currentOwner = previous;
+  }
+}
+
 void setGlobalErrorHandler(ErrorHandler handler) {
   _globalErrorHandler = handler;
 }

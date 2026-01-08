@@ -125,7 +125,8 @@ void on(
   String type,
   void Function(web.Event event) handler,
 ) {
-  final jsHandler = ((web.Event e) => handler(e)).toJS;
+  final owner = getOwner();
+  final jsHandler = ((web.Event e) => runWithOwner(owner, () => handler(e))).toJS;
   target.addEventListener(type, jsHandler);
   // Always attach the cleanup to the current owner (not the currently running
   // computation), so listeners created while building effects aren't
