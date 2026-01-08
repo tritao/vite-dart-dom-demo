@@ -70,7 +70,7 @@ web.DocumentFragment Combobox<T>({
   ComboboxFilter<T>? filter,
   String triggerMode = "input",
   void Function(String reason)? onClose,
-  int exitMs = 120,
+  int exitMs = 0,
   String? portalId,
   ComboboxOptionBuilder<T>? optionBuilder,
 }) {
