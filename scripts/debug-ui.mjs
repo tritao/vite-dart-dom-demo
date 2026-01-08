@@ -17,6 +17,7 @@ import { solidMenuUiScenarios } from "./scenarios/solid-menu-ui.mjs";
 import { solidSwitchUiScenarios } from "./scenarios/solid-switch-ui.mjs";
 import { runDocsNavScenario } from "./scenarios/docs-nav.mjs";
 import { runDocsListboxScenario } from "./scenarios/docs-listbox.mjs";
+import { runDocsCheckboxScenario } from "./scenarios/docs-checkbox.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -30,6 +31,7 @@ const solidScenarioRunners = {
   "solid-optionbuilder": (page, ctx) => runSolidOptionBuilderScenario(page, ctx),
   "docs-nav": (page, ctx) => runDocsNavScenario(page, ctx),
   "docs-listbox": (page, ctx) => runDocsListboxScenario(page, ctx),
+  "docs-checkbox": (page, ctx) => runDocsCheckboxScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";

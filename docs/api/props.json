@@ -43,6 +43,54 @@
       }
     ]
   },
+  "Checkbox": {
+    "title": "Checkbox",
+    "rows": [
+      {
+        "name": "checked",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controlled checked state."
+      },
+      {
+        "name": "setChecked",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Called when the checkbox toggles."
+      },
+      {
+        "name": "indeterminate",
+        "type": "bool Function()?",
+        "notes": "Optional indeterminate (mixed) state; sets aria-checked=\"mixed\"."
+      },
+      {
+        "name": "setIndeterminate",
+        "type": "void Function(bool next)?",
+        "notes": "Optional setter for indeterminate. When indeterminate is true and the user toggles, we clear indeterminate and set checked=true."
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?",
+        "notes": "Disables interactions and sets aria-disabled/data-disabled."
+      },
+      {
+        "name": "id",
+        "type": "String?",
+        "notes": "Optional element id."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"checkbox\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label for icon-only usage. If you render visible text, prefer linking via a <label> element."
+      }
+    ]
+  },
   "Dialog": {
     "title": "Dialog",
     "rows": [

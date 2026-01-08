@@ -38,6 +38,7 @@ Components:
 - [Menubar](?docs=menubar)
 - [ContextMenu](?docs=context-menu)
 - [Toast](?docs=toast)
+- [Checkbox](?docs=checkbox)
 - [Select](?docs=select)
 - [Combobox](?docs=combobox)
 - [Listbox](?docs=listbox)

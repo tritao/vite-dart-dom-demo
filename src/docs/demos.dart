@@ -17,6 +17,7 @@ import "./examples/toast_basic.dart";
 import "./examples/select_basic.dart";
 import "./examples/combobox_basic.dart";
 import "./examples/listbox_basic.dart";
+import "./examples/checkbox_basic.dart";
 import "./examples/tabs_basic.dart";
 import "./examples/accordion_basic.dart";
 import "./examples/switch_basic.dart";
@@ -31,6 +32,7 @@ typedef DocsDemoMount = Dispose Function(web.Element mount);
 
 final Map<String, DocsDemoMount> docsDemos = {
   "button-basic": mountDocsButtonBasic,
+  "checkbox-basic": mountDocsCheckboxBasic,
   "dialog-basic": mountDocsDialogBasic,
   "overlay-basic": mountDocsOverlayBasic,
   "focus-scope-basic": mountDocsFocusScopeBasic,
