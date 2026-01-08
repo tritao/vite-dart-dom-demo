@@ -12,6 +12,10 @@ Welcome to the docs.
 - **Docs**: clean examples + API notes (what you’d copy into an app).
 - **Labs**: conformance harness + edge cases + Playwright scenarios.
 
+Start here:
+
+- [Introduction](/?docs=intro)
+
 Start with:
 
 - [Overlay](/?docs=overlay)
