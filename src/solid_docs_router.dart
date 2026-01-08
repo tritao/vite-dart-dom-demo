@@ -9,6 +9,7 @@ import "package:web/web.dart" as web;
 
 import "package:dart_web_test/demo/solid_docs_nav.dart";
 import "./solid_docs_examples.dart";
+import "./solid_docs_props.dart";
 
 final class DocsManifestPage {
   DocsManifestPage({
@@ -250,6 +251,21 @@ void mountSolidDocs(web.Element mount, String? page) {
           try {
             mounted.add(mountDemo(node));
           } catch (_) {}
+        }
+
+        final props = content.querySelectorAll("[data-doc-props]");
+        for (var i = 0; i < props.length; i++) {
+          final node = props.item(i);
+          if (node is! web.Element) continue;
+          final name = node.getAttribute("data-doc-props");
+          if (name == null || name.isEmpty) continue;
+          final spec = docsProps[name];
+          if (spec == null) {
+            node.textContent = "Unknown props: $name";
+            continue;
+          }
+          node.textContent = "";
+          node.appendChild(renderDocsPropsTable(spec));
         }
       });
     });
