@@ -277,6 +277,7 @@ void mountSolidDocs(web.Element mount, String? page) {
     main.appendChild(content);
 
     final mounted = <Dispose>[];
+    final propMounts = createSignal<List<web.Element>>(const []);
     void cleanupMounted() {
       for (final d in mounted) {
         try {
@@ -287,6 +288,26 @@ void mountSolidDocs(web.Element mount, String? page) {
     }
 
     onCleanup(cleanupMounted);
+
+    void hydrateProps() {
+      final mounts = propMounts.value;
+      if (mounts.isEmpty) return;
+
+      final propsMap = propsData.value ?? const <String, DocsPropsSpec>{};
+      final loading = propsData.loading;
+
+      for (final node in mounts) {
+        final name = node.getAttribute("data-doc-props");
+        if (name == null || name.isEmpty) continue;
+        final spec = propsMap[name];
+        if (spec == null) {
+          node.textContent = loading ? "Loading…" : "Unknown props: $name";
+          continue;
+        }
+        node.textContent = "";
+        node.appendChild(renderDocsPropsTable(spec));
+      }
+    }
 
     createRenderEffect(() {
       sidebar.textContent = "";
@@ -371,9 +392,14 @@ void mountSolidDocs(web.Element mount, String? page) {
       }
     });
 
+    // Keep the props placeholders reactive: page HTML may render before props.json
+    // loads; hydrate once the resource resolves.
+    createRenderEffect(hydrateProps);
+
     createRenderEffect(() {
       cleanupMounted();
       content.textContent = "";
+      propMounts.value = const [];
 
       if (pageHtml.loading) {
         content.appendChild(web.HTMLParagraphElement()
@@ -407,21 +433,15 @@ void mountSolidDocs(web.Element mount, String? page) {
           } catch (_) {}
         }
 
-        final props = content.querySelectorAll("[data-doc-props]");
-        final propsMap = propsData.value ?? const <String, DocsPropsSpec>{};
-        for (var i = 0; i < props.length; i++) {
-          final node = props.item(i);
-          if (node is! web.Element) continue;
-          final name = node.getAttribute("data-doc-props");
-          if (name == null || name.isEmpty) continue;
-          final spec = propsMap[name];
-          if (spec == null) {
-            node.textContent = propsData.loading ? "Loading…" : "Unknown props: $name";
-            continue;
-          }
-          node.textContent = "";
-          node.appendChild(renderDocsPropsTable(spec));
+        // Record prop mounts for reactive hydration on slow props.json loads.
+        final nextPropMounts = <web.Element>[];
+        final propNodes = content.querySelectorAll("[data-doc-props]");
+        for (var i = 0; i < propNodes.length; i++) {
+          final node = propNodes.item(i);
+          if (node is web.Element) nextPropMounts.add(node);
         }
+        propMounts.value = nextPropMounts;
+        hydrateProps();
       });
     });
 
