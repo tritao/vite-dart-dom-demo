@@ -16,7 +16,7 @@ web.HTMLElement solidDocsNav({required String active}) {
     ..className = "docsTopbarBrand";
   final brandLogo = web.HTMLImageElement()
     ..className = "docsTopbarLogo"
-    ..src = "assets/solidus.png"
+    ..src = "assets/solidus-mark.png"
     ..alt = "";
   brand.appendChild(brandLogo);
   brand.appendChild(web.Text("Solidus"));

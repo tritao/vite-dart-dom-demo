@@ -8,7 +8,7 @@ status: beta
 ---
 
 <p class="docBrand">
-  <img class="docLogo" src="assets/solidus.png" alt="Solidus logo" />
+  <img class="docLogo" src="assets/solidus-logo.png" alt="Solidus logo" />
 </p>
 
 Welcome to Solidus docs.
