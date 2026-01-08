@@ -1,0 +1,35 @@
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+    --bg: #0b1020;
+    --card: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.14);
+    --text: rgba(255, 255, 255, 0.92);
+    --muted: rgba(255, 255, 255, 0.68);
+    --primary: #7c5cff;
+    --danger: #ff4d4d;
+    --bg-accent-a: rgba(124, 92, 255, 0.22);
+    --bg-accent-b: rgba(0, 193, 255, 0.14);
+    --bg-accent-c: rgba(255, 77, 77, 0.09);
+    --bg-grid: rgba(255, 255, 255, 0.045);
+    --bg-vignette: rgba(0, 0, 0, 0.35);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --border: rgba(0, 0, 0, 0.12);
+      --text: rgba(0, 0, 0, 0.9);
+      --muted: rgba(0, 0, 0, 0.62);
+      --primary: #5b4bff;
+      --danger: #d62828;
+      --bg-accent-a: rgba(91, 75, 255, 0.16);
+      --bg-accent-b: rgba(0, 193, 255, 0.11);
+      --bg-accent-c: rgba(214, 40, 40, 0.07);
+      --bg-grid: rgba(0, 0, 0, 0.05);
+      --bg-vignette: rgba(0, 0, 0, 0.06);
+    }
+  }
+}
+

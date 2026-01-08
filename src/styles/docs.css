@@ -1,0 +1,346 @@
+@layer docs {
+  .docsLayout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    margin-top: 14px;
+  }
+
+  .docsSidebar {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    max-height: calc(100vh - 140px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    scrollbar-width: none; /* Firefox: hide scrollbar, keep scrolling */
+  }
+
+  .docsSidebar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .docsGroupTitle {
+    margin: 10px 0 0;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .docsNavLink {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .docsNavLink:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .docsNavLink[data-active="true"] {
+    background: rgba(124, 92, 255, 0.12);
+    box-shadow: inset 3px 0 0 rgba(124, 92, 255, 0.6);
+  }
+
+  .docsMain {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .docsMain #docs-title {
+    margin: 0;
+    font-size: 34px;
+    letter-spacing: -0.03em;
+  }
+
+  .docsContent {
+    max-width: 78ch;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .docsContent h1,
+  .docsContent h2,
+  .docsContent h3 {
+    margin: 18px 0 10px;
+  }
+
+  .docsContent h2 {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 14px;
+  }
+
+  .docsContent h2:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .docsContent h2 {
+    font-size: 18px;
+  }
+
+  .docsContent h3 {
+    font-size: 15px;
+  }
+
+  .docsContent p {
+    margin: 10px 0;
+  }
+
+  .docsContent ul {
+    margin: 10px 0;
+    padding-left: 18px;
+  }
+
+  .docsContent li {
+    margin: 8px 0;
+  }
+
+  .docsContent code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95em;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 2px 6px;
+  }
+
+  .docsContent pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+
+  .docDemo {
+    padding: 14px;
+  }
+
+  .docDemoHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .docDemoTitle {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .docBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  .docDemoDesc p {
+    margin: 6px 0 0;
+  }
+
+  .docDemoMount {
+    margin-top: 12px;
+  }
+
+  .docPopperExample {
+    position: relative;
+    min-height: 140px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .docSelectList {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 360px;
+  }
+
+  .docSelectList:focus {
+    outline: 2px solid rgba(124, 92, 255, 0.35);
+    outline-offset: 3px;
+  }
+
+  .docSelectItem {
+    padding: 9px 10px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    user-select: none;
+  }
+
+  .docSelectItem.isFocused {
+    border-color: rgba(124, 92, 255, 0.5);
+    box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.12);
+  }
+
+  .docSelectItem.isSelected {
+    background: rgba(124, 92, 255, 0.12);
+  }
+
+  .docSelectItem.isDisabled {
+    opacity: 0.55;
+  }
+
+  .docCallout {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .docCalloutTitle {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .docCallout-note {
+    border-color: rgba(124, 92, 255, 0.35);
+  }
+
+  .docCallout-warning {
+    border-color: rgba(255, 77, 77, 0.35);
+  }
+
+  .docCallout-tip {
+    border-color: rgba(0, 193, 255, 0.28);
+  }
+
+  .docCodeBlock {
+    margin: 12px 0 0;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+
+  .docCodeBlock summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 10px 12px;
+    user-select: none;
+    font-weight: 600;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .docCodeBlock summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .docCodeBlock summary::after {
+    content: "▾";
+    float: right;
+    opacity: 0.8;
+  }
+
+  .docCodeBlock[open] summary::after {
+    content: "▴";
+  }
+
+  .docCode {
+    margin: 0;
+    padding: 12px 14px;
+    overflow: auto;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .docProps {
+    padding: 14px;
+  }
+
+  .docPropsInner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .docTable {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .docTable th,
+  .docTable td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 10px 12px;
+    vertical-align: top;
+  }
+
+  .docTable th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .docTable tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .docReq {
+    color: rgba(255, 77, 77, 0.9);
+    font-weight: 700;
+  }
+
+  @media (max-width: 980px) {
+    .docsLayout {
+      grid-template-columns: 1fr;
+    }
+    .docsSidebar {
+      position: static;
+      max-height: none;
+      padding-right: 0;
+    }
+    .docsContent {
+      max-width: none;
+    }
+  }
+}
+
