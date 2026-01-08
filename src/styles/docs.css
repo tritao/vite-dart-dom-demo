@@ -134,6 +134,7 @@
     background: hsl(var(--card));
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground) / 0.45) transparent;
+    scrollbar-gutter: stable;
   }
 
   .docsSidebar::-webkit-scrollbar {

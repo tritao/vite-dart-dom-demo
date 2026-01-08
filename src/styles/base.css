@@ -4,6 +4,11 @@
     height: 100%;
   }
 
+  html {
+    /* Prevent horizontal layout jumps when the page becomes scrollable. */
+    scrollbar-gutter: stable;
+  }
+
   body {
     margin: 0;
     position: relative;
