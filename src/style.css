@@ -198,6 +198,7 @@ a.btn {
   align-self: start;
   max-height: calc(100vh - 140px);
   overflow: auto;
+  overflow-x: hidden;
   padding-right: 8px;
   display: flex;
   flex-direction: column;
@@ -212,6 +213,7 @@ a.btn {
 }
 
 .docsLink {
+  display: block;
   width: 100%;
   text-align: left;
 }
