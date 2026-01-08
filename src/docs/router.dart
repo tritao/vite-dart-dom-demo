@@ -153,11 +153,14 @@ void mountSolidDocs(web.Element mount, String? page) {
   render(mount, () {
     final slug = (page == null || page == "1") ? "index" : page;
 
-    final root = web.HTMLDivElement()
-      ..id = "docs-root"
-      ..className = "container containerWide";
+    final root = web.HTMLDivElement()..id = "docs-root";
 
-    root.appendChild(solidDocsNav(active: "docs"));
+    final topbar = solidDocsNav(active: "docs");
+    root.appendChild(topbar);
+
+    final container = web.HTMLDivElement()
+      ..className = "container containerWide docsContainer";
+    root.appendChild(container);
 
     final layout = web.HTMLDivElement()..className = "docsLayout";
     final sidebar = web.HTMLDivElement()..className = "docsSidebar";
@@ -165,11 +168,27 @@ void mountSolidDocs(web.Element mount, String? page) {
 
     layout.appendChild(sidebar);
     layout.appendChild(main);
-    root.appendChild(layout);
+    container.appendChild(layout);
 
     final manifest = createResource(_fetchManifest);
     final pageHtml = createResourceWithSource(() => slug, _fetchPageHtml);
     final propsData = createResource(_fetchProps);
+
+    final searchQuery = createSignal("");
+
+    final searchEl = topbar.querySelector("#docs-search");
+    if (searchEl is web.HTMLInputElement) {
+      on(searchEl, "input", (_) {
+        searchQuery.value = searchEl.value;
+      });
+      on(searchEl, "keydown", (e) {
+        if (e is! web.KeyboardEvent) return;
+        if (e.key == "Escape") {
+          searchEl.value = "";
+          searchQuery.value = "";
+        }
+      });
+    }
 
     final title = web.HTMLHeadingElement.h1()
       ..id = "docs-title"
@@ -195,6 +214,8 @@ void mountSolidDocs(web.Element mount, String? page) {
 
     createRenderEffect(() {
       sidebar.textContent = "";
+
+      final q = searchQuery.value.trim().toLowerCase();
 
       final home = web.HTMLAnchorElement()
         ..href = "?docs=1"
@@ -226,14 +247,35 @@ void mountSolidDocs(web.Element mount, String? page) {
       final m = manifest.value;
       if (m == null) return;
 
+      var matchesAny = false;
       for (final group in m.groups) {
+        final visiblePages = <DocsManifestPage>[];
+        for (final p in group.pages) {
+          if (p.slug == "index") continue;
+          if (q.isEmpty) {
+            visiblePages.add(p);
+            continue;
+          }
+          final title = p.title.toLowerCase();
+          if (title.contains(q)) {
+            visiblePages.add(p);
+            continue;
+          }
+          if (p.tags.any((t) => t.toLowerCase().contains(q))) {
+            visiblePages.add(p);
+            continue;
+          }
+        }
+
+        if (visiblePages.isEmpty) continue;
+        matchesAny = true;
+
         final groupTitle = web.HTMLParagraphElement()
           ..className = "docsGroupTitle muted"
           ..textContent = group.label;
         sidebar.appendChild(groupTitle);
 
-        for (final p in group.pages) {
-          if (p.slug == "index") continue;
+        for (final p in visiblePages) {
           final a = web.HTMLAnchorElement()
             ..href = "?docs=${p.slug}"
             ..className = "docsNavLink"
@@ -244,6 +286,12 @@ void mountSolidDocs(web.Element mount, String? page) {
           }
           sidebar.appendChild(a);
         }
+      }
+
+      if (q.isNotEmpty && !matchesAny) {
+        sidebar.appendChild(web.HTMLParagraphElement()
+          ..className = "muted"
+          ..textContent = "No matches.");
       }
     });
 
