@@ -16,6 +16,7 @@ A combobox is a text input that opens a listbox of suggestions and supports sele
 - **Text input + popup**: input remains focused while navigating the suggestion list (virtual focus).
 - **Typeahead filtering**: suggestions update as you type.
 - **Keyboard navigation**: Arrow keys to move highlight; Enter to commit selection.
+- **Close on selection (default)**: selecting an option commits the value and closes the popup.
 
 ## Anatomy
 
@@ -24,7 +25,7 @@ A combobox is a text input that opens a listbox of suggestions and supports sele
 - **Listbox + options**: suggestion items.
 
 :::demo id=combobox-basic title="Basic combobox"
-Type to filter, ArrowDown to navigate, Enter to select.
+Type to filter, ArrowDown to navigate, Enter/click to select (popup closes by default).
 :::
 
 :::code file=src/docs/examples/combobox_basic.dart region=snippet lang=dart
