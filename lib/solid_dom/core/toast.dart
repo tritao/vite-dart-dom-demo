@@ -3,8 +3,8 @@ import "dart:async";
 import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
-import "./presence.dart";
-import "./solid_dom.dart";
+import "../presence.dart";
+import "../solid_dom.dart";
 
 final class ToastEntry {
   ToastEntry({
@@ -23,6 +23,13 @@ final class ToastEntry {
         open: open ?? this.open,
       );
 }
+
+typedef ToastItemBuilder = web.HTMLElement Function(
+  ToastEntry toast,
+  void Function([String reason]) dismiss,
+);
+
+typedef ToastViewportBuilder = web.HTMLElement Function();
 
 final class ToastController {
   ToastController({
@@ -86,13 +93,21 @@ final class ToastController {
   web.DocumentFragment view({
     String portalId = "toast-portal-container",
     String viewportId = "toast-viewport",
+    String viewportClassName = "",
+    ToastViewportBuilder? viewportBuilder,
+    ToastItemBuilder? toastBuilder,
   }) {
     final placeholder = Portal(
       id: portalId,
       children: () {
-        final viewport = web.HTMLDivElement()
-          ..id = viewportId
-          ..className = "toastViewport"
+        final viewport = (viewportBuilder ?? () => web.HTMLDivElement())()
+          ..id = viewportId;
+
+        if (viewportClassName.isNotEmpty) {
+          viewport.classList.add(viewportClassName);
+        }
+
+        viewport
           ..setAttribute("data-solid-toast-viewport", "1")
           ..setAttribute("data-solid-top-layer", "1")
           ..setAttribute("role", "region")
@@ -108,27 +123,10 @@ final class ToastController {
               exitMs: exitMs,
               children: () {
                 final toast = get();
-                final card = web.HTMLDivElement()
-                  ..id = "toast-${toast.id}"
-                  ..className = "card"
-                  ..setAttribute("role", "status");
-
-                final textEl = web.HTMLParagraphElement()
-                  ..textContent = toast.message;
-                card.appendChild(textEl);
-
-                final close = web.HTMLButtonElement()
-                  ..type = "button"
-                  ..className = "btn secondary"
-                  ..textContent = "Dismiss";
-                on(
-                  close,
-                  "click",
-                  (_) => dismiss(toast.id, reason: "button"),
-                );
-                card.appendChild(close);
-
-                return card;
+                final resolvedBuilder = toastBuilder ?? _defaultToastBuilder;
+                return resolvedBuilder(toast, ([reason = "button"]) {
+                  dismiss(toast.id, reason: reason);
+                });
               },
             ),
           ),
@@ -152,7 +150,27 @@ final class ToastController {
   }
 }
 
-ToastController createToaster({
+web.HTMLElement _defaultToastBuilder(
+  ToastEntry toast,
+  void Function([String reason]) dismiss,
+) {
+  final root = web.HTMLDivElement()
+    ..id = "toast-${toast.id}"
+    ..setAttribute("role", "status");
+
+  final textEl = web.HTMLParagraphElement()..textContent = toast.message;
+  root.appendChild(textEl);
+
+  final close = web.HTMLButtonElement()
+    ..type = "button"
+    ..textContent = "Dismiss";
+  on(close, "click", (_) => dismiss("button"));
+  root.appendChild(close);
+
+  return root;
+}
+
+ToastController createToastController({
   int exitMs = 120,
   int defaultDurationMs = 2500,
 }) {

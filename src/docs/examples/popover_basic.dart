@@ -1,5 +1,6 @@
 import "package:dart_web_test/solid.dart";
-import "package:dart_web_test/solid_dom.dart";
+import "package:dart_web_test/solid_dom/solid_dom.dart";
+import "package:dart_web_test/solid_ui.dart";
 import "package:web/web.dart" as web;
 
 Dispose mountDocsPopoverBasic(web.Element mount) {
@@ -51,4 +52,3 @@ Dispose mountDocsPopoverBasic(web.Element mount) {
   });
   // #doc:endregion snippet
 }
-

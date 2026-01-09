@@ -3,15 +3,15 @@ import "dart:async";
 import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
-import "./focus_scope.dart";
-import "./overlay.dart";
-import "./popper.dart";
-import "./presence.dart";
-import "./solid_dom.dart";
+import "../focus_scope.dart";
+import "../overlay.dart";
+import "../popper.dart";
+import "../presence.dart";
+import "../solid_dom.dart";
 
 typedef PopoverBuilder = web.HTMLElement Function(void Function() close);
 
-web.DocumentFragment Popover({
+web.DocumentFragment createPopover({
   required bool Function() open,
   required void Function(bool next) setOpen,
   required PopoverBuilder builder,

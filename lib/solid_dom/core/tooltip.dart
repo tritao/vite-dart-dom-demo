@@ -3,12 +3,14 @@ import "dart:async";
 import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
-import "./overlay.dart";
-import "./popper.dart";
-import "./presence.dart";
-import "./solid_dom.dart";
+import "../overlay.dart";
+import "../popper.dart";
+import "../presence.dart";
+import "../solid_dom.dart";
 
-typedef TooltipBuilder = web.HTMLElement Function(void Function([String reason]) close);
+typedef TooltipBuilder = web.HTMLElement Function(
+  void Function([String reason]) close,
+);
 
 int _tooltipIdCounter = 0;
 
@@ -31,7 +33,7 @@ String? _removeDescribedBy(String? existing, String id) {
   return parts.join(" ");
 }
 
-web.DocumentFragment Tooltip({
+web.DocumentFragment createTooltip({
   required bool Function() open,
   required void Function(bool next) setOpen,
   required web.Element trigger,

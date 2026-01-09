@@ -4,13 +4,13 @@ import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
 import "./popover.dart";
-import "./selection/create_selectable_collection.dart";
-import "./selection/create_selectable_item.dart";
-import "./selection/list_keyboard_delegate.dart";
-import "./selection/selection_manager.dart";
-import "./selection/types.dart";
-import "./selection/utils.dart";
-import "./solid_dom.dart";
+import "../selection/create_selectable_collection.dart";
+import "../selection/create_selectable_item.dart";
+import "../selection/list_keyboard_delegate.dart";
+import "../selection/selection_manager.dart";
+import "../selection/types.dart";
+import "../selection/utils.dart";
+import "../solid_dom.dart";
 
 final class NavigationMenuItem {
   NavigationMenuItem({
@@ -67,17 +67,17 @@ List<web.HTMLElement> _focusableWithin(web.Element root) {
 /// - Triggers are in a horizontal list with roving tabindex.
 /// - Each item opens a Popover panel anchored to its trigger.
 /// - Hover switches panels; click toggles.
-web.HTMLElement NavigationMenu({
+web.HTMLElement createNavigationMenu({
   required Iterable<NavigationMenuItem> items,
   bool openOnHover = true,
   int closeDelayMs = 140,
   int openDelayMs = 0,
   String ariaLabel = "navigation",
   String? id,
-  String rootClassName = "navigationMenu",
-  String listClassName = "navigationMenuList",
-  String triggerClassName = "navigationMenuTrigger",
-  String contentClassName = "navigationMenuContent",
+  String rootClassName = "",
+  String listClassName = "",
+  String triggerClassName = "",
+  String contentClassName = "",
 }) {
   final resolvedId = id ?? _nextNavMenuId("solid-nav-menu");
 
@@ -161,7 +161,8 @@ web.HTMLElement NavigationMenu({
     ..setAttribute("role", "navigation")
     ..setAttribute("aria-label", ariaLabel);
 
-  final list = web.HTMLDivElement()..className = listClassName;
+  final list = web.HTMLDivElement();
+  if (listClassName.isNotEmpty) list.className = listClassName;
   root.appendChild(list);
 
   final delegate = ListKeyboardDelegate(
@@ -202,7 +203,9 @@ web.HTMLElement NavigationMenu({
     final it = byKey[k]!;
     final trigger = it.trigger;
 
-    trigger.classList.add(triggerClassName);
+    if (triggerClassName.isNotEmpty) {
+      trigger.classList.add(triggerClassName);
+    }
     if (trigger is web.HTMLButtonElement) trigger.type = "button";
 
     if (trigger.id.isEmpty) trigger.id = "$resolvedId-trigger-$k";
@@ -300,7 +303,7 @@ web.HTMLElement NavigationMenu({
     list.appendChild(trigger);
 
     // Each item owns its own popover panel.
-    final fragment = Popover(
+    final fragment = createPopover(
       open: () => openKey() == k,
       setOpen: (next) => setOpenKey(next ? k : null),
       anchor: trigger,
@@ -316,8 +319,10 @@ web.HTMLElement NavigationMenu({
       builder: (close) {
         final panel = web.HTMLDivElement()
           ..id = contentId
-          ..className = contentClassName
           ..setAttribute("aria-labelledby", trigger.id);
+        if (contentClassName.isNotEmpty) {
+          panel.className = contentClassName;
+        }
 
         // Keep the panel open while interacting with it.
         on(panel, "pointerenter", (_) {

@@ -1,5 +1,6 @@
 import "package:dart_web_test/solid.dart";
-import "package:dart_web_test/solid_dom.dart";
+import "package:dart_web_test/solid_dom/solid_dom.dart";
+import "package:dart_web_test/solid_ui.dart";
 import "package:web/web.dart" as web;
 
 Dispose mountDocsToastBasic(web.Element mount) {
@@ -19,9 +20,13 @@ Dispose mountDocsToastBasic(web.Element mount) {
 
     final root = web.HTMLDivElement()..className = "row";
     root.appendChild(btn);
-    root.appendChild(toaster.view(portalId: "docs-toast-basic-portal", viewportId: "docs-toast-basic-viewport"));
+    root.appendChild(
+      toaster.view(
+        portalId: "docs-toast-basic-portal",
+        viewportId: "docs-toast-basic-viewport",
+      ),
+    );
     return root;
   });
   // #doc:endregion snippet
 }
-
