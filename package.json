@@ -105,7 +105,9 @@
     "debug:docs-input": "node scripts/debug-ui.mjs --mode dev --path \"/?docs=input\" --scenario docs-input --expect-h1 \"Input\" --expect-selector \"#docs-root\"",
     "debug:docs-input:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?docs=input\" --scenario docs-input --expect-h1 \"Input\" --expect-selector \"#docs-root\"",
     "debug:docs-form-field": "node scripts/debug-ui.mjs --mode dev --path \"/?docs=form-field\" --scenario docs-form-field --expect-h1 \"FormField\" --expect-selector \"#docs-root\"",
-    "debug:docs-form-field:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?docs=form-field\" --scenario docs-form-field --expect-h1 \"FormField\" --expect-selector \"#docs-root\""
+    "debug:docs-form-field:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?docs=form-field\" --scenario docs-form-field --expect-h1 \"FormField\" --expect-selector \"#docs-root\"",
+    "debug:docs-combobox": "node scripts/debug-ui.mjs --mode dev --path \"/?docs=combobox\" --scenario docs-combobox --expect-h1 \"Combobox\" --expect-selector \"#docs-root\"",
+    "debug:docs-combobox:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?docs=combobox\" --scenario docs-combobox --expect-h1 \"Combobox\" --expect-selector \"#docs-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

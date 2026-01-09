@@ -9,6 +9,7 @@ export "solid_ui/combobox.dart";
 export "solid_ui/context_menu.dart";
 export "solid_ui/dialog.dart";
 export "solid_ui/dropdown_menu.dart";
+export "solid_ui/form_controls.dart";
 export "solid_ui/fieldset.dart";
 export "solid_ui/form_field.dart";
 export "solid_ui/helper_text.dart";

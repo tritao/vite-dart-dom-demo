@@ -20,6 +20,7 @@ Start here:
 
 - [Introduction](?docs=intro)
 - [Theming](?docs=theming)
+- [Forms](?docs=forms)
 
 Start with:
 

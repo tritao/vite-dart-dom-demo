@@ -25,12 +25,12 @@ Dispose mountDocsSelectBasic(web.Element mount) {
       return "Select…";
     }
 
-    final trigger = web.HTMLButtonElement()
-      ..type = "button"
-      ..className = "btn primary";
-    createRenderEffect(() {
-      trigger.textContent = labelFor(value.value);
-    });
+    final control = buildSelectControl(
+      label: () => labelFor(value.value),
+      className: "btn primary",
+      ariaLabel: "Select framework",
+    );
+    final trigger = control.trigger;
 
     final status = web.HTMLParagraphElement()..className = "muted";
     status.appendChild(text(() => "Close: ${lastClose.value}"));

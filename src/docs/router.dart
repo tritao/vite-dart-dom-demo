@@ -106,12 +106,12 @@ Future<DocsManifest> _fetchManifest() async {
 
   const orderedGroups = <String>[
     "Docs",
+    "Forms",
     "UI",
     "Runtime",
+    "Navigation",
     "Overlays & Menus",
     "Selection",
-    "Navigation",
-    "Forms",
     "Foundations",
   ];
   final rank = <String, int>{
