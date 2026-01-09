@@ -50,6 +50,8 @@ Components:
 - [Input](?docs=input)
 - [Label](?docs=label)
 - [FormField](?docs=form-field)
+- [Textarea](?docs=textarea)
+- [Fieldset](?docs=fieldset)
 - [Checkbox](?docs=checkbox)
 - [RadioGroup](?docs=radio-group)
 - [ToggleGroup](?docs=toggle-group)

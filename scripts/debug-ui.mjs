@@ -29,6 +29,8 @@ import { runDocsBreadcrumbsScenario } from "./scenarios/docs-breadcrumbs.mjs";
 import { runDocsAlertScenario } from "./scenarios/docs-alert.mjs";
 import { runDocsNavigationMenuScenario } from "./scenarios/docs-navigation-menu.mjs";
 import { runDocsThemingScenario } from "./scenarios/docs-theming.mjs";
+import { runDocsInputScenario } from "./scenarios/docs-input.mjs";
+import { runDocsFormFieldScenario } from "./scenarios/docs-form-field.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -54,6 +56,8 @@ const solidScenarioRunners = {
   "docs-alert": (page, ctx) => runDocsAlertScenario(page, ctx),
   "docs-navigation-menu": (page, ctx) => runDocsNavigationMenuScenario(page, ctx),
   "docs-theming": (page, ctx) => runDocsThemingScenario(page, ctx),
+  "docs-input": (page, ctx) => runDocsInputScenario(page, ctx),
+  "docs-form-field": (page, ctx) => runDocsFormFieldScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";

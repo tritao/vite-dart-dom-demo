@@ -15,6 +15,7 @@ String _nextId(String prefix) {
 /// `aria-describedby`/`aria-invalid`.
 web.HTMLElement createFormField({
   required web.HTMLElement control,
+  web.HTMLElement? a11yTarget,
   String? Function()? label,
   String? Function()? description,
   String? Function()? error,
@@ -27,14 +28,16 @@ web.HTMLElement createFormField({
 }) {
   final resolvedId = id ?? _nextId("solidus-field");
 
-  if (control.id.isEmpty) {
-    control.id = "$resolvedId-control";
+  final target = a11yTarget ?? control;
+
+  if (target.id.isEmpty) {
+    target.id = "$resolvedId-control";
   }
 
   final root = web.HTMLDivElement()..className = className;
 
   final labelEl = web.HTMLLabelElement()..className = labelClassName;
-  labelEl.htmlFor = control.id;
+  labelEl.htmlFor = target.id;
 
   final descEl = web.HTMLParagraphElement()
     ..id = "$resolvedId-desc"
@@ -54,21 +57,27 @@ web.HTMLElement createFormField({
 
   void syncDescribedBy({required bool hasDesc, required bool hasMsg}) {
     final parts = <String>[];
-    final existing = control.getAttribute("aria-describedby");
+    final existing = target.getAttribute("aria-describedby");
     if (existing != null && existing.trim().isNotEmpty) {
-      parts.addAll(existing.split(RegExp(r"\\s+")).where((p) => p.isNotEmpty));
+      parts.addAll(existing.split(RegExp(r"\s+")).where((p) => p.isNotEmpty));
     }
 
-    parts.remove(descEl.id);
-    parts.remove(msgEl.id);
+    parts.removeWhere((p) => p == descEl.id || p == msgEl.id);
 
     if (hasDesc) parts.add(descEl.id);
     if (hasMsg) parts.add(msgEl.id);
 
-    if (parts.isEmpty) {
-      control.removeAttribute("aria-describedby");
+    // De-dup while preserving order (effects may run multiple times).
+    final unique = <String>[];
+    final seen = <String>{};
+    for (final p in parts) {
+      if (seen.add(p)) unique.add(p);
+    }
+
+    if (unique.isEmpty) {
+      target.removeAttribute("aria-describedby");
     } else {
-      control.setAttribute("aria-describedby", parts.join(" "));
+      target.setAttribute("aria-describedby", unique.join(" "));
     }
   }
 
@@ -101,9 +110,9 @@ web.HTMLElement createFormField({
 
     final invalid = e.isNotEmpty;
     if (invalid) {
-      control.setAttribute("aria-invalid", "true");
+      target.setAttribute("aria-invalid", "true");
     } else {
-      control.removeAttribute("aria-invalid");
+      target.removeAttribute("aria-invalid");
     }
 
     syncDescribedBy(hasDesc: d.isNotEmpty, hasMsg: e.isNotEmpty);

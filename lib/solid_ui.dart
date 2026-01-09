@@ -9,7 +9,9 @@ export "solid_ui/combobox.dart";
 export "solid_ui/context_menu.dart";
 export "solid_ui/dialog.dart";
 export "solid_ui/dropdown_menu.dart";
+export "solid_ui/fieldset.dart";
 export "solid_ui/form_field.dart";
+export "solid_ui/helper_text.dart";
 export "solid_ui/input.dart";
 export "solid_ui/label.dart";
 export "solid_ui/listbox.dart";
@@ -25,6 +27,7 @@ export "solid_ui/switch.dart";
 export "solid_ui/tabs.dart";
 export "solid_ui/toast.dart";
 export "solid_ui/toggle_group.dart";
+export "solid_ui/textarea.dart";
 export "solid_ui/tooltip.dart";
 
 // Re-export Solid-style DOM helpers so docs/demos can import only `solid_ui`.

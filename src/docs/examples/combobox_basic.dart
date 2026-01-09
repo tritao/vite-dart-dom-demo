@@ -1,5 +1,3 @@
-import "dart:js_interop";
-
 import "package:dart_web_test/solid.dart";
 import "package:dart_web_test/solid_ui.dart";
 import "package:web/web.dart" as web;
@@ -18,31 +16,32 @@ Dispose mountDocsComboboxBasic(web.Element mount) {
       ComboboxOption(value: "five", label: "Five"),
     ];
 
-    final input = web.HTMLInputElement()
-      ..id = "docs-combobox-basic-input"
-      ..type = "text"
-      ..className = "input"
-      ..placeholder = "Type to filter…";
+    final input = Input(
+      id: "docs-combobox-basic-input",
+      placeholder: "Type to filter…",
+      ariaLabel: "Pick one",
+    );
 
-    final trigger = web.HTMLButtonElement()
-      ..id = "docs-combobox-basic-trigger"
-      ..className = "comboTrigger"
-      ..innerHTML = (r'''
-<svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="m7 15 5 5 5-5" />
-  <path d="m7 9 5-5 5 5" />
-</svg>
-''').toJS;
-
-    final anchor = web.HTMLDivElement()..className = "comboControl";
-    anchor.appendChild(input);
-    anchor.appendChild(trigger);
+    final control = buildComboboxControl(
+      input: input,
+      includeTrigger: true,
+    );
+    final anchor = control.anchor;
+    final trigger = control.triggerButton!;
 
     final status = web.HTMLParagraphElement()..className = "muted";
     status.appendChild(text(() => "Value: ${value.value ?? "none"}"));
 
     final root = web.HTMLDivElement();
-    root.appendChild(anchor);
+    root.appendChild(
+      FormField(
+        id: "docs-combobox-basic-field",
+        label: () => "Pick one",
+        description: () => "Type to filter, then Enter to select.",
+        control: anchor,
+        a11yTarget: input,
+      ),
+    );
     root.appendChild(status);
 
     root.appendChild(

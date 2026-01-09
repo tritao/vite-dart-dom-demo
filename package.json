@@ -101,7 +101,11 @@
     "debug:solid-toast-modal": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=toast-modal\" --scenario solid-toast-modal --expect-h1 \"Solid Toast + Modal Demo\" --expect-selector \"#toast-modal-root\"",
     "debug:solid-toast-modal:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=toast-modal\" --scenario solid-toast-modal --expect-h1 \"Solid Toast + Modal Demo\" --expect-selector \"#toast-modal-root\"",
     "debug:solid-optionbuilder": "node scripts/debug-ui.mjs --mode dev --path \"/?solid=optionbuilder\" --scenario solid-optionbuilder --expect-h1 \"Solid OptionBuilder Demo\" --expect-selector \"#optionbuilder-root\"",
-    "debug:solid-optionbuilder:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=optionbuilder\" --scenario solid-optionbuilder --expect-h1 \"Solid OptionBuilder Demo\" --expect-selector \"#optionbuilder-root\""
+    "debug:solid-optionbuilder:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?solid=optionbuilder\" --scenario solid-optionbuilder --expect-h1 \"Solid OptionBuilder Demo\" --expect-selector \"#optionbuilder-root\"",
+    "debug:docs-input": "node scripts/debug-ui.mjs --mode dev --path \"/?docs=input\" --scenario docs-input --expect-h1 \"Input\" --expect-selector \"#docs-root\"",
+    "debug:docs-input:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?docs=input\" --scenario docs-input --expect-h1 \"Input\" --expect-selector \"#docs-root\"",
+    "debug:docs-form-field": "node scripts/debug-ui.mjs --mode dev --path \"/?docs=form-field\" --scenario docs-form-field --expect-h1 \"FormField\" --expect-selector \"#docs-root\"",
+    "debug:docs-form-field:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/?docs=form-field\" --scenario docs-form-field --expect-h1 \"FormField\" --expect-selector \"#docs-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

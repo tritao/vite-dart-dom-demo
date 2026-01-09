@@ -8,6 +8,7 @@ import "../solid_dom/core/form_field.dart";
 /// attributes.
 web.HTMLElement FormField({
   required web.HTMLElement control,
+  web.HTMLElement? a11yTarget,
   String? Function()? label,
   String? Function()? description,
   String? Function()? error,
@@ -20,6 +21,7 @@ web.HTMLElement FormField({
 }) {
   return createFormField(
     control: control,
+    a11yTarget: a11yTarget,
     label: label,
     description: description,
     error: error,
@@ -31,4 +33,3 @@ web.HTMLElement FormField({
     controlWrapClassName: controlWrapClassName,
   );
 }
-

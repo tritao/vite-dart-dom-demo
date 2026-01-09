@@ -1333,6 +1333,11 @@
         "notes": "The form control element (e.g. Input, Select trigger)."
       },
       {
+        "name": "a11yTarget",
+        "type": "HTMLElement?",
+        "notes": "Optional element that receives aria-describedby/aria-invalid and is used as the <label for=...> target (useful for composite controls like Combobox)."
+      },
+      {
         "name": "label",
         "type": "String? Function()?",
         "notes": "Label text shown above the control."
@@ -1350,6 +1355,81 @@
       {
         "name": "id",
         "type": "String?"
+      }
+    ]
+  },
+  "Textarea": {
+    "title": "Textarea",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"textarea\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label (required if there is no visible <label>)."
+      },
+      {
+        "name": "placeholder",
+        "type": "String?"
+      },
+      {
+        "name": "rows",
+        "type": "int?"
+      },
+      {
+        "name": "cols",
+        "type": "int?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?",
+        "notes": "Disables the control."
+      },
+      {
+        "name": "value",
+        "type": "String? Function()?",
+        "notes": "Controlled value accessor."
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)?",
+        "notes": "Controlled value setter (wired to input events)."
+      }
+    ]
+  },
+  "Fieldset": {
+    "title": "Fieldset",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"fieldset\""
+      },
+      {
+        "name": "legend",
+        "type": "String?"
+      },
+      {
+        "name": "legendClassName",
+        "type": "String",
+        "default": "\"fieldsetLegend\""
+      },
+      {
+        "name": "disabled",
+        "type": "bool",
+        "default": "false",
+        "notes": "Disables all descendant controls."
       }
     ]
   }
