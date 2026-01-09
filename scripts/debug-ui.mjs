@@ -37,6 +37,7 @@ import { runDocsTextareaAutosizeScenario } from "./scenarios/docs-textarea-autos
 import { runDocsSliderScenario } from "./scenarios/docs-slider.mjs";
 import { runDocsScrollAreaScenario } from "./scenarios/docs-scroll-area.mjs";
 import { runDocsFormsSuiteScenario } from "./scenarios/docs-forms-suite.mjs";
+import { runDocsPropsScenario } from "./scenarios/docs-props.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -70,6 +71,7 @@ const solidScenarioRunners = {
   "docs-slider": (page, ctx) => runDocsSliderScenario(page, ctx),
   "docs-scroll-area": (page, ctx) => runDocsScrollAreaScenario(page, ctx),
   "docs-forms-suite": (page, ctx) => runDocsFormsSuiteScenario(page, ctx),
+  "docs-props": (page, ctx) => runDocsPropsScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";

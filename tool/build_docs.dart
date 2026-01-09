@@ -4,6 +4,8 @@ import "dart:io";
 import "package:markdown/markdown.dart" as md;
 import "package:yaml/yaml.dart";
 
+import "./generate_props.dart" as gen;
+
 final class DocsPage {
   DocsPage({
     required this.sourcePath,
@@ -43,6 +45,14 @@ final class DocsPage {
 }
 
 Future<void> main(List<String> args) async {
+  // Keep `docs/api/props.json` in sync with source by generating it before
+  // building pages (avoids drift from manual edits).
+  try {
+    await gen.main(const []);
+  } catch (e) {
+    stderr.writeln("WARN: props generation failed: $e");
+  }
+
   final pagesRoot = Directory("docs/pages");
   if (!pagesRoot.existsSync()) {
     stderr.writeln("Missing docs/pages. Nothing to build.");

@@ -1,139 +1,93 @@
 {
-  "Button": {
-    "title": "Button",
+  "Accordion": {
+    "title": "Accordion",
     "rows": [
       {
-        "name": "label",
-        "type": "String",
-        "required": true,
-        "notes": "Visible button label (omit for icon-only buttons)."
+        "name": "items",
+        "type": "Iterable<AccordionItem>",
+        "required": true
       },
       {
-        "name": "variant",
-        "type": "ButtonVariant",
-        "default": "ButtonVariant.normal",
-        "notes": "default/secondary/outline/ghost/link/destructive."
+        "name": "expandedKeys",
+        "type": "Set<String> Function()",
+        "required": true
       },
       {
-        "name": "size",
-        "type": "ButtonSize",
-        "default": "ButtonSize.normal",
-        "notes": "default/sm/lg/icon."
+        "name": "setExpandedKeys",
+        "type": "void Function(Set<String> next)",
+        "required": true
       },
       {
-        "name": "disabled",
-        "type": "bool",
-        "default": "false",
-        "notes": "Disables the button."
+        "name": "multiple",
+        "type": "bool Function()?"
       },
       {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Required for icon-only buttons for accessibility."
+        "name": "collapsible",
+        "type": "bool Function()?"
       },
       {
-        "name": "className",
-        "type": "String?",
-        "notes": "Additional CSS classes (appended)."
+        "name": "shouldFocusWrap",
+        "type": "bool Function()?"
       },
-      {
-        "name": "onClick",
-        "type": "void Function(MouseEvent e)?",
-        "notes": "Optional click handler."
-      }
-    ]
-  },
-  "Badge": {
-    "title": "Badge",
-    "rows": [
-      {
-        "name": "label",
-        "type": "String",
-        "required": true,
-        "notes": "Badge text content."
-      },
-      {
-        "name": "variant",
-        "type": "BadgeVariant",
-        "default": "BadgeVariant.normal",
-        "notes": "default/secondary/outline/destructive."
-      },
-      {
-        "name": "className",
-        "type": "String?",
-        "notes": "Additional CSS classes (appended)."
-      }
-    ]
-  },
-  "Separator": {
-    "title": "Separator",
-    "rows": [
       {
         "name": "orientation",
-        "type": "SeparatorOrientation",
-        "default": "SeparatorOrientation.horizontal",
-        "notes": "horizontal or vertical."
-      },
-      {
-        "name": "decorative",
-        "type": "bool",
-        "default": "true",
-        "notes": "When true, uses role=presentation and aria-hidden=true."
-      },
-      {
-        "name": "className",
-        "type": "String",
-        "default": "\"separator\"",
-        "notes": "CSS class for the root."
-      }
-    ]
-  },
-  "Progress": {
-    "title": "Progress",
-    "rows": [
-      {
-        "name": "value",
-        "type": "double? Function()?",
-        "notes": "Current value. Return null to render indeterminate."
-      },
-      {
-        "name": "max",
-        "type": "double Function()?",
-        "default": "100.0",
-        "notes": "Maximum value for determinate progress."
+        "type": "Orientation Function()?"
       },
       {
         "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Accessible label for the progressbar when there's no visible label."
+        "type": "String?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
       },
       {
         "name": "rootClassName",
         "type": "String",
-        "default": "\"progress\"",
-        "notes": "CSS class for the root."
+        "default": "\"accordion\""
       },
       {
-        "name": "indicatorClassName",
+        "name": "itemClassName",
         "type": "String",
-        "default": "\"progressIndicator\"",
-        "notes": "CSS class for the inner indicator."
+        "default": "\"accordionItem\""
+      },
+      {
+        "name": "triggerClassName",
+        "type": "String",
+        "default": "\"accordionTrigger\""
+      },
+      {
+        "name": "panelClassName",
+        "type": "String",
+        "default": "\"accordionPanel\""
       }
     ]
   },
-  "Spinner": {
-    "title": "Spinner",
+  "Alert": {
+    "title": "Alert",
     "rows": [
       {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Accessible label (defaults to \"Loading\")."
+        "name": "children",
+        "type": "Iterable<web.Node>",
+        "required": true,
+        "notes": "Alert contents (commonly AlertTitle + AlertDescription)."
+      },
+      {
+        "name": "variant",
+        "type": "AlertVariant",
+        "default": "AlertVariant.normal",
+        "notes": "default/destructive."
       },
       {
         "name": "className",
+        "type": "String?",
+        "notes": "Additional CSS classes (appended)."
+      },
+      {
+        "name": "role",
         "type": "String",
-        "default": "\"spinner\"",
-        "notes": "CSS class for the root."
+        "default": "\"alert\"",
+        "notes": "ARIA role (\"alert\" by default). Set to \"\" to omit."
       }
     ]
   },
@@ -181,6 +135,28 @@
       }
     ]
   },
+  "Badge": {
+    "title": "Badge",
+    "rows": [
+      {
+        "name": "label",
+        "type": "String",
+        "required": true,
+        "notes": "Badge text content."
+      },
+      {
+        "name": "variant",
+        "type": "BadgeVariant",
+        "default": "BadgeVariant.normal",
+        "notes": "default/secondary/outline/destructive."
+      },
+      {
+        "name": "className",
+        "type": "String?",
+        "notes": "Additional CSS classes (appended)."
+      }
+    ]
+  },
   "Breadcrumbs": {
     "title": "Breadcrumbs",
     "rows": [
@@ -195,12 +171,6 @@
         "type": "String",
         "default": "\"breadcrumb\"",
         "notes": "Accessible label for the navigation."
-      },
-      {
-        "name": "separatorText",
-        "type": "String",
-        "default": "\"/\"",
-        "notes": "Text used between items (rendered as aria-hidden)."
       },
       {
         "name": "rootClassName",
@@ -237,23 +207,46 @@
         "type": "String",
         "default": "\"breadcrumbSeparator\"",
         "notes": "CSS class for separator <li> nodes."
+      },
+      {
+        "name": "separatorText",
+        "type": "String",
+        "default": "\"/\"",
+        "notes": "Text used between items (rendered as aria-hidden)."
       }
     ]
   },
-  "Alert": {
-    "title": "Alert",
+  "Button": {
+    "title": "Button",
     "rows": [
       {
-        "name": "children",
-        "type": "Iterable<Node>",
+        "name": "label",
+        "type": "String",
         "required": true,
-        "notes": "Alert contents (commonly AlertTitle + AlertDescription)."
+        "notes": "Visible button label (omit for icon-only buttons)."
       },
       {
         "name": "variant",
-        "type": "AlertVariant",
-        "default": "AlertVariant.normal",
-        "notes": "default/destructive."
+        "type": "ButtonVariant",
+        "default": "ButtonVariant.normal",
+        "notes": "default/secondary/outline/ghost/link/destructive."
+      },
+      {
+        "name": "size",
+        "type": "ButtonSize",
+        "default": "ButtonSize.normal",
+        "notes": "default/sm/lg/icon."
+      },
+      {
+        "name": "disabled",
+        "type": "bool",
+        "default": "false",
+        "notes": "Disables the button."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Required for icon-only buttons for accessibility."
       },
       {
         "name": "className",
@@ -261,74 +254,23 @@
         "notes": "Additional CSS classes (appended)."
       },
       {
-        "name": "role",
-        "type": "String",
-        "default": "\"alert\"",
-        "notes": "ARIA role (\"alert\" by default). Set to \"\" to omit."
+        "name": "onClick",
+        "type": "void Function(web.MouseEvent e)?",
+        "notes": "Optional click handler."
       }
     ]
   },
-  "NavigationMenu": {
-    "title": "NavigationMenu",
+  "Card": {
+    "title": "Card",
     "rows": [
       {
-        "name": "items",
-        "type": "Iterable<NavigationMenuItem>",
-        "required": true,
-        "notes": "Menu items: each provides a trigger element + a content panel element."
-      },
-      {
-        "name": "openOnHover",
-        "type": "bool",
-        "default": "true",
-        "notes": "Whether hover switches/opens panels."
-      },
-      {
-        "name": "closeDelayMs",
-        "type": "int",
-        "default": "140",
-        "notes": "Delay before closing when leaving trigger/panel."
-      },
-      {
-        "name": "openDelayMs",
-        "type": "int",
-        "default": "0",
-        "notes": "Delay before opening on hover."
-      },
-      {
-        "name": "ariaLabel",
+        "name": "className",
         "type": "String",
-        "default": "\"navigation\"",
-        "notes": "Accessible label for the navigation region."
+        "default": "\"card\""
       },
       {
-        "name": "id",
-        "type": "String?",
-        "notes": "Optional root id."
-      },
-      {
-        "name": "rootClassName",
-        "type": "String",
-        "default": "\"navigationMenu\"",
-        "notes": "CSS class for the root."
-      },
-      {
-        "name": "listClassName",
-        "type": "String",
-        "default": "\"navigationMenuList\"",
-        "notes": "CSS class for the trigger list."
-      },
-      {
-        "name": "triggerClassName",
-        "type": "String",
-        "default": "\"navigationMenuTrigger\"",
-        "notes": "CSS class applied to triggers."
-      },
-      {
-        "name": "contentClassName",
-        "type": "String",
-        "default": "\"navigationMenuContent\"",
-        "notes": "CSS class for the popover panel."
+        "name": "children",
+        "type": "Iterable<web.Node> Function()?"
       }
     ]
   },
@@ -380,483 +322,141 @@
       }
     ]
   },
-  "RadioGroup": {
-    "title": "RadioGroup",
-    "rows": [
-      {
-        "name": "items",
-        "type": "Iterable<RadioGroupItem>",
-        "required": true,
-        "notes": "Items to render. Each item provides a key + an interactive element (typically a <button>)."
-      },
-      {
-        "name": "value",
-        "type": "String? Function()",
-        "required": true,
-        "notes": "Controlled selected key."
-      },
-      {
-        "name": "setValue",
-        "type": "void Function(String next)",
-        "required": true,
-        "notes": "Called when selection changes (click/Space/Enter/Arrow keys)."
-      },
-      {
-        "name": "orientation",
-        "type": "Orientation Function()?",
-        "notes": "Keyboard orientation: vertical (default) or horizontal."
-      },
-      {
-        "name": "shouldFocusWrap",
-        "type": "bool Function()?",
-        "notes": "Whether Arrow navigation wraps from last↔first."
-      },
-      {
-        "name": "disabled",
-        "type": "bool Function()?",
-        "notes": "Disables the whole group (all items)."
-      },
-      {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Accessible label for the radiogroup when there is no visible group label."
-      },
-      {
-        "name": "id",
-        "type": "String?",
-        "notes": "Optional root id."
-      },
-      {
-        "name": "rootClassName",
-        "type": "String",
-        "default": "\"radioGroup\"",
-        "notes": "CSS class for the root."
-      },
-      {
-        "name": "itemClassName",
-        "type": "String",
-        "default": "\"radioItem\"",
-        "notes": "CSS class added to each item element."
-      }
-    ]
-  },
-  "ToggleGroup": {
-    "title": "ToggleGroup",
-    "rows": [
-      {
-        "name": "type",
-        "type": "ToggleGroupType Function()",
-        "required": true,
-        "notes": "Single or multiple selection."
-      },
-      {
-        "name": "items",
-        "type": "Iterable<ToggleGroupItem>",
-        "required": true,
-        "notes": "Items to render. Each item provides a key + an interactive element (typically a <button>)."
-      },
-      {
-        "name": "value",
-        "type": "String? Function()?",
-        "notes": "Single mode only: controlled selected key (nullable for deselect)."
-      },
-      {
-        "name": "setValue",
-        "type": "void Function(String? next)?",
-        "notes": "Single mode only: called on toggles/activation."
-      },
-      {
-        "name": "values",
-        "type": "Set<String> Function()?",
-        "notes": "Multiple mode only: controlled set of pressed keys."
-      },
-      {
-        "name": "setValues",
-        "type": "void Function(Set<String> next)?",
-        "notes": "Multiple mode only: called on toggles/activation."
-      },
-      {
-        "name": "disallowEmptySelection",
-        "type": "bool Function()?",
-        "notes": "Prevents clearing the last pressed item."
-      },
-      {
-        "name": "disabled",
-        "type": "bool Function()?",
-        "notes": "Disables the whole group (all items)."
-      },
-      {
-        "name": "orientation",
-        "type": "Orientation Function()?",
-        "notes": "Keyboard orientation: horizontal (default) or vertical."
-      },
-      {
-        "name": "shouldFocusWrap",
-        "type": "bool Function()?",
-        "notes": "Whether Arrow navigation wraps from last↔first."
-      },
-      {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Accessible label for the group when there is no visible label."
-      },
-      {
-        "name": "id",
-        "type": "String?",
-        "notes": "Optional root id."
-      },
-      {
-        "name": "rootClassName",
-        "type": "String",
-        "default": "\"toggleGroup\"",
-        "notes": "CSS class for the root."
-      },
-      {
-        "name": "itemClassName",
-        "type": "String",
-        "default": "\"toggleItem\"",
-        "notes": "CSS class added to each item element."
-      }
-    ]
-  },
-  "Dialog": {
-    "title": "Dialog",
+  "Combobox": {
+    "title": "Combobox",
     "rows": [
       {
         "name": "open",
         "type": "bool Function()",
-        "required": true,
-        "notes": "Controls visibility."
+        "required": true
       },
       {
         "name": "setOpen",
         "type": "void Function(bool next)",
-        "required": true,
-        "notes": "Called on dismiss/close; update your signal/state here."
-      },
-      {
-        "name": "builder",
-        "type": "DialogBuilder (close) → HTMLElement",
-        "required": true,
-        "notes": "Builds the dialog content; call close(reason?) to dismiss."
-      },
-      {
-        "name": "onClose",
-        "type": "void Function(String reason)?",
-        "notes": "Dismiss reason: escape/outside/close/etc (implementation-defined)."
-      },
-      {
-        "name": "modal",
-        "type": "bool",
-        "default": "true",
-        "notes": "When true: traps focus, disables outside pointer events, scroll-locks, and aria-hides outside content."
-      },
-      {
-        "name": "backdrop",
-        "type": "bool",
-        "default": "false",
-        "notes": "Renders a backdrop element behind the dialog panel."
-      },
-      {
-        "name": "exitMs",
-        "type": "int",
-        "default": "120",
-        "notes": "Presence exit duration for animations."
-      },
-      {
-        "name": "initialFocus",
-        "type": "HTMLElement?",
-        "notes": "Element to focus on open (modal focus-scope only)."
-      },
-      {
-        "name": "restoreFocus",
-        "type": "bool",
-        "default": "true",
-        "notes": "Restore focus to the previously focused element on close."
-      },
-      {
-        "name": "onOpenAutoFocus",
-        "type": "void Function(FocusScopeAutoFocusEvent event)?",
-        "notes": "Preventable hook to customize autofocus on mount."
-      },
-      {
-        "name": "onCloseAutoFocus",
-        "type": "void Function(FocusScopeAutoFocusEvent event)?",
-        "notes": "Preventable hook to customize autofocus on unmount."
-      },
-      {
-        "name": "labelledBy",
-        "type": "String?",
-        "notes": "Sets aria-labelledby on the dialog content."
-      },
-      {
-        "name": "describedBy",
-        "type": "String?",
-        "notes": "Sets aria-describedby on the dialog content."
-      },
-      {
-        "name": "role",
-        "type": "String",
-        "default": "\"dialog\"",
-        "notes": "Use \"alertdialog\" for urgent confirmations."
-      },
-      {
-        "name": "portalId",
-        "type": "String?",
-        "notes": "Optional id for the Portal container."
-      }
-    ]
-  },
-  "Popover": {
-    "title": "Popover",
-    "rows": [
-      {
-        "name": "open",
-        "type": "bool Function()",
-        "required": true,
-        "notes": "Controls visibility."
-      },
-      {
-        "name": "setOpen",
-        "type": "void Function(bool next)",
-        "required": true,
-        "notes": "Called on dismiss/close; update your signal/state here."
+        "required": true
       },
       {
         "name": "anchor",
-        "type": "Element?",
-        "notes": "Anchor element used for Popper positioning (recommended)."
+        "type": "web.HTMLElement",
+        "required": true
       },
       {
-        "name": "builder",
-        "type": "PopoverBuilder (close) → HTMLElement",
-        "required": true,
-        "notes": "Builds the panel element; call close(reason?) to dismiss."
+        "name": "input",
+        "type": "web.HTMLInputElement",
+        "required": true
       },
       {
-        "name": "onClose",
-        "type": "void Function(String reason)?",
-        "notes": "Dismiss reason: escape/outside/close/etc."
+        "name": "triggerButton",
+        "type": "web.HTMLButtonElement?"
       },
       {
-        "name": "trapFocus",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, traps focus inside the panel (Popover becomes modal-like)."
+        "name": "options",
+        "type": "Iterable<ComboboxOption<T>> Function()",
+        "required": true
       },
       {
-        "name": "initialFocus",
-        "type": "HTMLElement?",
-        "notes": "Element to focus on open (when trapFocus or autoFocus is used)."
+        "name": "value",
+        "type": "T? Function()",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(T? next)",
+        "required": true
+      },
+      {
+        "name": "equals",
+        "type": "bool Function(T a, T b)?"
+      },
+      {
+        "name": "listboxId",
+        "type": "String?"
       },
       {
         "name": "placement",
         "type": "String",
-        "default": "\"bottom-start\"",
-        "notes": "Floating UI placement."
+        "default": "\"bottom-start\""
       },
       {
         "name": "offset",
         "type": "double",
-        "default": "8",
-        "notes": "Distance between anchor and panel."
+        "default": "6"
       },
       {
         "name": "viewportPadding",
         "type": "double",
-        "default": "8",
-        "notes": "Padding when clamping/shift/flip near viewport edges."
+        "default": "8"
       },
       {
         "name": "flip",
         "type": "bool",
-        "default": "true",
-        "notes": "Allow flipping to remain visible."
+        "default": "true"
       },
       {
-        "name": "slide",
+        "name": "showArrow",
         "type": "bool",
-        "default": "true",
-        "notes": "Keep popover within viewport by sliding along the anchor."
+        "default": "false"
       },
       {
-        "name": "overlap",
-        "type": "bool",
-        "default": "false",
-        "notes": "Allow overlap with the anchor when shifting."
-      },
-      {
-        "name": "hideWhenDetached",
-        "type": "bool",
-        "default": "false",
-        "notes": "Hide the panel when the anchor is detached/offscreen."
-      },
-      {
-        "name": "exitMs",
-        "type": "int",
-        "default": "120",
-        "notes": "Presence exit duration for animations."
-      },
-      {
-        "name": "portalId",
-        "type": "String?",
-        "notes": "Optional id for the Portal container."
-      }
-    ]
-  },
-  "Tooltip": {
-    "title": "Tooltip",
-    "rows": [
-      {
-        "name": "open",
-        "type": "bool Function()",
-        "required": true,
-        "notes": "Controls visibility."
-      },
-      {
-        "name": "setOpen",
-        "type": "void Function(bool next)",
-        "required": true,
-        "notes": "Called by hover/focus interactions; update your signal/state here."
-      },
-      {
-        "name": "trigger",
-        "type": "Element",
-        "required": true,
-        "notes": "The element that shows the tooltip on hover/focus."
-      },
-      {
-        "name": "builder",
-        "type": "TooltipBuilder (close) → HTMLElement",
-        "required": true,
-        "notes": "Builds the tooltip element."
-      },
-      {
-        "name": "openDelayMs",
-        "type": "int",
-        "default": "500",
-        "notes": "Delay before opening on hover."
-      },
-      {
-        "name": "closeDelayMs",
-        "type": "int",
-        "default": "150",
-        "notes": "Delay before closing on pointer leave."
-      },
-      {
-        "name": "interactive",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, tooltip can receive pointer events (useful for richer content)."
-      },
-      {
-        "name": "placement",
-        "type": "String",
-        "default": "\"top\"",
-        "notes": "Floating UI placement."
-      },
-      {
-        "name": "portalId",
-        "type": "String?",
-        "notes": "Optional id for the Portal container."
-      }
-    ]
-  },
-  "DropdownMenu": {
-    "title": "DropdownMenu",
-    "rows": [
-      {
-        "name": "open",
-        "type": "bool Function()",
-        "required": true,
-        "notes": "Controls visibility."
-      },
-      {
-        "name": "setOpen",
-        "type": "void Function(bool next)",
-        "required": true,
-        "notes": "Called on dismiss/close; update your signal/state here."
-      },
-      {
-        "name": "anchor",
-        "type": "Element",
-        "required": true,
-        "notes": "Anchor element used for Popper positioning."
-      },
-      {
-        "name": "builder",
-        "type": "DropdownMenuBuilder (close) → MenuContent",
-        "required": true,
-        "notes": "Builds menu content + item registry (items power keyboard + typeahead)."
-      },
-      {
-        "name": "modal",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, blocks outside pointer events (modal-like)."
-      },
-      {
-        "name": "placement",
-        "type": "String",
-        "default": "\"bottom-start\"",
-        "notes": "Floating UI placement."
-      },
-      {
-        "name": "offset",
+        "name": "arrowPadding",
         "type": "double",
-        "default": "4",
-        "notes": "Distance between anchor and menu."
+        "default": "4"
       },
       {
-        "name": "flip",
+        "name": "allowsEmptyCollection",
         "type": "bool",
-        "default": "true",
-        "notes": "Allow flipping to remain visible."
+        "default": "false"
+      },
+      {
+        "name": "keepOpenOnEmpty",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "emptyText",
+        "type": "String",
+        "default": "\"No results.\""
+      },
+      {
+        "name": "noResetInputOnBlur",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "disallowEmptySelection",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "closeOnSelection",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "filter",
+        "type": "ComboboxFilter<T>?"
+      },
+      {
+        "name": "triggerMode",
+        "type": "String",
+        "default": "\"input\""
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
       },
       {
         "name": "exitMs",
         "type": "int",
-        "default": "120",
-        "notes": "Presence exit duration for animations."
+        "default": "0"
       },
       {
         "name": "portalId",
-        "type": "String?",
-        "notes": "Optional id for the Portal container."
-      }
-    ]
-  },
-  "Menubar": {
-    "title": "Menubar",
-    "rows": [
-      {
-        "name": "openKey",
-        "type": "String? Function()",
-        "required": true,
-        "notes": "Key of the currently open top-level menu (or null)."
+        "type": "String?"
       },
       {
-        "name": "setOpenKey",
-        "type": "void Function(String? next)",
-        "required": true,
-        "notes": "Updates the open top-level menu key."
-      },
-      {
-        "name": "menus",
-        "type": "List<MenubarMenu>",
-        "required": true,
-        "notes": "Defines triggers + menu builders (each menu is built with Menu semantics)."
-      },
-      {
-        "name": "className",
-        "type": "String",
-        "default": "\"menubar\"",
-        "notes": "CSS class for the menubar root."
-      },
-      {
-        "name": "portalId",
-        "type": "String?",
-        "notes": "Optional id for the Portal container used by all menus."
+        "name": "optionBuilder",
+        "type": "ComboboxOptionBuilder<T>?"
       }
     ]
   },
@@ -877,13 +477,13 @@
       },
       {
         "name": "target",
-        "type": "Element",
+        "type": "web.Element",
         "required": true,
         "notes": "Element that receives right-click/long-press events."
       },
       {
         "name": "builder",
-        "type": "MenuBuilder (close) → MenuContent",
+        "type": "MenuBuilder",
         "required": true,
         "notes": "Builds menu content + items."
       },
@@ -894,6 +494,18 @@
         "notes": "When true, context menu won’t open."
       },
       {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
+      },
+      {
+        "name": "onOpenAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
+      },
+      {
+        "name": "onCloseAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
+      },
+      {
         "name": "exitMs",
         "type": "int",
         "default": "120",
@@ -906,95 +518,131 @@
       }
     ]
   },
-  "Toast": {
-    "title": "Toast",
+  "Dialog": {
+    "title": "Dialog",
     "rows": [
       {
-        "name": "createToaster.exitMs",
+        "name": "open",
+        "type": "bool Function()",
+        "required": true
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true
+      },
+      {
+        "name": "builder",
+        "type": "DialogBuilder",
+        "required": true
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
+      },
+      {
+        "name": "modal",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "backdrop",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "backdropId",
+        "type": "String?"
+      },
+      {
+        "name": "backdropClassName",
+        "type": "String?"
+      },
+      {
+        "name": "exitMs",
         "type": "int",
-        "default": "120",
-        "notes": "Presence exit duration for toast animations."
+        "default": "120"
       },
       {
-        "name": "createToaster.defaultDurationMs",
-        "type": "int",
-        "default": "2500",
-        "notes": "Default auto-dismiss duration for new toasts."
+        "name": "initialFocus",
+        "type": "web.HTMLElement?"
       },
       {
-        "name": "controller.show",
-        "type": "int Function(String message, {int? durationMs})",
-        "notes": "Push a new toast; returns an id."
+        "name": "restoreFocus",
+        "type": "bool",
+        "default": "true"
       },
       {
-        "name": "controller.dismiss",
-        "type": "void Function(int id, {String reason})",
-        "notes": "Dismiss a toast (keeps it mounted for exitMs)."
+        "name": "onOpenAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
       },
       {
-        "name": "controller.view.portalId",
+        "name": "onCloseAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
+      },
+      {
+        "name": "labelledBy",
+        "type": "String?"
+      },
+      {
+        "name": "describedBy",
+        "type": "String?"
+      },
+      {
+        "name": "role",
         "type": "String",
-        "default": "\"toast-portal-container\"",
-        "notes": "Portal id for the toast viewport."
+        "default": "\"dialog\""
       },
       {
-        "name": "controller.view.viewportId",
-        "type": "String",
-        "default": "\"toast-viewport\"",
-        "notes": "DOM id for the viewport element."
+        "name": "portalId",
+        "type": "String?"
       }
     ]
   },
-  "Select": {
-    "title": "Select",
+  "DropdownMenu": {
+    "title": "DropdownMenu",
     "rows": [
       {
         "name": "open",
         "type": "bool Function()",
         "required": true,
-        "notes": "Controls popup visibility."
+        "notes": "Controls visibility."
       },
       {
         "name": "setOpen",
         "type": "void Function(bool next)",
         "required": true,
-        "notes": "Called by trigger/outside interactions; update your state here."
+        "notes": "Called on dismiss/close; update your signal/state here."
       },
       {
-        "name": "trigger",
-        "type": "HTMLElement",
+        "name": "anchor",
+        "type": "web.Element",
         "required": true,
-        "notes": "Button element; remains focused (virtual focus)."
+        "notes": "Anchor element used for Popper positioning."
       },
       {
-        "name": "options",
-        "type": "Iterable<SelectOption<T>> Function()",
+        "name": "builder",
+        "type": "DropdownMenuBuilder",
         "required": true,
-        "notes": "Options list (disabled options are skipped)."
+        "notes": "Builds menu content + item registry (items power keyboard + typeahead)."
       },
       {
-        "name": "value",
-        "type": "T? Function()",
-        "required": true,
-        "notes": "Currently selected value (controlled)."
+        "name": "onClose",
+        "type": "void Function(String reason)?"
       },
       {
-        "name": "setValue",
-        "type": "void Function(T? next)",
-        "required": true,
-        "notes": "Updates the selected value."
+        "name": "onOpenAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
       },
       {
-        "name": "fitViewport",
-        "type": "bool",
-        "default": "true",
-        "notes": "Clamp maxHeight on short viewports and allow scrolling."
+        "name": "onCloseAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
       },
       {
-        "name": "disallowEmptySelection",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, prevents clearing selection."
+        "name": "exitMs",
+        "type": "int",
+        "default": "120",
+        "notes": "Presence exit duration for animations."
       },
       {
         "name": "placement",
@@ -1003,415 +651,32 @@
         "notes": "Floating UI placement."
       },
       {
-        "name": "exitMs",
-        "type": "int",
-        "default": "120",
-        "notes": "Presence exit duration for animations."
+        "name": "offset",
+        "type": "double",
+        "default": "4",
+        "notes": "Distance between anchor and menu."
       },
       {
-        "name": "portalId",
-        "type": "String?",
-        "notes": "Optional id for the Portal container."
-      }
-    ]
-  },
-  "Combobox": {
-    "title": "Combobox",
-    "rows": [
-      {
-        "name": "open",
-        "type": "bool Function()",
-        "required": true,
-        "notes": "Controls popup visibility."
+        "name": "viewportPadding",
+        "type": "double",
+        "default": "8"
       },
       {
-        "name": "setOpen",
-        "type": "void Function(bool next)",
-        "required": true,
-        "notes": "Called by input/outside interactions; update your state here."
-      },
-      {
-        "name": "anchor",
-        "type": "HTMLElement",
-        "required": true,
-        "notes": "Anchor element used for Popper positioning (often wraps the input)."
-      },
-      {
-        "name": "input",
-        "type": "HTMLInputElement",
-        "required": true,
-        "notes": "Text input (remains focused while navigating options)."
-      },
-      {
-        "name": "options",
-        "type": "Iterable<ComboboxOption<T>> Function()",
-        "required": true,
-        "notes": "Options list (can be filtered by input)."
-      },
-      {
-        "name": "value",
-        "type": "T? Function()",
-        "required": true,
-        "notes": "Currently selected value (controlled)."
-      },
-      {
-        "name": "setValue",
-        "type": "void Function(T? next)",
-        "required": true,
-        "notes": "Updates the selected value."
-      },
-      {
-        "name": "filter",
-        "type": "ComboboxFilter<T>?",
-        "notes": "Custom filter; defaults to case-insensitive contains(textValue)."
-      },
-      {
-        "name": "closeOnSelection",
+        "name": "flip",
         "type": "bool",
         "default": "true",
-        "notes": "Close the popup when selecting an option."
+        "notes": "Allow flipping to remain visible."
       },
       {
-        "name": "exitMs",
-        "type": "int",
-        "default": "120",
-        "notes": "Presence exit duration for animations."
+        "name": "modal",
+        "type": "bool",
+        "default": "false",
+        "notes": "When true, blocks outside pointer events (modal-like)."
       },
       {
         "name": "portalId",
         "type": "String?",
         "notes": "Optional id for the Portal container."
-      }
-    ]
-  },
-  "Listbox": {
-    "title": "Listbox (createListbox)",
-    "rows": [
-      {
-        "name": "id",
-        "type": "String",
-        "required": true,
-        "notes": "DOM id for the listbox element."
-      },
-      {
-        "name": "options",
-        "type": "List<O> Function()?",
-        "notes": "Flat options list (use sections for grouped lists)."
-      },
-      {
-        "name": "sections",
-        "type": "Iterable<ListboxSection<T,O>> Function()?",
-        "notes": "Optional grouped sections."
-      },
-      {
-        "name": "selected",
-        "type": "T? Function()",
-        "required": true,
-        "notes": "Currently selected value."
-      },
-      {
-        "name": "onSelect",
-        "type": "void Function(O option, int index)",
-        "required": true,
-        "notes": "Called on selection (Enter/Space/pointer)."
-      },
-      {
-        "name": "shouldUseVirtualFocus",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, uses aria-activedescendant and keeps focus on the root."
-      },
-      {
-        "name": "shouldSelectOnPressUp",
-        "type": "bool",
-        "default": "false",
-        "notes": "Select on pointer up (menu-like timing)."
-      },
-      {
-        "name": "allowsDifferentPressOrigin",
-        "type": "bool",
-        "default": "false",
-        "notes": "Allow press down on one item and release on another."
-      },
-      {
-        "name": "disallowEmptySelection",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, prevents clearing selection."
-      }
-    ]
-  },
-  "Tabs": {
-    "title": "Tabs",
-    "rows": [
-      {
-        "name": "items",
-        "type": "Iterable<TabsItem>",
-        "required": true,
-        "notes": "Tab triggers + panels (ids are wired automatically)."
-      },
-      {
-        "name": "value",
-        "type": "String? Function()",
-        "required": true,
-        "notes": "Controlled selected tab key."
-      },
-      {
-        "name": "setValue",
-        "type": "void Function(String next)",
-        "required": true,
-        "notes": "Updates the selected tab."
-      },
-      {
-        "name": "activationMode",
-        "type": "TabsActivationMode Function()?",
-        "notes": "automatic selects on focus; manual selects on click/Enter/Space."
-      },
-      {
-        "name": "orientation",
-        "type": "Orientation Function()?",
-        "notes": "horizontal or vertical."
-      },
-      {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Optional aria-label for the tablist."
-      }
-    ]
-  },
-  "Accordion": {
-    "title": "Accordion",
-    "rows": [
-      {
-        "name": "items",
-        "type": "Iterable<AccordionItem>",
-        "required": true,
-        "notes": "Accordion triggers + panels."
-      },
-      {
-        "name": "expandedKeys",
-        "type": "Set<String> Function()",
-        "required": true,
-        "notes": "Controlled set of expanded item keys."
-      },
-      {
-        "name": "setExpandedKeys",
-        "type": "void Function(Set<String> next)",
-        "required": true,
-        "notes": "Updates expanded item keys."
-      },
-      {
-        "name": "multiple",
-        "type": "bool Function()?",
-        "notes": "Allow multiple items expanded at once."
-      },
-      {
-        "name": "collapsible",
-        "type": "bool Function()?",
-        "notes": "Allow closing the last open item (single mode)."
-      }
-    ]
-  },
-  "Switch": {
-    "title": "Switch",
-    "rows": [
-      {
-        "name": "checked",
-        "type": "bool Function()",
-        "required": true,
-        "notes": "Controlled checked state."
-      },
-      {
-        "name": "setChecked",
-        "type": "void Function(bool next)",
-        "required": true,
-        "notes": "Updates checked state."
-      },
-      {
-        "name": "disabled",
-        "type": "bool Function()?",
-        "notes": "Disable the switch."
-      },
-      {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Optional aria-label for the control."
-      },
-      {
-        "name": "className",
-        "type": "String",
-        "default": "\"switch\"",
-        "notes": "CSS class for the root."
-      },
-      {
-        "name": "thumbClassName",
-        "type": "String",
-        "default": "\"switchThumb\"",
-        "notes": "CSS class for the thumb element."
-      }
-    ]
-  },
-  "Input": {
-    "title": "Input",
-    "rows": [
-      {
-        "name": "type",
-        "type": "String",
-        "default": "\"text\"",
-        "notes": "Input type (text, email, password, etc)."
-      },
-      {
-        "name": "id",
-        "type": "String?"
-      },
-      {
-        "name": "className",
-        "type": "String",
-        "default": "\"input\"",
-        "notes": "CSS class for the input element."
-      },
-      {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Accessible label (required if there is no visible <label>)."
-      },
-      {
-        "name": "placeholder",
-        "type": "String?"
-      },
-      {
-        "name": "disabled",
-        "type": "bool Function()?",
-        "notes": "Disables the control."
-      },
-      {
-        "name": "value",
-        "type": "String? Function()?",
-        "notes": "Controlled value accessor."
-      },
-      {
-        "name": "setValue",
-        "type": "void Function(String next)?",
-        "notes": "Controlled value setter (wired to input events)."
-      }
-    ]
-  },
-  "Label": {
-    "title": "Label",
-    "rows": [
-      {
-        "name": "text",
-        "type": "String",
-        "required": true,
-        "notes": "Visible label text."
-      },
-      {
-        "name": "htmlFor",
-        "type": "String?",
-        "notes": "Id of the labeled control."
-      },
-      {
-        "name": "required",
-        "type": "bool",
-        "default": "false",
-        "notes": "Marks the label as required (adds an asterisk via CSS)."
-      },
-      {
-        "name": "className",
-        "type": "String",
-        "default": "\"label\""
-      }
-    ]
-  },
-  "FormField": {
-    "title": "FormField",
-    "rows": [
-      {
-        "name": "control",
-        "type": "HTMLElement",
-        "required": true,
-        "notes": "The form control element (e.g. Input, Select trigger)."
-      },
-      {
-        "name": "a11yTarget",
-        "type": "HTMLElement?",
-        "notes": "Optional element that receives aria-describedby/aria-invalid and is used as the <label for=...> target (useful for composite controls like Combobox)."
-      },
-      {
-        "name": "label",
-        "type": "String? Function()?",
-        "notes": "Label text shown above the control."
-      },
-      {
-        "name": "description",
-        "type": "String? Function()?",
-        "notes": "Helper text shown below the control."
-      },
-      {
-        "name": "error",
-        "type": "String? Function()?",
-        "notes": "Error text shown below the control (also sets aria-invalid)."
-      },
-      {
-        "name": "id",
-        "type": "String?"
-      }
-    ]
-  },
-  "Textarea": {
-    "title": "Textarea",
-    "rows": [
-      {
-        "name": "id",
-        "type": "String?"
-      },
-      {
-        "name": "className",
-        "type": "String",
-        "default": "\"textarea\""
-      },
-      {
-        "name": "ariaLabel",
-        "type": "String?",
-        "notes": "Accessible label (required if there is no visible <label>)."
-      },
-      {
-        "name": "placeholder",
-        "type": "String?"
-      },
-      {
-        "name": "rows",
-        "type": "int?"
-      },
-      {
-        "name": "cols",
-        "type": "int?"
-      },
-      {
-        "name": "autosize",
-        "type": "bool",
-        "default": "false",
-        "notes": "When true, uses autosizing behavior (equivalent to TextareaAutosize)."
-      },
-      {
-        "name": "maxHeightPx",
-        "type": "int?",
-        "notes": "Maximum height when autosizing; overflowing content becomes scrollable."
-      },
-      {
-        "name": "disabled",
-        "type": "bool Function()?",
-        "notes": "Disables the control."
-      },
-      {
-        "name": "value",
-        "type": "String? Function()?",
-        "notes": "Controlled value accessor."
-      },
-      {
-        "name": "setValue",
-        "type": "void Function(String next)?",
-        "notes": "Controlled value setter (wired to input events)."
       }
     ]
   },
@@ -1439,91 +704,1261 @@
       {
         "name": "disabled",
         "type": "bool",
-        "default": "false",
-        "notes": "Disables all descendant controls."
+        "default": "false"
+      },
+      {
+        "name": "children",
+        "type": "Iterable<web.Node> Function()?"
+      }
+    ]
+  },
+  "FormField": {
+    "title": "FormField",
+    "rows": [
+      {
+        "name": "control",
+        "type": "web.HTMLElement",
+        "required": true
+      },
+      {
+        "name": "a11yTarget",
+        "type": "web.HTMLElement?"
+      },
+      {
+        "name": "label",
+        "type": "String? Function()?"
+      },
+      {
+        "name": "description",
+        "type": "String? Function()?"
+      },
+      {
+        "name": "error",
+        "type": "String? Function()?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"formField\""
+      },
+      {
+        "name": "labelClassName",
+        "type": "String",
+        "default": "\"formLabel\""
+      },
+      {
+        "name": "descriptionClassName",
+        "type": "String",
+        "default": "\"formDescription\""
+      },
+      {
+        "name": "messageClassName",
+        "type": "String",
+        "default": "\"formMessage\""
+      },
+      {
+        "name": "controlWrapClassName",
+        "type": "String",
+        "default": "\"formControl\""
+      }
+    ]
+  },
+  "Input": {
+    "title": "Input",
+    "rows": [
+      {
+        "name": "type",
+        "type": "String",
+        "default": "\"text\""
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"input\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "placeholder",
+        "type": "String?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "value",
+        "type": "String? Function()?"
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)?"
+      },
+      {
+        "name": "onInput",
+        "type": "void Function(web.Event e, String currentValue)?"
+      },
+      {
+        "name": "onChange",
+        "type": "void Function(web.Event e, String currentValue)?"
+      }
+    ]
+  },
+  "InputOTP": {
+    "title": "InputOTP",
+    "rows": [
+      {
+        "name": "length",
+        "type": "int",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "String Function()",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)",
+        "required": true
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "allowedChar",
+        "type": "RegExp?",
+        "notes": "Allowed character filter; defaults to digits only."
+      },
+      {
+        "name": "inputPattern",
+        "type": "String?",
+        "notes": "Optional HTML `pattern` attribute; defaults to digits."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"otp\""
+      },
+      {
+        "name": "inputClassName",
+        "type": "String",
+        "default": "\"otpInput\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      }
+    ]
+  },
+  "Label": {
+    "title": "Label",
+    "rows": [
+      {
+        "name": "text",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "htmlFor",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"label\""
+      },
+      {
+        "name": "required",
+        "type": "bool",
+        "default": "false"
+      }
+    ]
+  },
+  "Listbox": {
+    "title": "Listbox",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String",
+        "required": true
+      },
+      {
+        "name": "options",
+        "type": "List<O> Function()?"
+      },
+      {
+        "name": "sections",
+        "type": "Iterable<ListboxSection<T, O>> Function()?"
+      },
+      {
+        "name": "selected",
+        "type": "T? Function()",
+        "required": true
+      },
+      {
+        "name": "onSelect",
+        "type": "void Function(O option, int index)",
+        "required": true
+      },
+      {
+        "name": "onClearSelection",
+        "type": "void Function()?"
+      },
+      {
+        "name": "equals",
+        "type": "bool Function(T a, T b)?"
+      },
+      {
+        "name": "activeIndex",
+        "type": "Signal<int>?"
+      },
+      {
+        "name": "initialActiveIndex",
+        "type": "int Function()?"
+      },
+      {
+        "name": "shouldUseVirtualFocus",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "tabFocusable",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "shouldFocusOnHover",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "shouldFocusWrap",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "disallowTypeAhead",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "enableKeyboardNavigation",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "selectOnFocus",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "shouldSelectOnPressUp",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "allowsDifferentPressOrigin",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "disallowEmptySelection",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "onTabOut",
+        "type": "void Function()?"
+      },
+      {
+        "name": "onEscape",
+        "type": "void Function()?"
+      },
+      {
+        "name": "emptyText",
+        "type": "String",
+        "default": "\"No results.\""
+      },
+      {
+        "name": "showEmptyState",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "getOptionKey",
+        "type": "Object? Function(O option)?"
+      },
+      {
+        "name": "idRegistry",
+        "type": "ListboxIdRegistry<T, O>?"
+      },
+      {
+        "name": "scrollContainer",
+        "type": "web.HTMLElement? Function()?"
+      },
+      {
+        "name": "useInnerScrollContainer",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "scrollToIndex",
+        "type": "void Function(int index)?"
+      },
+      {
+        "name": "pageSize",
+        "type": "int Function()?"
+      },
+      {
+        "name": "optionBuilder",
+        "type": "ListboxOptionBuilder<T, O>?"
+      },
+      {
+        "name": "optionBuilderReactive",
+        "type": "ListboxOptionBuilderReactive<T, O>?"
+      }
+    ]
+  },
+  "Menubar": {
+    "title": "Menubar",
+    "rows": [
+      {
+        "name": "openKey",
+        "type": "String? Function()",
+        "required": true
+      },
+      {
+        "name": "setOpenKey",
+        "type": "void Function(String? next)",
+        "required": true
+      },
+      {
+        "name": "menus",
+        "type": "List<MenubarMenu>",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"menubar\""
+      },
+      {
+        "name": "portalId",
+        "type": "String?"
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
+      }
+    ]
+  },
+  "NavigationMenu": {
+    "title": "NavigationMenu",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<NavigationMenuItem>",
+        "required": true
+      },
+      {
+        "name": "openOnHover",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "closeDelayMs",
+        "type": "int",
+        "default": "140"
+      },
+      {
+        "name": "openDelayMs",
+        "type": "int",
+        "default": "0"
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String",
+        "default": "\"navigation\""
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      }
+    ]
+  },
+  "Popover": {
+    "title": "Popover",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true
+      },
+      {
+        "name": "builder",
+        "type": "PopoverBuilder",
+        "required": true
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120"
+      },
+      {
+        "name": "initialFocus",
+        "type": "web.HTMLElement?"
+      },
+      {
+        "name": "trapFocus",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "onOpenAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
+      },
+      {
+        "name": "onCloseAutoFocus",
+        "type": "void Function(FocusScopeAutoFocusEvent event)?"
+      },
+      {
+        "name": "anchor",
+        "type": "web.Element?"
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"bottom-start\""
+      },
+      {
+        "name": "offset",
+        "type": "double",
+        "default": "8"
+      },
+      {
+        "name": "viewportPadding",
+        "type": "double",
+        "default": "8"
+      },
+      {
+        "name": "flip",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "shift",
+        "type": "double",
+        "default": "0"
+      },
+      {
+        "name": "slide",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "overlap",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "hideWhenDetached",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "detachedPadding",
+        "type": "double",
+        "default": "0"
+      },
+      {
+        "name": "arrowPadding",
+        "type": "double",
+        "default": "4"
+      },
+      {
+        "name": "role",
+        "type": "String",
+        "default": "\"dialog\""
+      },
+      {
+        "name": "portalId",
+        "type": "String?"
+      }
+    ]
+  },
+  "Progress": {
+    "title": "Progress",
+    "rows": [
+      {
+        "name": "value",
+        "type": "double? Function()?",
+        "notes": "Current value. Return null to render indeterminate."
+      },
+      {
+        "name": "max",
+        "type": "double Function()?",
+        "notes": "Maximum value for determinate progress."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label for the progressbar when there's no visible label."
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"progress\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "indicatorClassName",
+        "type": "String",
+        "default": "\"progressIndicator\"",
+        "notes": "CSS class for the inner indicator."
+      }
+    ]
+  },
+  "RadioGroup": {
+    "title": "RadioGroup",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<RadioGroupItem>",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "String? Function()",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)",
+        "required": true
+      },
+      {
+        "name": "orientation",
+        "type": "Orientation Function()?"
+      },
+      {
+        "name": "shouldFocusWrap",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"radioGroup\""
+      },
+      {
+        "name": "itemClassName",
+        "type": "String",
+        "default": "\"radioItem\""
+      }
+    ]
+  },
+  "ScrollArea": {
+    "title": "ScrollArea",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"scrollArea\""
+      },
+      {
+        "name": "viewportClassName",
+        "type": "String",
+        "default": "\"scrollViewport\""
+      },
+      {
+        "name": "contentClassName",
+        "type": "String",
+        "default": "\"scrollContent\""
+      }
+    ]
+  },
+  "Select": {
+    "title": "Select",
+    "rows": [
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true
+      },
+      {
+        "name": "trigger",
+        "type": "web.HTMLElement",
+        "required": true
+      },
+      {
+        "name": "options",
+        "type": "Iterable<SelectOption<T>> Function()",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "T? Function()",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(T? next)",
+        "required": true
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
+      },
+      {
+        "name": "equals",
+        "type": "bool Function(T a, T b)?"
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"bottom-start\""
+      },
+      {
+        "name": "offset",
+        "type": "double",
+        "default": "4"
+      },
+      {
+        "name": "viewportPadding",
+        "type": "double",
+        "default": "8"
+      },
+      {
+        "name": "flip",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "shift",
+        "type": "double",
+        "default": "0"
+      },
+      {
+        "name": "slide",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "overlap",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "fitViewport",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "disallowEmptySelection",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120"
+      },
+      {
+        "name": "portalId",
+        "type": "String?"
+      },
+      {
+        "name": "listboxId",
+        "type": "String?"
+      },
+      {
+        "name": "optionBuilder",
+        "type": "SelectOptionBuilder<T>?"
+      }
+    ]
+  },
+  "Separator": {
+    "title": "Separator",
+    "rows": [
+      {
+        "name": "orientation",
+        "type": "SeparatorOrientation",
+        "default": "SeparatorOrientation.horizontal",
+        "notes": "horizontal or vertical."
+      },
+      {
+        "name": "decorative",
+        "type": "bool",
+        "default": "true",
+        "notes": "When true, uses role=presentation and aria-hidden=true."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"separator\"",
+        "notes": "CSS class for the root."
+      }
+    ]
+  },
+  "Slider": {
+    "title": "Slider",
+    "rows": [
+      {
+        "name": "value",
+        "type": "double Function()",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(double next)",
+        "required": true
+      },
+      {
+        "name": "min",
+        "type": "double Function()?"
+      },
+      {
+        "name": "max",
+        "type": "double Function()?"
+      },
+      {
+        "name": "step",
+        "type": "double Function()?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"slider\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      }
+    ]
+  },
+  "Spinner": {
+    "title": "Spinner",
+    "rows": [
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label (defaults to \"Loading\")."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"spinner\"",
+        "notes": "CSS class for the root."
+      }
+    ]
+  },
+  "Switch": {
+    "title": "Switch",
+    "rows": [
+      {
+        "name": "checked",
+        "type": "bool Function()",
+        "required": true,
+        "notes": "Controlled checked state."
+      },
+      {
+        "name": "setChecked",
+        "type": "void Function(bool next)",
+        "required": true,
+        "notes": "Updates checked state."
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?",
+        "notes": "Disable the switch."
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"switch\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "thumbClassName",
+        "type": "String",
+        "default": "\"switchThumb\"",
+        "notes": "CSS class for the thumb element."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Optional aria-label for the control."
+      }
+    ]
+  },
+  "Table": {
+    "title": "Table",
+    "rows": [
+      {
+        "name": "wrapperClassName",
+        "type": "String",
+        "default": "\"tableWrap\""
+      },
+      {
+        "name": "tableClassName",
+        "type": "String",
+        "default": "\"table\""
+      },
+      {
+        "name": "head",
+        "type": "Iterable<web.Node> Function()?"
+      },
+      {
+        "name": "body",
+        "type": "Iterable<web.Node> Function()?"
+      }
+    ]
+  },
+  "Tabs": {
+    "title": "Tabs",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<TabsItem>",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "String? Function()",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)",
+        "required": true
+      },
+      {
+        "name": "activationMode",
+        "type": "TabsActivationMode Function()?"
+      },
+      {
+        "name": "orientation",
+        "type": "Orientation Function()?"
+      },
+      {
+        "name": "shouldFocusWrap",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"tabs\""
+      },
+      {
+        "name": "tabListClassName",
+        "type": "String",
+        "default": "\"tabsList\""
+      },
+      {
+        "name": "panelsClassName",
+        "type": "String",
+        "default": "\"tabsPanels\""
+      },
+      {
+        "name": "panelClassName",
+        "type": "String",
+        "default": "\"tabsPanel\""
+      }
+    ]
+  },
+  "Textarea": {
+    "title": "Textarea",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"textarea\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "placeholder",
+        "type": "String?"
+      },
+      {
+        "name": "rows",
+        "type": "int?"
+      },
+      {
+        "name": "cols",
+        "type": "int?"
+      },
+      {
+        "name": "autosize",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "value",
+        "type": "String? Function()?"
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)?"
+      },
+      {
+        "name": "onInput",
+        "type": "void Function(web.Event e, String currentValue)?"
+      },
+      {
+        "name": "onChange",
+        "type": "void Function(web.Event e, String currentValue)?"
+      },
+      {
+        "name": "maxHeightPx",
+        "type": "int?"
+      }
+    ]
+  },
+  "TextareaAutosize": {
+    "title": "TextareaAutosize",
+    "rows": [
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"textarea\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "placeholder",
+        "type": "String?"
+      },
+      {
+        "name": "rows",
+        "type": "int?"
+      },
+      {
+        "name": "cols",
+        "type": "int?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "value",
+        "type": "String? Function()?"
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)?"
+      },
+      {
+        "name": "onInput",
+        "type": "void Function(web.Event e, String currentValue)?"
+      },
+      {
+        "name": "onChange",
+        "type": "void Function(web.Event e, String currentValue)?"
+      },
+      {
+        "name": "maxHeightPx",
+        "type": "int?"
+      }
+    ]
+  },
+  "Toast": {
+    "title": "Toast",
+    "rows": [
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "120"
+      },
+      {
+        "name": "defaultDurationMs",
+        "type": "int",
+        "default": "2500"
       }
     ]
   },
   "Toggle": {
     "title": "Toggle",
     "rows": [
-      { "name": "pressed", "type": "bool Function()", "required": true },
-      { "name": "setPressed", "type": "void Function(bool next)", "required": true },
-      { "name": "disabled", "type": "bool Function()?" },
-      { "name": "label", "type": "String?" },
-      { "name": "ariaLabel", "type": "String?" },
-      { "name": "variant", "type": "ToggleVariant", "default": "ToggleVariant.defaultVariant" },
-      { "name": "size", "type": "ToggleSize", "default": "ToggleSize.normal" },
-      { "name": "className", "type": "String", "default": "\"toggle\"" }
+      {
+        "name": "pressed",
+        "type": "bool Function()",
+        "required": true
+      },
+      {
+        "name": "setPressed",
+        "type": "void Function(bool next)",
+        "required": true
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "variant",
+        "type": "ToggleVariant",
+        "default": "ToggleVariant.defaultVariant"
+      },
+      {
+        "name": "size",
+        "type": "ToggleSize",
+        "default": "ToggleSize.normal"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"toggle\""
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "label",
+        "type": "String?"
+      }
     ]
   },
-  "Slider": {
-    "title": "Slider",
+  "ToggleGroup": {
+    "title": "ToggleGroup",
     "rows": [
-      { "name": "value", "type": "double Function()", "required": true },
-      { "name": "setValue", "type": "void Function(double next)", "required": true },
-      { "name": "min", "type": "double Function()?" },
-      { "name": "max", "type": "double Function()?" },
-      { "name": "step", "type": "double Function()?" },
-      { "name": "disabled", "type": "bool Function()?" },
-      { "name": "ariaLabel", "type": "String?" },
-      { "name": "className", "type": "String", "default": "\"slider\"" }
+      {
+        "name": "type",
+        "type": "ToggleGroupType Function()",
+        "required": true
+      },
+      {
+        "name": "items",
+        "type": "Iterable<ToggleGroupItem>",
+        "required": true
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String? next)?"
+      },
+      {
+        "name": "setValues",
+        "type": "void Function(Set<String> next)?"
+      },
+      {
+        "name": "disallowEmptySelection",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "orientation",
+        "type": "Orientation Function()?"
+      },
+      {
+        "name": "shouldFocusWrap",
+        "type": "bool Function()?"
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?"
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"toggleGroup\""
+      },
+      {
+        "name": "itemClassName",
+        "type": "String",
+        "default": "\"toggleItem\""
+      }
     ]
   },
-  "ScrollArea": {
-    "title": "ScrollArea",
+  "Tooltip": {
+    "title": "Tooltip",
     "rows": [
-      { "name": "id", "type": "String?" },
-      { "name": "rootClassName", "type": "String", "default": "\"scrollArea\"" },
-      { "name": "viewportClassName", "type": "String", "default": "\"scrollViewport\"" },
-      { "name": "contentClassName", "type": "String", "default": "\"scrollContent\"" }
-    ]
-  },
-  "Card": {
-    "title": "Card",
-    "rows": [
-      { "name": "className", "type": "String", "default": "\"card\"" },
-      { "name": "children", "type": "Iterable<Node> Function()?" }
-    ]
-  },
-  "Table": {
-    "title": "Table",
-    "rows": [
-      { "name": "wrapperClassName", "type": "String", "default": "\"tableWrap\"" },
-      { "name": "tableClassName", "type": "String", "default": "\"table\"" },
-      { "name": "head", "type": "Iterable<Node> Function()?" },
-      { "name": "body", "type": "Iterable<Node> Function()?" }
-    ]
-  },
-  "InputOTP": {
-    "title": "InputOTP",
-    "rows": [
-      { "name": "length", "type": "int", "required": true },
-      { "name": "value", "type": "String Function()", "required": true },
-      { "name": "setValue", "type": "void Function(String next)", "required": true },
-      { "name": "disabled", "type": "bool Function()?" },
-      { "name": "allowedChar", "type": "RegExp?", "default": "RegExp(r\"[0-9]\")", "notes": "Allowed character filter; defaults to digits only." },
-      { "name": "inputPattern", "type": "String?", "default": "\"[0-9]*\"", "notes": "Optional HTML `pattern` attribute; defaults to digits." },
-      { "name": "ariaLabel", "type": "String?" },
-      { "name": "className", "type": "String", "default": "\"otp\"" },
-      { "name": "inputClassName", "type": "String", "default": "\"otpInput\"" }
-    ]
-  },
-  "TextareaAutosize": {
-    "title": "TextareaAutosize",
-    "rows": [
-      { "name": "id", "type": "String?" },
-      { "name": "className", "type": "String", "default": "\"textarea\"" },
-      { "name": "ariaLabel", "type": "String?" },
-      { "name": "placeholder", "type": "String?" },
-      { "name": "rows", "type": "int?" },
-      { "name": "cols", "type": "int?" },
-      { "name": "disabled", "type": "bool Function()?" },
-      { "name": "value", "type": "String? Function()?" },
-      { "name": "setValue", "type": "void Function(String next)?" },
-      { "name": "onInput", "type": "void Function(Event e, String currentValue)?" },
-      { "name": "onChange", "type": "void Function(Event e, String currentValue)?" },
-      { "name": "maxHeightPx", "type": "int?" }
+      {
+        "name": "open",
+        "type": "bool Function()",
+        "required": true
+      },
+      {
+        "name": "setOpen",
+        "type": "void Function(bool next)",
+        "required": true
+      },
+      {
+        "name": "trigger",
+        "type": "web.Element",
+        "required": true
+      },
+      {
+        "name": "builder",
+        "type": "TooltipBuilder",
+        "required": true
+      },
+      {
+        "name": "onClose",
+        "type": "void Function(String reason)?"
+      },
+      {
+        "name": "placement",
+        "type": "String",
+        "default": "\"top\""
+      },
+      {
+        "name": "offset",
+        "type": "double",
+        "default": "6"
+      },
+      {
+        "name": "shift",
+        "type": "double",
+        "default": "0"
+      },
+      {
+        "name": "viewportPadding",
+        "type": "double",
+        "default": "8"
+      },
+      {
+        "name": "flip",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "slide",
+        "type": "bool",
+        "default": "true"
+      },
+      {
+        "name": "overlap",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "hideWhenDetached",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "detachedPadding",
+        "type": "double",
+        "default": "0"
+      },
+      {
+        "name": "arrowPadding",
+        "type": "double",
+        "default": "4"
+      },
+      {
+        "name": "interactive",
+        "type": "bool",
+        "default": "false"
+      },
+      {
+        "name": "openDelayMs",
+        "type": "int",
+        "default": "500"
+      },
+      {
+        "name": "closeDelayMs",
+        "type": "int",
+        "default": "150"
+      },
+      {
+        "name": "exitMs",
+        "type": "int",
+        "default": "80"
+      },
+      {
+        "name": "portalId",
+        "type": "String?"
+      }
     ]
   }
 }

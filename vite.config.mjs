@@ -39,6 +39,8 @@ export default defineConfig(({ mode, command }) => {
       rollupOptions: {
         input: {
           index: path.resolve(process.cwd(), "index.html"),
+          docs: path.resolve(process.cwd(), "docs.html"),
+          labs: path.resolve(process.cwd(), "labs.html"),
           wordproc: path.resolve(process.cwd(), "wordproc.html"),
         },
       },
