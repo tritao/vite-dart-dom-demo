@@ -268,6 +268,70 @@
       }
     ]
   },
+  "NavigationMenu": {
+    "title": "NavigationMenu",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<NavigationMenuItem>",
+        "required": true,
+        "notes": "Menu items: each provides a trigger element + a content panel element."
+      },
+      {
+        "name": "openOnHover",
+        "type": "bool",
+        "default": "true",
+        "notes": "Whether hover switches/opens panels."
+      },
+      {
+        "name": "closeDelayMs",
+        "type": "int",
+        "default": "140",
+        "notes": "Delay before closing when leaving trigger/panel."
+      },
+      {
+        "name": "openDelayMs",
+        "type": "int",
+        "default": "0",
+        "notes": "Delay before opening on hover."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String",
+        "default": "\"navigation\"",
+        "notes": "Accessible label for the navigation region."
+      },
+      {
+        "name": "id",
+        "type": "String?",
+        "notes": "Optional root id."
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"navigationMenu\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "listClassName",
+        "type": "String",
+        "default": "\"navigationMenuList\"",
+        "notes": "CSS class for the trigger list."
+      },
+      {
+        "name": "triggerClassName",
+        "type": "String",
+        "default": "\"navigationMenuTrigger\"",
+        "notes": "CSS class applied to triggers."
+      },
+      {
+        "name": "contentClassName",
+        "type": "String",
+        "default": "\"navigationMenuContent\"",
+        "notes": "CSS class for the popover panel."
+      }
+    ]
+  },
   "Checkbox": {
     "title": "Checkbox",
     "rows": [

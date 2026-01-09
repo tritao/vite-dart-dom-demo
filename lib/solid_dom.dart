@@ -15,6 +15,7 @@ export "solid_dom/focus_scope.dart";
 export "solid_dom/menu.dart";
 export "solid_dom/menubar.dart";
 export "solid_dom/overlay.dart";
+export "solid_dom/navigation_menu.dart";
 export "solid_dom/tabs.dart";
 export "solid_dom/popover.dart";
 export "solid_dom/presence.dart";

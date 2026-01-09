@@ -36,6 +36,7 @@ import "./examples/spinner_basic.dart";
 import "./examples/avatar_basic.dart";
 import "./examples/breadcrumbs_basic.dart";
 import "./examples/alert_basic.dart";
+import "./examples/navigation_menu_basic.dart";
 
 typedef DocsDemoMount = Dispose Function(web.Element mount);
 
@@ -51,6 +52,7 @@ final Map<String, DocsDemoMount> docsDemos = {
   "toggle-group-basic": mountDocsToggleGroupBasic,
   "progress-basic": mountDocsProgressBasic,
   "breadcrumbs-basic": mountDocsBreadcrumbsBasic,
+  "navigation-menu-basic": mountDocsNavigationMenuBasic,
   "dialog-basic": mountDocsDialogBasic,
   "overlay-basic": mountDocsOverlayBasic,
   "focus-scope-basic": mountDocsFocusScopeBasic,

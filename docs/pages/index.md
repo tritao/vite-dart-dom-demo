@@ -55,3 +55,8 @@ Components:
 - [Tabs](?docs=tabs)
 - [Accordion](?docs=accordion)
 - [Switch](?docs=switch)
+
+Navigation:
+
+- [NavigationMenu](?docs=navigation-menu)
+- [NavigationMenu](?docs=navigation-menu)

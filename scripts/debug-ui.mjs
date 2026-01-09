@@ -27,6 +27,7 @@ import { runDocsSpinnerScenario } from "./scenarios/docs-spinner.mjs";
 import { runDocsAvatarScenario } from "./scenarios/docs-avatar.mjs";
 import { runDocsBreadcrumbsScenario } from "./scenarios/docs-breadcrumbs.mjs";
 import { runDocsAlertScenario } from "./scenarios/docs-alert.mjs";
+import { runDocsNavigationMenuScenario } from "./scenarios/docs-navigation-menu.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -50,6 +51,7 @@ const solidScenarioRunners = {
   "docs-avatar": (page, ctx) => runDocsAvatarScenario(page, ctx),
   "docs-breadcrumbs": (page, ctx) => runDocsBreadcrumbsScenario(page, ctx),
   "docs-alert": (page, ctx) => runDocsAlertScenario(page, ctx),
+  "docs-navigation-menu": (page, ctx) => runDocsNavigationMenuScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";
