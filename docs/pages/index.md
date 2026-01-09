@@ -56,7 +56,6 @@ Components:
 - [Label](?docs=label)
 - [FormField](?docs=form-field)
 - [Textarea](?docs=textarea)
-- [TextareaAutosize](?docs=textarea-autosize)
 - [Fieldset](?docs=fieldset)
 - [Checkbox](?docs=checkbox)
 - [RadioGroup](?docs=radio-group)

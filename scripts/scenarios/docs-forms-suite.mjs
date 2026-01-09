@@ -38,7 +38,8 @@ export async function runDocsFormsSuiteScenario(page, ctx) {
   await gotoDocs(page, "input-otp", timeoutMs);
   await runDocsInputOtpScenario(page, { timeoutMs });
 
-  await gotoDocs(page, "textarea-autosize", timeoutMs);
+  // Autosize lives on the Textarea docs page.
+  await gotoDocs(page, "textarea", timeoutMs);
   await runDocsTextareaAutosizeScenario(page, { timeoutMs });
 
   await gotoDocs(page, "checkbox", timeoutMs);

@@ -6,10 +6,11 @@ Dispose mountDocsTextareaAutosizeBasic(web.Element mount) {
   // #doc:region snippet
   return render(mount, () {
     final v = createSignal("Type multiple lines…");
-    final el = TextareaAutosize(
+    final el = Textarea(
       value: () => v.value,
       setValue: (next) => v.value = next,
       rows: 2,
+      autosize: true,
       maxHeightPx: 180,
       ariaLabel: "Autosize textarea",
     );
@@ -23,4 +24,3 @@ Dispose mountDocsTextareaAutosizeBasic(web.Element mount) {
   });
   // #doc:endregion snippet
 }
-
