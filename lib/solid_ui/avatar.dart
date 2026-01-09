@@ -3,7 +3,7 @@ import "dart:async";
 import "package:dart_web_test/solid.dart";
 import "package:web/web.dart" as web;
 
-import "./solid_dom.dart";
+import "../solid_dom/solid_dom.dart";
 
 /// Avatar primitive (shadcn-ish).
 ///

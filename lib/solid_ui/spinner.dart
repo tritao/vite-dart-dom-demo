@@ -19,4 +19,3 @@ web.HTMLElement Spinner({
   }
   return el;
 }
-

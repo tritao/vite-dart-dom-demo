@@ -2,6 +2,7 @@ import "dart:async";
 
 import "package:dart_web_test/solid.dart";
 import "package:dart_web_test/solid_dom.dart";
+import "package:dart_web_test/solid_ui.dart";
 import "package:web/web.dart" as web;
 
 Dispose mountDocsProgressBasic(web.Element mount) {
@@ -78,4 +79,3 @@ Dispose mountDocsProgressBasic(web.Element mount) {
   });
   // #doc:endregion snippet
 }
-

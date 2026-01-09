@@ -41,4 +41,3 @@ web.HTMLElement Badge({
     ..className = badgeClassName(variant: variant, className: className)
     ..textContent = label;
 }
-

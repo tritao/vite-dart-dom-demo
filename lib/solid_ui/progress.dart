@@ -54,4 +54,3 @@ web.HTMLElement Progress({
 
   return root;
 }
-
