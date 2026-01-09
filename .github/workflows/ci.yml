@@ -96,6 +96,30 @@ jobs:
           DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
         run: npm run debug:solid-toast:ci
 
+      - name: Docs Forms suite (Playwright)
+        if: runner.os == 'Linux'
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run debug:docs-forms-suite:ci
+
+      - name: Docs Overlay suite (Playwright)
+        if: runner.os == 'Linux'
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run debug:docs-overlay-suite:ci
+
+      - name: Docs UI suite (Playwright)
+        if: runner.os == 'Linux'
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run debug:docs-ui-suite:ci
+
+      - name: Docs props hydration (Playwright)
+        if: runner.os == 'Linux'
+        env:
+          DART: ${{ github.workspace }}/.dart-sdk/dart-sdk/bin/dart
+        run: npm run debug:docs-props:ci
+
       - name: Upload UI debug artifacts (on failure)
         if: failure() && runner.os == 'Linux'
         uses: actions/upload-artifact@v4

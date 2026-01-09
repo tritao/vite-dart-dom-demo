@@ -11,6 +11,7 @@
     "dev": "vite",
     "prebuild": "npm run dart:get && npm run docs:build",
     "build": "vite build",
+    "build:all": "BUILD_WORDPROC=1 vite build",
     "preview": "vite preview",
     "debug:ui": "node scripts/debug-ui.mjs --path \"/?demos=1\" --expect-h1 \"Dart + Vite (DOM demo)\" --expect-selector \"#app-root\"",
     "debug:ui:dev": "node scripts/debug-ui.mjs --mode dev --path \"/?demos=1\" --expect-h1 \"Dart + Vite (DOM demo)\" --expect-selector \"#app-root\"",
@@ -119,7 +120,11 @@
     "debug:docs-forms-suite": "node scripts/debug-ui.mjs --mode dev --path \"/docs.html?docs=forms\" --scenario docs-forms-suite --expect-h1 \"Forms\" --expect-selector \"#docs-root\"",
     "debug:docs-forms-suite:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/docs.html?docs=forms\" --scenario docs-forms-suite --expect-h1 \"Forms\" --expect-selector \"#docs-root\"",
     "debug:docs-props": "node scripts/debug-ui.mjs --mode dev --path \"/docs.html?docs=input\" --scenario docs-props --expect-h1 \"Input\" --expect-selector \"#docs-root\"",
-    "debug:docs-props:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/docs.html?docs=input\" --scenario docs-props --expect-h1 \"Input\" --expect-selector \"#docs-root\""
+    "debug:docs-props:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/docs.html?docs=input\" --scenario docs-props --expect-h1 \"Input\" --expect-selector \"#docs-root\"",
+    "debug:docs-ui-suite": "node scripts/debug-ui.mjs --mode dev --path \"/docs.html?docs=button\" --scenario docs-ui-suite --expect-h1 \"Button\" --expect-selector \"#docs-root\"",
+    "debug:docs-ui-suite:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/docs.html?docs=button\" --scenario docs-ui-suite --expect-h1 \"Button\" --expect-selector \"#docs-root\"",
+    "debug:docs-overlay-suite": "node scripts/debug-ui.mjs --mode dev --path \"/docs.html?docs=dialog\" --scenario docs-overlay-suite --expect-h1 \"Dialog\" --expect-selector \"#docs-root\"",
+    "debug:docs-overlay-suite:ci": "node scripts/debug-ui.mjs --mode dev --timeout-ms 240000 --path \"/docs.html?docs=dialog\" --scenario docs-overlay-suite --expect-h1 \"Dialog\" --expect-selector \"#docs-root\""
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

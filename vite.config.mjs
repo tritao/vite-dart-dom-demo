@@ -33,6 +33,12 @@ export default defineConfig(({ mode, command }) => {
         ? "./"
         : "/";
 
+  const buildWordproc =
+    env.BUILD_WORDPROC === "1" ||
+    env.VITE_BUILD_WORDPROC === "1" ||
+    process.env.BUILD_WORDPROC === "1" ||
+    process.env.VITE_BUILD_WORDPROC === "1";
+
   return {
     base,
     build: {
@@ -41,7 +47,9 @@ export default defineConfig(({ mode, command }) => {
           index: path.resolve(process.cwd(), "index.html"),
           docs: path.resolve(process.cwd(), "docs.html"),
           labs: path.resolve(process.cwd(), "labs.html"),
-          wordproc: path.resolve(process.cwd(), "wordproc.html"),
+          ...(buildWordproc
+            ? { wordproc: path.resolve(process.cwd(), "wordproc.html") }
+            : {}),
         },
       },
     },

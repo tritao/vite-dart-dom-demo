@@ -38,6 +38,19 @@ import { runDocsSliderScenario } from "./scenarios/docs-slider.mjs";
 import { runDocsScrollAreaScenario } from "./scenarios/docs-scroll-area.mjs";
 import { runDocsFormsSuiteScenario } from "./scenarios/docs-forms-suite.mjs";
 import { runDocsPropsScenario } from "./scenarios/docs-props.mjs";
+import { runDocsUiSuiteScenario } from "./scenarios/docs-ui-suite.mjs";
+import { runDocsOverlaySuiteScenario } from "./scenarios/docs-overlay-suite.mjs";
+import { runDocsDialogScenario } from "./scenarios/docs-dialog.mjs";
+import { runDocsPopoverScenario } from "./scenarios/docs-popover.mjs";
+import { runDocsTooltipScenario } from "./scenarios/docs-tooltip.mjs";
+import { runDocsDropdownMenuScenario } from "./scenarios/docs-dropdown-menu.mjs";
+import { runDocsMenubarScenario } from "./scenarios/docs-menubar.mjs";
+import { runDocsContextMenuScenario } from "./scenarios/docs-context-menu.mjs";
+import { runDocsToastScenario } from "./scenarios/docs-toast.mjs";
+import { runDocsButtonScenario } from "./scenarios/docs-button.mjs";
+import { runDocsToggleScenario } from "./scenarios/docs-toggle.mjs";
+import { runDocsCardScenario } from "./scenarios/docs-card.mjs";
+import { runDocsTableScenario } from "./scenarios/docs-table.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -72,6 +85,19 @@ const solidScenarioRunners = {
   "docs-scroll-area": (page, ctx) => runDocsScrollAreaScenario(page, ctx),
   "docs-forms-suite": (page, ctx) => runDocsFormsSuiteScenario(page, ctx),
   "docs-props": (page, ctx) => runDocsPropsScenario(page, ctx),
+  "docs-ui-suite": (page, ctx) => runDocsUiSuiteScenario(page, ctx),
+  "docs-overlay-suite": (page, ctx) => runDocsOverlaySuiteScenario(page, ctx),
+  "docs-dialog": (page, ctx) => runDocsDialogScenario(page, ctx),
+  "docs-popover": (page, ctx) => runDocsPopoverScenario(page, ctx),
+  "docs-tooltip": (page, ctx) => runDocsTooltipScenario(page, ctx),
+  "docs-dropdown-menu": (page, ctx) => runDocsDropdownMenuScenario(page, ctx),
+  "docs-menubar": (page, ctx) => runDocsMenubarScenario(page, ctx),
+  "docs-context-menu": (page, ctx) => runDocsContextMenuScenario(page, ctx),
+  "docs-toast": (page, ctx) => runDocsToastScenario(page, ctx),
+  "docs-button": (page, ctx) => runDocsButtonScenario(page, ctx),
+  "docs-toggle": (page, ctx) => runDocsToggleScenario(page, ctx),
+  "docs-card": (page, ctx) => runDocsCardScenario(page, ctx),
+  "docs-table": (page, ctx) => runDocsTableScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";
