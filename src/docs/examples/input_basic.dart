@@ -19,8 +19,10 @@ Dispose mountDocsInputBasic(web.Element mount) {
 
     final toggle = web.HTMLButtonElement()
       ..type = "button"
-      ..className = "btn secondary"
-      ..textContent = "Toggle disabled";
+      ..className = "btn secondary";
+    toggle.appendChild(text(
+      () => disabled.value ? "Enable input" : "Disable input",
+    ));
     on(toggle, "click", (_) => disabled.value = !disabled.value);
 
     final root = web.HTMLDivElement()..className = "row";
@@ -33,4 +35,3 @@ Dispose mountDocsInputBasic(web.Element mount) {
   });
   // #doc:endregion snippet
 }
-

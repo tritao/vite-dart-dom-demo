@@ -53,6 +53,19 @@
     box-shadow: 0 0 0 3px hsl(var(--ring) / 0.3);
   }
 
+  .input:disabled,
+  .input[data-disabled="true"] {
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground) / 0.65);
+    border-color: hsl(var(--border));
+    cursor: not-allowed;
+  }
+
+  .input:disabled::placeholder,
+  .input[data-disabled="true"]::placeholder {
+    color: hsl(var(--muted-foreground) / 0.75);
+  }
+
   .comboControl {
     flex: 1 1 240px;
     display: flex;

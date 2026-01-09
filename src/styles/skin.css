@@ -61,6 +61,19 @@
     box-shadow: 0 0 0 3px hsl(var(--ring) / 0.3);
   }
 
+  .textarea:disabled,
+  .textarea[data-disabled="true"] {
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground) / 0.65);
+    border-color: hsl(var(--border));
+    cursor: not-allowed;
+  }
+
+  .textarea:disabled::placeholder,
+  .textarea[data-disabled="true"]::placeholder {
+    color: hsl(var(--muted-foreground) / 0.75);
+  }
+
   .fieldset {
     width: min(720px, 100%);
     border: 1px solid hsl(var(--border));
