@@ -10,6 +10,8 @@ tags: [forms, ui]
 
 An OTP input splits a code across multiple inputs with paste support.
 
+By default it accepts digits only (non-digit characters are ignored). Use `allowedChar` if you need alphanumeric codes.
+
 :::demo id=input-otp-basic title="Basic InputOTP"
 Type digits, use Backspace to move, or paste a full code.
 :::
@@ -19,4 +21,3 @@ Type digits, use Backspace to move, or paste a full code.
 
 :::props name=InputOTP
 :::
-

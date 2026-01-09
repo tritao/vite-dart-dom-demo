@@ -1455,6 +1455,8 @@
       { "name": "max", "type": "double Function()?" },
       { "name": "step", "type": "double Function()?" },
       { "name": "disabled", "type": "bool Function()?" },
+      { "name": "allowedChar", "type": "RegExp?", "default": "RegExp(r\"[0-9]\")", "notes": "Allowed character filter; defaults to digits only." },
+      { "name": "inputPattern", "type": "String?", "default": "\"[0-9]*\"", "notes": "Optional HTML `pattern` attribute; defaults to digits." },
       { "name": "ariaLabel", "type": "String?" },
       { "name": "className", "type": "String", "default": "\"slider\"" }
     ]

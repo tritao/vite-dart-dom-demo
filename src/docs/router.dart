@@ -430,6 +430,15 @@ void mountSolidDocs(web.Element mount, String? page) {
     // loads; hydrate once the resource resolves.
     createRenderEffect(hydrateProps);
 
+    // Keep the title reactive to both slug and manifest availability.
+    createRenderEffect(() {
+      final m = manifest.value;
+      final currentSlug = slug.value;
+      final meta = m?.bySlug[currentSlug];
+      title.textContent =
+          meta?.title ?? (currentSlug == "index" ? "Solidus Docs" : currentSlug);
+    });
+
     createRenderEffect(() {
       cleanupMounted();
       content.textContent = "";
@@ -448,12 +457,6 @@ void mountSolidDocs(web.Element mount, String? page) {
       content.innerHTML = html.toJS;
 
       scheduleMicrotask(() {
-        final m = manifest.value;
-        final currentSlug = slug.value;
-        final meta = m?.bySlug[currentSlug];
-        title.textContent = meta?.title ??
-            (currentSlug == "index" ? "Solidus Docs" : currentSlug);
-
         final mounts = content.querySelectorAll("[data-doc-demo]");
         for (var i = 0; i < mounts.length; i++) {
           final node = mounts.item(i);

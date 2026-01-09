@@ -12,17 +12,27 @@ web.HTMLElement InputOTP({
   required String Function() value,
   required void Function(String next) setValue,
   bool Function()? disabled,
+  RegExp? allowedChar,
+  String? inputPattern,
   String className = "otp",
   String inputClassName = "otpInput",
   String? ariaLabel,
 }) {
   final isDisabled = disabled ?? () => false;
+  final allowed = allowedChar ?? RegExp(r"[0-9]");
+  final pattern = inputPattern ?? "[0-9]*";
   final inputs = <web.HTMLInputElement>[];
 
   String normalized(String raw) {
-    final digits = raw.replaceAll(RegExp(r"\s+"), "");
-    if (digits.length <= length) return digits;
-    return digits.substring(0, length);
+    final out = StringBuffer();
+    for (final rune in raw.runes) {
+      final ch = String.fromCharCode(rune);
+      if (ch.trim().isEmpty) continue;
+      if (!allowed.hasMatch(ch)) continue;
+      out.write(ch);
+      if (out.length >= length) break;
+    }
+    return out.toString();
   }
 
   void commitAt(int index, String nextChar) {
@@ -69,6 +79,7 @@ web.HTMLElement InputOTP({
       ..className = inputClassName
       ..setAttribute("data-index", i.toString())
       ..setAttribute("autocomplete", "one-time-code");
+    input.setAttribute("pattern", pattern);
 
     on(input, "keydown", (e) {
       if (e is! web.KeyboardEvent) return;
@@ -102,17 +113,19 @@ web.HTMLElement InputOTP({
 
     on(input, "input", (_) {
       if (isDisabled()) return;
-      final v = input.value;
+      final raw = input.value;
+      final v = normalized(raw);
       if (v.isEmpty) {
+        if (raw.isNotEmpty) input.value = "";
         commitAt(i, "");
         return;
       }
-      // Use the last typed char.
-      final ch = v.substring(v.length - 1);
-      commitAt(i, ch);
-      if (i < length - 1) {
-        scheduleMicrotask(() => inputs[i + 1].focus());
+      if (v.length > 1) {
+        commitMany(i, v);
+        return;
       }
+      commitAt(i, v);
+      if (i < length - 1) scheduleMicrotask(() => inputs[i + 1].focus());
     });
 
     on(input, "paste", (e) {
