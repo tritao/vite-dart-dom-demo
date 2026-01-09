@@ -22,6 +22,8 @@ import { runDocsRadioGroupScenario } from "./scenarios/docs-radio-group.mjs";
 import { runDocsToggleGroupScenario } from "./scenarios/docs-toggle-group.mjs";
 import { runDocsBadgeScenario } from "./scenarios/docs-badge.mjs";
 import { runDocsSeparatorScenario } from "./scenarios/docs-separator.mjs";
+import { runDocsProgressScenario } from "./scenarios/docs-progress.mjs";
+import { runDocsSpinnerScenario } from "./scenarios/docs-spinner.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -40,6 +42,8 @@ const solidScenarioRunners = {
   "docs-toggle-group": (page, ctx) => runDocsToggleGroupScenario(page, ctx),
   "docs-badge": (page, ctx) => runDocsBadgeScenario(page, ctx),
   "docs-separator": (page, ctx) => runDocsSeparatorScenario(page, ctx),
+  "docs-progress": (page, ctx) => runDocsProgressScenario(page, ctx),
+  "docs-spinner": (page, ctx) => runDocsSpinnerScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";

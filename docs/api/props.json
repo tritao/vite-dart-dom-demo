@@ -88,6 +88,55 @@
       }
     ]
   },
+  "Progress": {
+    "title": "Progress",
+    "rows": [
+      {
+        "name": "value",
+        "type": "double? Function()?",
+        "notes": "Current value. Return null to render indeterminate."
+      },
+      {
+        "name": "max",
+        "type": "double Function()?",
+        "default": "100.0",
+        "notes": "Maximum value for determinate progress."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label for the progressbar when there's no visible label."
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"progress\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "indicatorClassName",
+        "type": "String",
+        "default": "\"progressIndicator\"",
+        "notes": "CSS class for the inner indicator."
+      }
+    ]
+  },
+  "Spinner": {
+    "title": "Spinner",
+    "rows": [
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label (defaults to \"Loading\")."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"spinner\"",
+        "notes": "CSS class for the root."
+      }
+    ]
+  },
   "Checkbox": {
     "title": "Checkbox",
     "rows": [

@@ -35,6 +35,8 @@ Components:
 - [Button](?docs=button)
 - [Badge](?docs=badge)
 - [Separator](?docs=separator)
+- [Progress](?docs=progress)
+- [Spinner](?docs=spinner)
 - [Popover](?docs=popover)
 - [Tooltip](?docs=tooltip)
 - [DropdownMenu](?docs=dropdown-menu)

@@ -51,6 +51,58 @@
     align-self: stretch;
   }
 
+  .spinner {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    border-radius: 999px;
+    border: 2px solid hsl(var(--muted-foreground) / 0.25);
+    border-top-color: hsl(var(--muted-foreground) / 0.85);
+    animation: solidus-spin 0.9s linear infinite;
+  }
+
+  @keyframes solidus-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .progress {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
+    box-sizing: border-box;
+  }
+
+  .progressIndicator {
+    width: 100%;
+    height: 100%;
+    background: hsl(var(--primary));
+    transform: translateX(-100%);
+    transition: transform 200ms ease;
+    will-change: transform;
+  }
+
+  .progress[data-state="indeterminate"] .progressIndicator {
+    animation: solidus-progress-indeterminate 1.1s ease-in-out infinite;
+    transition: none;
+  }
+
+  @keyframes solidus-progress-indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(-30%);
+    }
+    100% {
+      transform: translateX(0%);
+    }
+  }
+
   .popperArrow {
     position: absolute;
     width: 10px;
