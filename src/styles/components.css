@@ -103,6 +103,84 @@
     }
   }
 
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    overflow: hidden;
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border));
+    box-sizing: border-box;
+    flex: 0 0 auto;
+  }
+
+  .avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .avatarFallback {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .avatar[data-state="loaded"] .avatarImage {
+    display: block;
+  }
+
+  .avatar[data-state="loaded"] .avatarFallback {
+    display: none;
+  }
+
+  .breadcrumbs {
+    display: block;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .breadcrumbList {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .breadcrumbItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .breadcrumbLink {
+    color: hsl(var(--muted-foreground));
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 2px 4px;
+  }
+
+  .breadcrumbLink:hover {
+    color: hsl(var(--foreground));
+    background: hsl(var(--accent));
+  }
+
+  .breadcrumbPage {
+    color: hsl(var(--foreground));
+    font-weight: 500;
+  }
+
+  .breadcrumbSeparator {
+    color: hsl(var(--muted-foreground));
+  }
+
   .popperArrow {
     position: absolute;
     width: 10px;

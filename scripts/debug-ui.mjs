@@ -24,6 +24,8 @@ import { runDocsBadgeScenario } from "./scenarios/docs-badge.mjs";
 import { runDocsSeparatorScenario } from "./scenarios/docs-separator.mjs";
 import { runDocsProgressScenario } from "./scenarios/docs-progress.mjs";
 import { runDocsSpinnerScenario } from "./scenarios/docs-spinner.mjs";
+import { runDocsAvatarScenario } from "./scenarios/docs-avatar.mjs";
+import { runDocsBreadcrumbsScenario } from "./scenarios/docs-breadcrumbs.mjs";
 
 const solidScenarioRunners = {
   ...solidBasicUiScenarios,
@@ -44,6 +46,8 @@ const solidScenarioRunners = {
   "docs-separator": (page, ctx) => runDocsSeparatorScenario(page, ctx),
   "docs-progress": (page, ctx) => runDocsProgressScenario(page, ctx),
   "docs-spinner": (page, ctx) => runDocsSpinnerScenario(page, ctx),
+  "docs-avatar": (page, ctx) => runDocsAvatarScenario(page, ctx),
+  "docs-breadcrumbs": (page, ctx) => runDocsBreadcrumbsScenario(page, ctx),
 };
 
 const HOST = "127.0.0.1";

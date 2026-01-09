@@ -137,6 +137,109 @@
       }
     ]
   },
+  "Avatar": {
+    "title": "Avatar",
+    "rows": [
+      {
+        "name": "src",
+        "type": "String? Function()?",
+        "notes": "Image src. When omitted/empty or when the image errors, the fallback is shown."
+      },
+      {
+        "name": "alt",
+        "type": "String?",
+        "notes": "Alt text for the image."
+      },
+      {
+        "name": "fallback",
+        "type": "String? Function()?",
+        "notes": "Fallback label (typically initials)."
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "default": "32",
+        "notes": "Size in pixels (width/height)."
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"avatar\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "imageClassName",
+        "type": "String",
+        "default": "\"avatarImage\"",
+        "notes": "CSS class for the <img>."
+      },
+      {
+        "name": "fallbackClassName",
+        "type": "String",
+        "default": "\"avatarFallback\"",
+        "notes": "CSS class for the fallback."
+      }
+    ]
+  },
+  "Breadcrumbs": {
+    "title": "Breadcrumbs",
+    "rows": [
+      {
+        "name": "items",
+        "type": "Iterable<BreadcrumbItem>",
+        "required": true,
+        "notes": "Breadcrumb items. The current page should set current=true (or omit href)."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String",
+        "default": "\"breadcrumb\"",
+        "notes": "Accessible label for the navigation."
+      },
+      {
+        "name": "separatorText",
+        "type": "String",
+        "default": "\"/\"",
+        "notes": "Text used between items (rendered as aria-hidden)."
+      },
+      {
+        "name": "rootClassName",
+        "type": "String",
+        "default": "\"breadcrumbs\"",
+        "notes": "CSS class for the root."
+      },
+      {
+        "name": "listClassName",
+        "type": "String",
+        "default": "\"breadcrumbList\"",
+        "notes": "CSS class for the list."
+      },
+      {
+        "name": "itemClassName",
+        "type": "String",
+        "default": "\"breadcrumbItem\"",
+        "notes": "CSS class for item <li> nodes."
+      },
+      {
+        "name": "linkClassName",
+        "type": "String",
+        "default": "\"breadcrumbLink\"",
+        "notes": "CSS class for non-current links."
+      },
+      {
+        "name": "pageClassName",
+        "type": "String",
+        "default": "\"breadcrumbPage\"",
+        "notes": "CSS class for the current page span."
+      },
+      {
+        "name": "separatorClassName",
+        "type": "String",
+        "default": "\"breadcrumbSeparator\"",
+        "notes": "CSS class for separator <li> nodes."
+      }
+    ]
+  },
   "Checkbox": {
     "title": "Checkbox",
     "rows": [

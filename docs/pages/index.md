@@ -37,6 +37,8 @@ Components:
 - [Separator](?docs=separator)
 - [Progress](?docs=progress)
 - [Spinner](?docs=spinner)
+- [Avatar](?docs=avatar)
+- [Breadcrumbs](?docs=breadcrumbs)
 - [Popover](?docs=popover)
 - [Tooltip](?docs=tooltip)
 - [DropdownMenu](?docs=dropdown-menu)

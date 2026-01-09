@@ -33,18 +33,22 @@ import "./examples/separator_basic.dart";
 import "./examples/toggle_group_basic.dart";
 import "./examples/progress_basic.dart";
 import "./examples/spinner_basic.dart";
+import "./examples/avatar_basic.dart";
+import "./examples/breadcrumbs_basic.dart";
 
 typedef DocsDemoMount = Dispose Function(web.Element mount);
 
 final Map<String, DocsDemoMount> docsDemos = {
   "button-basic": mountDocsButtonBasic,
   "badge-basic": mountDocsBadgeBasic,
+  "avatar-basic": mountDocsAvatarBasic,
   "checkbox-basic": mountDocsCheckboxBasic,
   "spinner-basic": mountDocsSpinnerBasic,
   "radio-group-basic": mountDocsRadioGroupBasic,
   "separator-basic": mountDocsSeparatorBasic,
   "toggle-group-basic": mountDocsToggleGroupBasic,
   "progress-basic": mountDocsProgressBasic,
+  "breadcrumbs-basic": mountDocsBreadcrumbsBasic,
   "dialog-basic": mountDocsDialogBasic,
   "overlay-basic": mountDocsOverlayBasic,
   "focus-scope-basic": mountDocsFocusScopeBasic,
