@@ -1250,5 +1250,107 @@
         "notes": "CSS class for the thumb element."
       }
     ]
+  },
+  "Input": {
+    "title": "Input",
+    "rows": [
+      {
+        "name": "type",
+        "type": "String",
+        "default": "\"text\"",
+        "notes": "Input type (text, email, password, etc)."
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"input\"",
+        "notes": "CSS class for the input element."
+      },
+      {
+        "name": "ariaLabel",
+        "type": "String?",
+        "notes": "Accessible label (required if there is no visible <label>)."
+      },
+      {
+        "name": "placeholder",
+        "type": "String?"
+      },
+      {
+        "name": "disabled",
+        "type": "bool Function()?",
+        "notes": "Disables the control."
+      },
+      {
+        "name": "value",
+        "type": "String? Function()?",
+        "notes": "Controlled value accessor."
+      },
+      {
+        "name": "setValue",
+        "type": "void Function(String next)?",
+        "notes": "Controlled value setter (wired to input events)."
+      }
+    ]
+  },
+  "Label": {
+    "title": "Label",
+    "rows": [
+      {
+        "name": "text",
+        "type": "String",
+        "required": true,
+        "notes": "Visible label text."
+      },
+      {
+        "name": "htmlFor",
+        "type": "String?",
+        "notes": "Id of the labeled control."
+      },
+      {
+        "name": "required",
+        "type": "bool",
+        "default": "false",
+        "notes": "Marks the label as required (adds an asterisk via CSS)."
+      },
+      {
+        "name": "className",
+        "type": "String",
+        "default": "\"label\""
+      }
+    ]
+  },
+  "FormField": {
+    "title": "FormField",
+    "rows": [
+      {
+        "name": "control",
+        "type": "HTMLElement",
+        "required": true,
+        "notes": "The form control element (e.g. Input, Select trigger)."
+      },
+      {
+        "name": "label",
+        "type": "String? Function()?",
+        "notes": "Label text shown above the control."
+      },
+      {
+        "name": "description",
+        "type": "String? Function()?",
+        "notes": "Helper text shown below the control."
+      },
+      {
+        "name": "error",
+        "type": "String? Function()?",
+        "notes": "Error text shown below the control (also sets aria-invalid)."
+      },
+      {
+        "name": "id",
+        "type": "String?"
+      }
+    ]
   }
 }

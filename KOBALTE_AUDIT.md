@@ -42,9 +42,10 @@ Audit in dependency order: **foundations → selection core → composed compone
    - Menu core: `lib/solid_dom/core/menu.dart`
    - DropdownMenu core: `lib/solid_dom/core/dropdown_menu.dart`
    - UI wrappers: `lib/solid_ui/dropdown_menu.dart`, `lib/solid_ui/menubar.dart`, `lib/solid_ui/context_menu.dart`
-   - Popover/Tooltip: `lib/solid_dom/popover.dart`, `lib/solid_dom/tooltip.dart`
-   - Dialog: `lib/solid_dom/dialog.dart`
-   - Toast: `lib/solid_dom/toast.dart`
+   - Popover/Tooltip (core): `lib/solid_dom/core/popover.dart`, `lib/solid_dom/core/tooltip.dart`
+   - Dialog (core): `lib/solid_dom/core/dialog.dart`
+   - Toast (core): `lib/solid_dom/core/toast.dart`
+   - UI wrappers: `lib/solid_ui/popover.dart`, `lib/solid_ui/tooltip.dart`, `lib/solid_ui/dialog.dart`, `lib/solid_ui/toast.dart`
 
 ## Kobalte → Dart mapping (starting point)
 
@@ -88,17 +89,17 @@ Use this as the “what file should I read?” index during the audit.
 
 - Dialog
   - Kobalte: `.cache/refs/kobalte/packages/core/src/dialog/*`
-  - Dart: `lib/solid_dom/dialog.dart` (+ `overlay.dart`, `focus_scope.dart`)
+  - Dart: `lib/solid_dom/core/dialog.dart` (+ `overlay.dart`, `focus_scope.dart`)
   - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-overlay`
 
 - Popover
   - Kobalte: `.cache/refs/kobalte/packages/core/src/popover/*`
-  - Dart: `lib/solid_dom/popover.dart` (+ `overlay.dart`, `floating.dart`, `focus_scope.dart`)
+  - Dart: `lib/solid_dom/core/popover.dart` (+ `overlay.dart`, `floating.dart`, `focus_scope.dart`)
   - Tests: `npm run debug:solid-popover`, `npm run debug:solid-popover-position`, `npm run debug:solid-popover-flip`
 
 - Tooltip
   - Kobalte: `.cache/refs/kobalte/packages/core/src/tooltip/*`
-  - Dart: `lib/solid_dom/tooltip.dart` (+ `overlay.dart`, `floating.dart`)
+  - Dart: `lib/solid_dom/core/tooltip.dart` (+ `overlay.dart`, `floating.dart`)
   - Tests: `npm run debug:solid-tooltip`
 
 - Menu / DropdownMenu
@@ -123,7 +124,7 @@ Use this as the “what file should I read?” index during the audit.
 
 - Toast
   - Kobalte: `.cache/refs/kobalte/packages/core/src/toast/*`
-  - Dart: `lib/solid_dom/toast.dart` (+ `overlay.dart` top-layer rules)
+  - Dart: `lib/solid_dom/core/toast.dart` (+ `overlay.dart` top-layer rules)
   - Tests: `npm run debug:solid-toast`
 
 ## Audit workflow (how we’ll run it)

@@ -116,6 +116,31 @@
     flex: 0 0 auto;
   }
 
+  .avatar[data-size="24"] {
+    width: 24px;
+    height: 24px;
+  }
+
+  .avatar[data-size="32"] {
+    width: 32px;
+    height: 32px;
+  }
+
+  .avatar[data-size="40"] {
+    width: 40px;
+    height: 40px;
+  }
+
+  .avatar[data-size="48"] {
+    width: 48px;
+    height: 48px;
+  }
+
+  .avatar[data-size="64"] {
+    width: 64px;
+    height: 64px;
+  }
+
   .avatarImage {
     width: 100%;
     height: 100%;

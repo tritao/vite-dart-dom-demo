@@ -9,6 +9,9 @@ export "solid_ui/combobox.dart";
 export "solid_ui/context_menu.dart";
 export "solid_ui/dialog.dart";
 export "solid_ui/dropdown_menu.dart";
+export "solid_ui/form_field.dart";
+export "solid_ui/input.dart";
+export "solid_ui/label.dart";
 export "solid_ui/listbox.dart";
 export "solid_ui/navigation_menu.dart";
 export "solid_ui/menubar.dart";
@@ -23,6 +26,9 @@ export "solid_ui/tabs.dart";
 export "solid_ui/toast.dart";
 export "solid_ui/toggle_group.dart";
 export "solid_ui/tooltip.dart";
+
+// Re-export Solid-style DOM helpers so docs/demos can import only `solid_ui`.
+export "solid_dom/solid_dom.dart";
 
 export "solid_dom/core/accordion.dart" show AccordionItem;
 export "solid_dom/core/combobox.dart" show ComboboxOption, ComboboxFilter;

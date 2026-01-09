@@ -21,10 +21,12 @@ web.HTMLElement Avatar({
   final srcAccessor = src ?? () => null;
   final fallbackAccessor = fallback ?? () => "";
 
+  final supportedSizes = const <int>{24, 32, 40, 48, 64};
+  final resolvedSize = supportedSizes.contains(size) ? size : 32;
+
   final root = web.HTMLSpanElement()
     ..className = rootClassName
-    ..style.width = "${size}px"
-    ..style.height = "${size}px";
+    ..setAttribute("data-size", resolvedSize.toString());
 
   final img = web.HTMLImageElement()..className = imageClassName;
   if (alt != null && alt.isNotEmpty) img.alt = alt;

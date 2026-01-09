@@ -37,6 +37,9 @@ import "./examples/avatar_basic.dart";
 import "./examples/breadcrumbs_basic.dart";
 import "./examples/alert_basic.dart";
 import "./examples/navigation_menu_basic.dart";
+import "./examples/input_basic.dart";
+import "./examples/label_basic.dart";
+import "./examples/form_field_basic.dart";
 
 typedef DocsDemoMount = Dispose Function(web.Element mount);
 
@@ -45,6 +48,9 @@ final Map<String, DocsDemoMount> docsDemos = {
   "badge-basic": mountDocsBadgeBasic,
   "avatar-basic": mountDocsAvatarBasic,
   "alert-basic": mountDocsAlertBasic,
+  "input-basic": mountDocsInputBasic,
+  "label-basic": mountDocsLabelBasic,
+  "form-field-basic": mountDocsFormFieldBasic,
   "checkbox-basic": mountDocsCheckboxBasic,
   "spinner-basic": mountDocsSpinnerBasic,
   "radio-group-basic": mountDocsRadioGroupBasic,
