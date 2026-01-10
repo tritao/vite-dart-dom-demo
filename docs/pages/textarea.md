@@ -34,5 +34,4 @@ Type multiple lines to expand the height.
 :::props name=Textarea
 :::
 
-:::props name=TextareaAutosize
-:::
+`TextareaAutosize(...)` is an equivalent wrapper around `Textarea(autosize: true, ...)` and takes the same arguments, except it doesn’t include the `autosize` parameter.
