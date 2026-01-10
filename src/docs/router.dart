@@ -105,14 +105,13 @@ Future<DocsManifest> _fetchManifest() async {
   }
 
   const orderedGroups = <String>[
-    "Docs",
-    "Forms",
-    "UI",
     "Runtime",
-    "Navigation",
+    "UI",
     "Overlays & Menus",
     "Selection",
+    "Forms",
     "Foundations",
+    "Docs",
   ];
   final rank = <String, int>{
     for (var i = 0; i < orderedGroups.length; i++) orderedGroups[i]: i,

@@ -38,7 +38,7 @@ Example:
 
 ## UI helpers
 
-Use `solid_ui` helpers to keep scaffolding consistent:
+Use `solidus_ui` helpers to keep scaffolding consistent:
 
 - `buildInputGroup(...)`
 - `buildSelectControl(...)`

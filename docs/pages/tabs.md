@@ -1,8 +1,8 @@
 ---
 title: Tabs
 slug: tabs
-group: Navigation
-order: 10
+group: UI
+order: 70
 description: Tab list + tab panels with roving focus.
 labHref: "?lab=tabs"
 status: beta

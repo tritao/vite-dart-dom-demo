@@ -1,8 +1,8 @@
 ---
 title: Accordion
 slug: accordion
-group: Navigation
-order: 20
+group: UI
+order: 80
 description: Expand/collapse sections with keyboard support.
 labHref: "?lab=accordion"
 status: beta

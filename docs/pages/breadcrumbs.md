@@ -1,8 +1,8 @@
 ---
 title: Breadcrumbs
 slug: breadcrumbs
-group: Navigation
-order: 5
+group: UI
+order: 50
 description: Hierarchical navigation trail.
 status: beta
 tags: [navigation, a11y]
@@ -24,4 +24,3 @@ A simple breadcrumb trail.
 
 :::props name=Breadcrumbs
 :::
-

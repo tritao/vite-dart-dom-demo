@@ -1,8 +1,8 @@
 ---
 title: NavigationMenu
 slug: navigation-menu
-group: Navigation
-order: 6
+group: UI
+order: 60
 description: Top navigation with hover/click panels.
 status: beta
 tags: [navigation, overlays, a11y]
@@ -25,4 +25,3 @@ Hover/click the triggers; press Escape to close.
 
 :::props name=NavigationMenu
 :::
-

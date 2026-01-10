@@ -14,11 +14,47 @@ If you only need querystring helpers (like `?docs=...`), see: [Routing (URL quer
 
 ## Pieces
 
-- `BrowserRouter`: tracks location and updates on `popstate` / `hashchange`
-- `Routes`: renders the best match (supports nested routes)
-- `Link`: client-side navigation without full page reload
-- Hooks: `useLocation`, `useNavigate`, `useParams`, `useMatches`
-- `Outlet()`: placeholder for nested route children
+### `BrowserRouter`
+
+Tracks the current location, computes matches/params, and provides navigation helpers.
+
+Use it once per app (usually at the root).
+
+### `RouteDef` / `RouteMatch`
+
+Defines route patterns and the match results (including merged `params`).
+
+Use `RouteDef(children: ...)` for nesting.
+
+### `RouterProvider(router: ..., children: ...)`
+
+Provides the router to the subtree.
+
+Use it to wrap the part of your app that needs routing hooks/components.
+
+### `Routes(fallback: ...)`
+
+Renders the best match chain and wires up nested routes via `Outlet()`.
+
+Use it as the “router outlet” of your app.
+
+### `Outlet()`
+
+Placeholder for nested route children.
+
+Use it inside a parent route view that wants to render its child route.
+
+### `Link(to: ... | toFn: ...)`
+
+Client-side navigation without full page reload.
+
+Use it instead of raw `<a href>` for internal links.
+
+### Hooks: `useLocation`, `useMatches`, `useParams`, `useSearchParams`, `useNavigate`
+
+Small helpers for reading router state and navigating.
+
+Use them inside code that runs under `RouterProvider`.
 
 All are exported from `package:solidus/solidus_router.dart`.
 
@@ -130,6 +166,41 @@ final btn = web.HTMLButtonElement()
 on(btn, "click", (_) => nav("/", replace: true));
 ```
 
+## Matches (`useMatches`)
+
+`useMatches()` returns the current match chain (root → leaf). This is useful for:
+
+- building breadcrumbs
+- per-route layouts (based on matched path)
+- deciding which “shell” to show for a section of the app
+
+```dart
+final matches = useMatches();
+
+createEffect(() {
+  final paths = [for (final m in matches.value) m.matchedPath].join(" → ");
+  // e.g. log, render breadcrumbs, etc.
+});
+```
+
+## Router helpers (`href` / `resolve`)
+
+`BrowserRouter.href(to)` computes a browser URL for a destination string. `resolve(to)` returns the internal `Uri` relative to the current location.
+
+Use this when you need URLs outside of `Link` (e.g. setting `location.href`, building a copy-link button).
+
+```dart
+final router = useRouter();
+
+final copy = web.HTMLButtonElement()
+  ..type = "button"
+  ..textContent = "Copy link";
+on(copy, "click", (_) {
+  final url = router.href("/users/123?tab=billing");
+  // copy to clipboard, etc.
+});
+```
+
 ## Search params (querystring)
 
 `useSearchParams()` gives you a small helper for `?k=v` on top of the current path.
@@ -159,40 +230,6 @@ createRenderEffect(() {
   final active = loc.value.path == "/settings/profile";
   a.className = active ? "active" : "";
 });
-```
-
-## Is this enough for serious apps?
-
-Yes for many SPAs, as long as you’re okay with a **small, explicit** router:
-
-- You get nested routes, params, query helpers, and `Link`/`navigate`.
-- You don’t get “full framework router” features like loaders/actions, route ranking, scroll restoration, transitions, prefetching, or error boundaries.
-
-If you need those, a reasonable next step is a higher-level layer on top of this router (route tree + loaders + pending/error UI) while keeping `BrowserRouter` as the primitive.
-
-## “What people expect” (a realistic next design)
-
-If Solidus grows a higher-level router, the usual expectations are:
-
-- **Route ranking** (so `/users/:id` doesn’t depend on manual ordering)
-- **Loaders + pending UI** (data loading per route, with `pendingView`)
-- **Error UI** (route-level error boundaries, `errorView`)
-- **Redirects** (`redirect(to)` from loaders or guards)
-- **Scroll restoration** (optional but expected)
-- **Prefetching** (`Link(prefetch: ...)` or `router.preload(...)`)
-
-A simple (still-Dart/DOM-first) shape could look like:
-
-```dart
-final routes = [
-  RouteDef(
-    path: "/users/:id",
-    // loader: (match) async => await fetchUser(match.params["id"]!),
-    view: (m) => UserPage(id: m.params["id"]!),
-    // pendingView: (_) => Spinner(),
-    // errorView: (e) => ErrorPanel(e),
-  ),
-];
 ```
 
 ## Hosting note (history routing)

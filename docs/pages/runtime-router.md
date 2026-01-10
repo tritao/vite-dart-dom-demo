@@ -21,12 +21,31 @@ For path-based routing (nested routes, params, Links), see: [Browser router (pat
 
 ### Read
 
-- `getQueryParam(key)` → current `?key=value` (or `null`)
-- `getQueryFlag(key, defaultValue: false)` → convenience for flags like `?debug=1` / `?debug=true`
+#### `getQueryParam(key)`
+
+Returns the current `?key=value` (or `null`).
+
+Use it to read string params that drive state (tabs, filters, ids).
+
+```dart
+final tab = router.getQueryParam("tab") ?? "overview";
+```
+
+#### `getQueryFlag(key, defaultValue: false)`
+
+Returns a boolean flag from `?key=1|true|0|false` (or a default).
+
+Use it for feature flags and debug toggles.
+
+```dart
+final debug = router.getQueryFlag("debug");
+```
 
 ### Write
 
-`setQueryParam(key, value, replace: true)` updates the current URL:
+#### `setQueryParam(key, value, replace: true)`
+
+Updates the current URL querystring, keeping other params intact.
 
 - `replace: true` (default) → `history.replaceState(...)` (does not add a new history entry)
 - `replace: false` → `history.pushState(...)` (adds a history entry; back/forward will traverse it)
@@ -35,7 +54,9 @@ Passing `value: null` removes the key from the querystring.
 
 ### Back/forward
 
-`listenPopState((uri) { ... })` lets you react to browser navigation (back/forward).
+#### `listenPopState((uri) { ... })`
+
+Lets you react to back/forward navigation.
 
 It returns a dispose function you can call to stop listening.
 

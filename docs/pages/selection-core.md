@@ -1,8 +1,8 @@
 ---
 title: Selection core
 slug: selection-core
-group: Foundations
-order: 50
+group: Selection
+order: 0
 description: SelectionManager + selectable collection/item utilities.
 labHref: "?lab=selection"
 status: beta

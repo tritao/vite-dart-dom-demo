@@ -1,7 +1,7 @@
 ---
 title: Theming
 slug: theming
-group: UI
+group: Foundations
 order: 0
 description: Theme tokens, accent palettes, and radius presets.
 status: beta
@@ -35,7 +35,7 @@ Preferences are persisted in `localStorage` and applied early (before Vite loads
 
 ## Theme contract (for component authors)
 
-When adding a new `solid_ui` component:
+When adding a new `solidus_ui` component:
 
 - Use **tokens** (`hsl(var(--...))`) instead of hardcoded colors.
 - Prefer **semantic tokens** (`--background`, `--foreground`, `--border`, `--muted`, `--accent`, `--popover`, `--ring`) over palette-specific ones.
