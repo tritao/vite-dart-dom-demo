@@ -4,7 +4,7 @@ slug: switch
 group: Forms
 order: 10
 description: Accessible boolean toggle.
-labHref: "?solid=switch"
+labHref: "?lab=switch"
 status: beta
 tags: [forms, a11y]
 ---

@@ -42,7 +42,7 @@ web.DocumentFragment createDialog({
 
         final dialog = builder(close);
         dialog.setAttribute("role", role);
-        dialog.setAttribute("data-solid-dialog-content", "1");
+        dialog.setAttribute("data-solidus-dialog-content", "1");
         if (modal) dialog.setAttribute("aria-modal", "true");
         if (labelledBy != null) {
           dialog.setAttribute("aria-labelledby", labelledBy);
@@ -54,12 +54,12 @@ web.DocumentFragment createDialog({
 
         final usesWrapper = modal || backdrop;
         final wrapper = web.HTMLDivElement()
-          ..setAttribute("data-solid-dialog-wrapper", "1");
+          ..setAttribute("data-solidus-dialog-wrapper", "1");
 
         web.HTMLElement? backdropEl;
         if (backdrop) {
           final el = web.HTMLDivElement()
-            ..setAttribute("data-solid-backdrop", "1");
+            ..setAttribute("data-solidus-backdrop", "1");
           if (backdropId != null) el.id = backdropId;
           if (backdropClassName != null) el.className = backdropClassName;
           backdropEl = el;

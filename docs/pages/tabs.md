@@ -4,7 +4,7 @@ slug: tabs
 group: Navigation
 order: 10
 description: Tab list + tab panels with roving focus.
-labHref: "?solid=tabs"
+labHref: "?lab=tabs"
 status: beta
 tags: [a11y, navigation]
 ---

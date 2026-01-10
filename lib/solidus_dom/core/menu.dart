@@ -346,7 +346,7 @@ web.DocumentFragment createMenu({
         var closeReason = "close";
 
         final rootWrapper = web.HTMLDivElement()
-          ..setAttribute("data-solid-menu-wrapper", "1");
+          ..setAttribute("data-solidus-menu-wrapper", "1");
 
         void closeRoot([String reason = "close"]) {
           closeReason = reason;
@@ -715,7 +715,7 @@ web.DocumentFragment createMenu({
                 if (rt != null && (identical(rt, contentEl) || contentEl.contains(rt))) {
                   return;
                 }
-                final place = contentEl.getAttribute("data-solid-placement") ??
+                final place = contentEl.getAttribute("data-solidus-placement") ??
                     (_documentDirection() == "rtl" ? "left-start" : "right-start");
                 // Bias the direction check toward the submenu side at the
                 // moment we set the grace intent.

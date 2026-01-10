@@ -229,11 +229,7 @@ String _expandDirectives(String input, {String? labHref}) {
       if (bodyHtml.isNotEmpty) {
         out.writeln('  <div class="docDemoDesc muted">$bodyHtml</div>');
       }
-      out.writeln('  <div class="docDemoMount">');
-      out.writeln(
-        '    <iframe class="docDemoIframe" data-doc-demo="${_escapeHtml(id)}" loading="lazy" src="docs-embed.html?demo=${_escapeHtml(id)}"></iframe>',
-      );
-      out.writeln("  </div>");
+      out.writeln('  <div class="docDemoMount" data-doc-demo="${_escapeHtml(id)}"></div>');
       out.writeln("</div>");
       continue;
     }

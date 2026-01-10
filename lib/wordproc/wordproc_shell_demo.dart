@@ -3,7 +3,7 @@ import "dart:convert";
 
 import "package:solidus/solidus.dart";
 import "package:solidus/solidus_dom.dart";
-import "package:solidus/demo/solid_demo_nav.dart";
+import "package:solidus/demo/labs_demo_nav.dart";
 import "package:web/web.dart" as web;
 
 import "./editor_bridge.dart";
@@ -142,15 +142,15 @@ void _persist({
   );
 }
 
-void mountSolidWordprocShellDemo(web.Element mount) {
+void mountWordprocShellDemo(web.Element mount) {
   render(mount, () {
     final root = web.HTMLDivElement()
       ..id = "wordproc-root"
       ..className = "wordproc";
 
-    root.appendChild(solidDemoNav(active: "wordproc"));
+    root.appendChild(labsDemoNav(active: "wordproc"));
     root.appendChild(
-      web.HTMLHeadingElement.h1()..textContent = "Solid Wordproc Shell Demo",
+      web.HTMLHeadingElement.h1()..textContent = "Solidus Wordproc Shell Demo",
     );
 
     final persisted = _loadPersisted();

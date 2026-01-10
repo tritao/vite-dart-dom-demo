@@ -4,7 +4,7 @@ slug: popper
 group: Foundations
 order: 40
 description: Position floating elements relative to anchors (via attachPopper).
-labHref: "?solid=popover"
+labHref: "?lab=popover"
 status: beta
 tags: [overlay, positioning]
 ---

@@ -165,9 +165,9 @@ Map<String, Object?> _readExisting(String path) {
 PropsSpec? _extractComponentSpec(String name) {
   // Prefer UI components; fall back to primitives/core if needed.
   final searchDirs = <String>[
-    "lib/solid_ui",
-    "lib/solid_dom/core",
-    "lib/solid_dom",
+    "lib/solidus_ui",
+    "lib/solidus_dom/core",
+    "lib/solidus_dom",
     "lib",
   ];
 

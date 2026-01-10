@@ -4,7 +4,7 @@ slug: dropdown-menu
 group: Overlays & Menus
 order: 40
 description: Button-triggered menu with typeahead and submenus.
-labHref: "?solid=dropdownmenu"
+labHref: "?lab=dropdownmenu"
 status: beta
 tags: [menu, overlay, a11y]
 ---

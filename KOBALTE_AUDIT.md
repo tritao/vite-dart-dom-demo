@@ -1,4 +1,4 @@
-# Kobalte Parity Audit (Solid DOM in Dart)
+# Kobalte Parity Audit (Solidus DOM in Dart)
 
 Goal: systematically compare our Solid DOM primitives/components to Kobalte’s “core” behavior and close gaps without chasing regressions.
 
@@ -23,29 +23,29 @@ If you need to re-clone:
 Audit in dependency order: **foundations → selection core → composed components**.
 
 1) Foundations (fix once, benefits everything)
-   - Event/listener lifecycle glue: `lib/solid_dom/solid_dom.dart`
-   - Focus management (stack + sentinels + trap/loop + restore): `lib/solid_dom/focus_scope.dart`
-   - Outside interaction + stacking + pointer-blocking: `lib/solid_dom/overlay.dart`
-   - Positioning: `lib/solid_dom/floating.dart` + `vendor/floating_ui_bridge.js`
+   - Event/listener lifecycle glue: `lib/solidus_dom/solid_dom.dart`
+   - Focus management (stack + sentinels + trap/loop + restore): `lib/solidus_dom/focus_scope.dart`
+   - Outside interaction + stacking + pointer-blocking: `lib/solidus_dom/overlay.dart`
+   - Positioning: `lib/solidus_dom/floating.dart` + `vendor/floating_ui_bridge.js`
 
 2) Selection/navigation core (shared by menu/listbox/select/combobox)
-   - `lib/solid_dom/selection/selection_manager.dart`
-   - `lib/solid_dom/selection/create_selectable_collection.dart`
-   - `lib/solid_dom/selection/create_selectable_item.dart`
-   - Typeahead: `lib/solid_dom/selection/create_type_select.dart`
+   - `lib/solidus_dom/selection/selection_manager.dart`
+   - `lib/solidus_dom/selection/create_selectable_collection.dart`
+   - `lib/solidus_dom/selection/create_selectable_item.dart`
+   - Typeahead: `lib/solidus_dom/selection/create_type_select.dart`
 
 3) Reference components (compose the above)
-   - Listbox (core): `lib/solid_dom/core/listbox.dart`
-   - Select (core): `lib/solid_dom/core/select.dart`
-   - Combobox (core): `lib/solid_dom/core/combobox.dart`
-   - UI wrappers: `lib/solid_ui/listbox.dart`, `lib/solid_ui/select.dart`, `lib/solid_ui/combobox.dart`
-   - Menu core: `lib/solid_dom/core/menu.dart`
-   - DropdownMenu core: `lib/solid_dom/core/dropdown_menu.dart`
-   - UI wrappers: `lib/solid_ui/dropdown_menu.dart`, `lib/solid_ui/menubar.dart`, `lib/solid_ui/context_menu.dart`
-   - Popover/Tooltip (core): `lib/solid_dom/core/popover.dart`, `lib/solid_dom/core/tooltip.dart`
-   - Dialog (core): `lib/solid_dom/core/dialog.dart`
-   - Toast (core): `lib/solid_dom/core/toast.dart`
-   - UI wrappers: `lib/solid_ui/popover.dart`, `lib/solid_ui/tooltip.dart`, `lib/solid_ui/dialog.dart`, `lib/solid_ui/toast.dart`
+   - Listbox (core): `lib/solidus_dom/core/listbox.dart`
+   - Select (core): `lib/solidus_dom/core/select.dart`
+   - Combobox (core): `lib/solidus_dom/core/combobox.dart`
+   - UI wrappers: `lib/solidus_ui/listbox.dart`, `lib/solidus_ui/select.dart`, `lib/solidus_ui/combobox.dart`
+   - Menu core: `lib/solidus_dom/core/menu.dart`
+   - DropdownMenu core: `lib/solidus_dom/core/dropdown_menu.dart`
+   - UI wrappers: `lib/solidus_ui/dropdown_menu.dart`, `lib/solidus_ui/menubar.dart`, `lib/solidus_ui/context_menu.dart`
+   - Popover/Tooltip (core): `lib/solidus_dom/core/popover.dart`, `lib/solidus_dom/core/tooltip.dart`
+   - Dialog (core): `lib/solidus_dom/core/dialog.dart`
+   - Toast (core): `lib/solidus_dom/core/toast.dart`
+   - UI wrappers: `lib/solidus_ui/popover.dart`, `lib/solidus_ui/tooltip.dart`, `lib/solidus_ui/dialog.dart`, `lib/solidus_ui/toast.dart`
 
 ## Kobalte → Dart mapping (starting point)
 
@@ -55,77 +55,77 @@ Use this as the “what file should I read?” index during the audit.
 
 - Focus scope
   - Kobalte: `.cache/refs/kobalte/packages/core/src/primitives/create-focus-scope/create-focus-scope.tsx`
-  - Dart: `lib/solid_dom/focus_scope.dart`
-  - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-overlay`
+  - Dart: `lib/solidus_dom/focus_scope.dart`
+  - Tests: `npm run debug:labs-dialog`, `npm run debug:labs-overlay`
 
 - Interact-outside
   - Kobalte: `.cache/refs/kobalte/packages/core/src/primitives/create-interact-outside/create-interact-outside.ts`
-  - Dart: `lib/solid_dom/overlay.dart` (`dismissableLayer`)
-  - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-popover`, `npm run debug:solid-tooltip`, `npm run debug:solid-dropdownmenu`, `npm run debug:solid-select`
+  - Dart: `lib/solidus_dom/overlay.dart` (`dismissableLayer`)
+  - Tests: `npm run debug:labs-dialog`, `npm run debug:labs-popover`, `npm run debug:labs-tooltip`, `npm run debug:labs-dropdownmenu`, `npm run debug:labs-select`
 
 - Dismissable layer stacking / pointer blocking
   - Kobalte: `.cache/refs/kobalte/packages/core/src/dismissable-layer/*`
-  - Dart: `lib/solid_dom/overlay.dart` (`dismissableLayer`, `data-solid-top-layer` rules)
-  - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-overlay`, `npm run debug:solid-toast`
+  - Dart: `lib/solidus_dom/overlay.dart` (`dismissableLayer`, top-layer rules)
+  - Tests: `npm run debug:labs-dialog`, `npm run debug:labs-overlay`, `npm run debug:labs-toast`
 
 - Hide outside (aria-hidden / inert)
   - Kobalte: `.cache/refs/kobalte/packages/core/src/primitives/create-hide-outside/*`
-  - Dart: `lib/solid_dom/overlay.dart` (`ariaHideOthers`)
-  - Tests: `npm run debug:solid-overlay`, `npm run debug:solid-dialog`
+  - Dart: `lib/solidus_dom/overlay.dart` (`ariaHideOthers`)
+  - Tests: `npm run debug:labs-overlay`, `npm run debug:labs-dialog`
 
 - Positioning (Popper)
   - Kobalte: `.cache/refs/kobalte/packages/core/src/popper/*`
-  - Dart: `lib/solid_dom/floating.dart` (Floating UI bridge preferred, fallback algo)
-  - Tests: `npm run debug:solid-popover-position`, `npm run debug:solid-popover-flip`
+  - Dart: `lib/solidus_dom/floating.dart` (Floating UI bridge preferred, fallback algo)
+  - Tests: `npm run debug:labs-popover-position`, `npm run debug:labs-popover-flip`
 
 ### Selection core
 
 - Selection manager + selectable collection/item + typeahead
   - Kobalte: `.cache/refs/kobalte/packages/core/src/selection/*`
-  - Dart: `lib/solid_dom/selection/*`
-  - Tests: `npm run debug:solid-selection`, `npm run debug:solid-listbox`, `npm run debug:solid-select`, `npm run debug:solid-combobox`, `npm run debug:solid-dropdownmenu`
+  - Dart: `lib/solidus_dom/selection/*`
+  - Tests: `npm run debug:labs-selection`, `npm run debug:labs-listbox`, `npm run debug:labs-select`, `npm run debug:labs-combobox`, `npm run debug:labs-dropdownmenu`
 
 ### Components
 
 - Dialog
   - Kobalte: `.cache/refs/kobalte/packages/core/src/dialog/*`
-  - Dart: `lib/solid_dom/core/dialog.dart` (+ `overlay.dart`, `focus_scope.dart`)
-  - Tests: `npm run debug:solid-dialog`, `npm run debug:solid-overlay`
+  - Dart: `lib/solidus_dom/core/dialog.dart` (+ `overlay.dart`, `focus_scope.dart`)
+  - Tests: `npm run debug:labs-dialog`, `npm run debug:labs-overlay`
 
 - Popover
   - Kobalte: `.cache/refs/kobalte/packages/core/src/popover/*`
-  - Dart: `lib/solid_dom/core/popover.dart` (+ `overlay.dart`, `floating.dart`, `focus_scope.dart`)
-  - Tests: `npm run debug:solid-popover`, `npm run debug:solid-popover-position`, `npm run debug:solid-popover-flip`
+  - Dart: `lib/solidus_dom/core/popover.dart` (+ `overlay.dart`, `floating.dart`, `focus_scope.dart`)
+  - Tests: `npm run debug:labs-popover`, `npm run debug:labs-popover-position`, `npm run debug:labs-popover-flip`
 
 - Tooltip
   - Kobalte: `.cache/refs/kobalte/packages/core/src/tooltip/*`
-  - Dart: `lib/solid_dom/core/tooltip.dart` (+ `overlay.dart`, `floating.dart`)
-  - Tests: `npm run debug:solid-tooltip`
+  - Dart: `lib/solidus_dom/core/tooltip.dart` (+ `overlay.dart`, `floating.dart`)
+  - Tests: `npm run debug:labs-tooltip`
 
 - Menu / DropdownMenu
   - Kobalte: `.cache/refs/kobalte/packages/core/src/menu/*` and `.cache/refs/kobalte/packages/core/src/dropdown-menu/*`
-  - Dart: `lib/solid_dom/core/menu.dart` + `lib/solid_dom/core/dropdown_menu.dart`
-  - Tests: `npm run debug:solid-dropdownmenu`
+  - Dart: `lib/solidus_dom/core/menu.dart` + `lib/solidus_dom/core/dropdown_menu.dart`
+  - Tests: `npm run debug:labs-dropdownmenu`
 
 - Listbox
   - Kobalte: `.cache/refs/kobalte/packages/core/src/listbox/*`
-  - Dart: `lib/solid_dom/core/listbox.dart`
-  - Tests: `npm run debug:solid-listbox`
+  - Dart: `lib/solidus_dom/core/listbox.dart`
+  - Tests: `npm run debug:labs-listbox`
 
 - Select
   - Kobalte: `.cache/refs/kobalte/packages/core/src/select/*`
-  - Dart: `lib/solid_dom/core/select.dart` (+ `lib/solid_dom/core/listbox.dart`)
-  - Tests: `npm run debug:solid-select`
+  - Dart: `lib/solidus_dom/core/select.dart` (+ `lib/solidus_dom/core/listbox.dart`)
+  - Tests: `npm run debug:labs-select`
 
 - Combobox
   - Kobalte: `.cache/refs/kobalte/packages/core/src/combobox/*`
-  - Dart: `lib/solid_dom/core/combobox.dart` (+ `lib/solid_dom/core/listbox.dart`)
-  - Tests: `npm run debug:solid-combobox`
+  - Dart: `lib/solidus_dom/core/combobox.dart` (+ `lib/solidus_dom/core/listbox.dart`)
+  - Tests: `npm run debug:labs-combobox`
 
 - Toast
   - Kobalte: `.cache/refs/kobalte/packages/core/src/toast/*`
-  - Dart: `lib/solid_dom/core/toast.dart` (+ `overlay.dart` top-layer rules)
-  - Tests: `npm run debug:solid-toast`
+  - Dart: `lib/solidus_dom/core/toast.dart` (+ `overlay.dart` top-layer rules)
+  - Tests: `npm run debug:labs-toast`
 
 ## Audit workflow (how we’ll run it)
 

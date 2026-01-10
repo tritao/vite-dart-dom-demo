@@ -24,15 +24,15 @@ ScrollAreaHandle createScrollArea({
   final root = web.HTMLDivElement()
     ..id = id ?? ""
     ..className = rootClassName
-    ..setAttribute("data-solid-scroll-area", "1");
+    ..setAttribute("data-solidus-scroll-area", "1");
 
   final viewport = web.HTMLDivElement()
     ..className = viewportClassName
-    ..setAttribute("data-solid-scroll-viewport", "1");
+    ..setAttribute("data-solidus-scroll-viewport", "1");
 
   final content = web.HTMLDivElement()
     ..className = contentClassName
-    ..setAttribute("data-solid-scroll-content", "1");
+    ..setAttribute("data-solidus-scroll-content", "1");
 
   viewport.appendChild(content);
   root.appendChild(viewport);

@@ -4,7 +4,7 @@ slug: select
 group: Selection
 order: 10
 description: Button-triggered listbox with typeahead and focus management.
-labHref: "?solid=select"
+labHref: "?lab=select"
 status: beta
 tags: [selection, listbox, popper]
 ---

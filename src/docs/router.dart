@@ -158,7 +158,7 @@ void mountSolidDocs(web.Element mount, String? page) {
 
     final root = web.HTMLDivElement()..id = "docs-root";
 
-    final topbar = solidDocsNav(active: "docs");
+    final topbar = solidusDocsNav(active: "docs");
     root.appendChild(topbar);
 
     final container = web.HTMLDivElement()
@@ -369,7 +369,7 @@ void mountSolidDocs(web.Element mount, String? page) {
           ..className = "muted"
           ..textContent = "Docs manifest failed to load.");
         sidebar.appendChild(web.HTMLAnchorElement()
-          ..href = "?solid=catalog"
+          ..href = "?lab=catalog"
           ..className = "docsNavLink"
           ..textContent = "Open labs");
         return;

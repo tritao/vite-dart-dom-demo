@@ -29,7 +29,7 @@ FloatingHandle attachPopper({
   final resolvedArrow = arrow ??
       (() {
         try {
-          final el = floating.querySelector("[data-solid-popper-arrow]");
+          final el = floating.querySelector("[data-solidus-popper-arrow]");
           return el is web.HTMLElement ? el : null;
         } catch (_) {
           return null;

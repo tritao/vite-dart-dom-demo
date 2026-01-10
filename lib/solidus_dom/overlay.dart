@@ -58,8 +58,8 @@ AriaHiddenHandle ariaHideOthers(web.Element keep) {
       if (identical(node, keep) || node.contains(keep)) continue;
       // Never hide "top layer" UI (e.g. toast regions).
       try {
-        if (node.getAttribute("data-solid-top-layer") != null ||
-            node.querySelector("[data-solid-top-layer]") != null) {
+        if (node.getAttribute("data-solidus-top-layer") != null ||
+            node.querySelector("[data-solidus-top-layer]") != null) {
           continue;
         }
       } catch (_) {}
@@ -214,7 +214,7 @@ FocusTrapHandle focusTrap(
     if (target is! web.Node) return;
     if (container.contains(target)) return;
     if (target is web.Element &&
-        target.closest("[data-solid-top-layer]") != null) {
+        target.closest("[data-solidus-top-layer]") != null) {
       return;
     }
     if (!container.isConnected) return;
@@ -292,9 +292,9 @@ void _restorePointerPatches() {
         el.style.pointerEvents = prev;
       } catch (_) {}
       if (prevLayerAttr == null) {
-        el.removeAttribute("data-solid-pointer-layer");
+        el.removeAttribute("data-solidus-pointer-layer");
       } else {
-        el.setAttribute("data-solid-pointer-layer", prevLayerAttr);
+        el.setAttribute("data-solidus-pointer-layer", prevLayerAttr);
       }
     }
     _topLayerPointerPatches.clear();
@@ -314,9 +314,9 @@ void _restorePointerPatches() {
       if (el is web.HTMLElement) el.style.pointerEvents = prev;
     }
     if (prevLayerAttr == null) {
-      el.removeAttribute("data-solid-pointer-layer");
+      el.removeAttribute("data-solidus-pointer-layer");
     } else {
-      el.setAttribute("data-solid-pointer-layer", prevLayerAttr);
+      el.setAttribute("data-solidus-pointer-layer", prevLayerAttr);
     }
   }
   final body = web.document.body;
@@ -342,9 +342,9 @@ void _restoreEntryPointerPatch(_LayerEntry entry) {
     }
   }
   if (prevLayerAttr == null) {
-    el.removeAttribute("data-solid-pointer-layer");
+    el.removeAttribute("data-solidus-pointer-layer");
   } else {
-    el.setAttribute("data-solid-pointer-layer", prevLayerAttr);
+    el.setAttribute("data-solidus-pointer-layer", prevLayerAttr);
   }
 }
 
@@ -373,32 +373,32 @@ void _syncPointerBlocking() {
     final el = entry.element;
     if (el is! web.HTMLElement) continue;
     entry._prevPointerEvents = el.style.pointerEvents;
-    entry._prevPointerLayerAttr = el.getAttribute("data-solid-pointer-layer");
+    entry._prevPointerLayerAttr = el.getAttribute("data-solidus-pointer-layer");
     entry._pointerPatched = true;
 
     if (i < blockerIndex) {
       el.style.pointerEvents = "none";
-      el.removeAttribute("data-solid-pointer-layer");
+      el.removeAttribute("data-solidus-pointer-layer");
     } else {
       el.style.pointerEvents = "auto";
-      el.setAttribute("data-solid-pointer-layer", "1");
+      el.setAttribute("data-solidus-pointer-layer", "1");
     }
   }
 
   // Ensure "top layer" elements remain interactive even when the body is
   // pointer-blocked by a modal layer (e.g. toast viewport).
   try {
-    final topNodes = body.querySelectorAll("[data-solid-top-layer]");
+    final topNodes = body.querySelectorAll("[data-solidus-top-layer]");
     for (var i = 0; i < topNodes.length; i++) {
       final n = topNodes.item(i);
       if (n is! web.HTMLElement) continue;
       if (_topLayerPointerPatches.containsKey(n)) continue;
       _topLayerPointerPatches[n] = (
         prevPointerEvents: n.style.pointerEvents,
-        prevPointerLayerAttr: n.getAttribute("data-solid-pointer-layer"),
+        prevPointerLayerAttr: n.getAttribute("data-solidus-pointer-layer"),
       );
       n.style.pointerEvents = "auto";
-      n.setAttribute("data-solid-pointer-layer", "1");
+      n.setAttribute("data-solidus-pointer-layer", "1");
     }
   } catch (_) {}
 }
@@ -447,8 +447,8 @@ DismissableLayerHandle dismissableLayer(
     // Ignore interactions inside nested layers (e.g. submenus / nested dialogs).
     if (isWithinNestedLayer(target)) return true;
     // Ignore events targeting "top layer" elements (e.g. toasts), but do not
-    // confuse that with pointer-blocking layers (data-solid-pointer-layer).
-    if (target.closest("[data-solid-top-layer]") != null) return true;
+    // confuse that with pointer-blocking layers (data-solidus-pointer-layer).
+    if (target.closest("[data-solidus-top-layer]") != null) return true;
     return false;
   }
 

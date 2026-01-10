@@ -75,7 +75,7 @@ web.DocumentFragment createContextMenu({
   String? portalId,
 }) {
   final anchor = web.HTMLDivElement()
-    ..setAttribute("data-solid-contextmenu-anchor", "1");
+    ..setAttribute("data-solidus-contextmenu-anchor", "1");
   anchor.style
     ..position = "fixed"
     ..left = "0"

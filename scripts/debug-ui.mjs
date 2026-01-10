@@ -7,15 +7,15 @@ import { chromium } from "playwright";
 import { setTimeout as delay } from "node:timers/promises";
 import { setTimeout as setTimeoutCb } from "node:timers";
 
-import { runSolidWordprocScenario } from "./scenarios/solid-wordproc.mjs";
-import { runSolidNestingScenario } from "./scenarios/solid-nesting.mjs";
-import { runSolidToastModalScenario } from "./scenarios/solid-toast-modal.mjs";
-import { runSolidOptionBuilderScenario } from "./scenarios/solid-optionbuilder.mjs";
-import { solidBasicUiScenarios } from "./scenarios/solid-basic-ui.mjs";
-import { solidPopperUiScenarios } from "./scenarios/solid-popper-ui.mjs";
-import { solidSelectionUiScenarios } from "./scenarios/solid-selection-ui.mjs";
-import { solidMenuUiScenarios } from "./scenarios/solid-menu-ui.mjs";
-import { solidSwitchUiScenarios } from "./scenarios/solid-switch-ui.mjs";
+import { runWordprocShellScenario } from "./scenarios/wordproc-shell.mjs";
+import { runLabsNestingScenario } from "./scenarios/labs-nesting.mjs";
+import { runLabsToastModalScenario } from "./scenarios/labs-toast-modal.mjs";
+import { runLabsOptionBuilderScenario } from "./scenarios/labs-optionbuilder.mjs";
+import { labsBasicUiScenarios } from "./scenarios/labs-basic-ui.mjs";
+import { labsPopperUiScenarios } from "./scenarios/labs-popper-ui.mjs";
+import { labsSelectionUiScenarios } from "./scenarios/labs-selection-ui.mjs";
+import { labsMenuUiScenarios } from "./scenarios/labs-menu-ui.mjs";
+import { labsSwitchUiScenarios } from "./scenarios/labs-switch-ui.mjs";
 import { runDocsNavScenario } from "./scenarios/docs-nav.mjs";
 import { runDocsListboxScenario } from "./scenarios/docs-listbox.mjs";
 import { runDocsCheckboxScenario } from "./scenarios/docs-checkbox.mjs";
@@ -53,16 +53,16 @@ import { runDocsToggleScenario } from "./scenarios/docs-toggle.mjs";
 import { runDocsCardScenario } from "./scenarios/docs-card.mjs";
 import { runDocsTableScenario } from "./scenarios/docs-table.mjs";
 
-const solidScenarioRunners = {
-  ...solidBasicUiScenarios,
-  ...solidPopperUiScenarios,
-  ...solidSelectionUiScenarios,
-  ...solidMenuUiScenarios,
-  ...solidSwitchUiScenarios,
-  "solid-wordproc": (page, ctx) => runSolidWordprocScenario(page, ctx),
-  "solid-nesting": (page, ctx) => runSolidNestingScenario(page, ctx),
-  "solid-toast-modal": (page, ctx) => runSolidToastModalScenario(page, ctx),
-  "solid-optionbuilder": (page, ctx) => runSolidOptionBuilderScenario(page, ctx),
+const scenarioRunners = {
+  ...labsBasicUiScenarios,
+  ...labsPopperUiScenarios,
+  ...labsSelectionUiScenarios,
+  ...labsMenuUiScenarios,
+  ...labsSwitchUiScenarios,
+  "wordproc-shell": (page, ctx) => runWordprocShellScenario(page, ctx),
+  "labs-nesting": (page, ctx) => runLabsNestingScenario(page, ctx),
+  "labs-toast-modal": (page, ctx) => runLabsToastModalScenario(page, ctx),
+  "labs-optionbuilder": (page, ctx) => runLabsOptionBuilderScenario(page, ctx),
   "docs-nav": (page, ctx) => runDocsNavScenario(page, ctx),
   "docs-listbox": (page, ctx) => runDocsListboxScenario(page, ctx),
   "docs-checkbox": (page, ctx) => runDocsCheckboxScenario(page, ctx),
@@ -321,7 +321,7 @@ async function inspectUrl(
 
   const interactionResults = [];
   if (interactions) {
-    const runner = solidScenarioRunners[scenario];
+    const runner = scenarioRunners[scenario];
     if (runner) {
       try {
         const result = await runner(page, { timeoutMs, jitter });

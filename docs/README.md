@@ -18,7 +18,7 @@ slug: dialog
 group: Overlays & Menus
 order: 10
 description: ...
-labHref: "?solid=dialog"
+labHref: "?lab=dialog"
 status: beta
 tags: [overlay, a11y]
 ---

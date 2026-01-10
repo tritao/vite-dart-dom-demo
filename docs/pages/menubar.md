@@ -4,7 +4,7 @@ slug: menubar
 group: Overlays & Menus
 order: 50
 description: Horizontal menubar with roving focus and menu popups.
-labHref: "?solid=menubar"
+labHref: "?lab=menubar"
 status: beta
 tags: [menu, a11y]
 ---

@@ -22,6 +22,15 @@ If you only need querystring helpers (like `?docs=...`), see: [Routing (URL quer
 
 All are exported from `package:solidus/solidus_router.dart`.
 
+## Matching rules (important)
+
+- **First match wins**: routes are tried in the order you provide them; put more specific routes first.
+- **Nested paths are relative**: child routes like `profile` match under the parent path.
+- **Absolute child paths**: a child path that starts with `/` is matched from the root.
+- **Index routes**: `RouteDef(index: true, ...)` matches only when all segments are consumed.
+- **Pathless layout routes**: `RouteDef(path: null, ...)` wraps children without consuming segments.
+- **Splat**: `*` captures remaining segments into `params["splat"]`.
+
 ## Router setup
 
 ```dart
@@ -84,6 +93,29 @@ final router = BrowserRouter(routes: [
 ]);
 ```
 
+## Layout route (pathless parent)
+
+Use `path: null` when you want a “layout” wrapper that always renders, regardless of the child path.
+
+```dart
+final router = BrowserRouter(routes: [
+  RouteDef(
+    path: null, // layout
+    view: (_) {
+      final root = web.HTMLDivElement();
+      root.appendChild(web.HTMLDivElement()..textContent = "App chrome");
+      root.appendChild(insert(root, () => Outlet()));
+      return root;
+    },
+    children: [
+      RouteDef(path: "/", view: (_) => web.HTMLDivElement()..textContent = "Home"),
+      RouteDef(path: "/users/:id", view: (_) => web.HTMLDivElement()..textContent = "User"),
+      RouteDef(path: "*", view: (_) => web.HTMLDivElement()..textContent = "Not found"),
+    ],
+  ),
+]);
+```
+
 ## Params + navigation
 
 ```dart
@@ -96,6 +128,71 @@ final btn = web.HTMLButtonElement()
   ..type = "button"
   ..textContent = "Go home";
 on(btn, "click", (_) => nav("/", replace: true));
+```
+
+## Search params (querystring)
+
+`useSearchParams()` gives you a small helper for `?k=v` on top of the current path.
+
+```dart
+final sp = useSearchParams();
+
+final view = sp.get("view") ?? "grid";
+
+final btn = web.HTMLButtonElement()
+  ..type = "button"
+  ..textContent = "Toggle view";
+on(btn, "click", (_) {
+  sp.set("view", view == "grid" ? "list" : "grid", replace: false);
+});
+```
+
+## Active links (basic)
+
+Solidus doesn’t impose an “active link” API. A simple pattern:
+
+```dart
+final loc = useLocation();
+final a = Link(toFn: () => "/settings/profile", child: "Profile");
+
+createRenderEffect(() {
+  final active = loc.value.path == "/settings/profile";
+  a.className = active ? "active" : "";
+});
+```
+
+## Is this enough for serious apps?
+
+Yes for many SPAs, as long as you’re okay with a **small, explicit** router:
+
+- You get nested routes, params, query helpers, and `Link`/`navigate`.
+- You don’t get “full framework router” features like loaders/actions, route ranking, scroll restoration, transitions, prefetching, or error boundaries.
+
+If you need those, a reasonable next step is a higher-level layer on top of this router (route tree + loaders + pending/error UI) while keeping `BrowserRouter` as the primitive.
+
+## “What people expect” (a realistic next design)
+
+If Solidus grows a higher-level router, the usual expectations are:
+
+- **Route ranking** (so `/users/:id` doesn’t depend on manual ordering)
+- **Loaders + pending UI** (data loading per route, with `pendingView`)
+- **Error UI** (route-level error boundaries, `errorView`)
+- **Redirects** (`redirect(to)` from loaders or guards)
+- **Scroll restoration** (optional but expected)
+- **Prefetching** (`Link(prefetch: ...)` or `router.preload(...)`)
+
+A simple (still-Dart/DOM-first) shape could look like:
+
+```dart
+final routes = [
+  RouteDef(
+    path: "/users/:id",
+    // loader: (match) async => await fetchUser(match.params["id"]!),
+    view: (m) => UserPage(id: m.params["id"]!),
+    // pendingView: (_) => Spinner(),
+    // errorView: (e) => ErrorPanel(e),
+  ),
+];
 ```
 
 ## Hosting note (history routing)

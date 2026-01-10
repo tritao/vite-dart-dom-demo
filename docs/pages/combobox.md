@@ -4,7 +4,7 @@ slug: combobox
 group: Selection
 order: 20
 description: Text input with listbox suggestions and selection.
-labHref: "?solid=combobox"
+labHref: "?lab=combobox"
 status: beta
 tags: [selection, listbox, popper]
 ---

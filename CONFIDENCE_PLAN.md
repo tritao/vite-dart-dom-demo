@@ -1,4 +1,4 @@
-# Confidence Plan (Solid DOM Primitives)
+# Confidence Plan (Solidus DOM Primitives)
 
 Goal: increase confidence in correctness/robustness (Kobalte-style behavior) beyond the current “happy-path” Playwright smoke checks.
 
@@ -16,7 +16,7 @@ Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for th
 **Why:** current `optionBuilder(option, selected, active)` inputs are not guaranteed reactive; real components will style/ARIA off them.
 
 **Deliverables**
-- New demo route: `/?solid=optionbuilder` (or extend existing demos) that:
+- New demo route: `/labs.html?lab=optionbuilder` (or extend existing demos) that:
   - renders options via `optionBuilder` using `active/selected` props to set:
     - `data-active-from-builder`
     - `data-selected-from-builder`
@@ -34,7 +34,7 @@ Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for th
 **Why:** modal pointer-blocking is easy to regress; toasts must remain clickable and must not dismiss the modal.
 
 **Deliverables**
-- Extend `/?solid=dialog` or `/?solid=toast` to include:
+- Extend `/labs.html?lab=dialog` or `/labs.html?lab=toast` to include:
   - “Open modal dialog” button
   - “Show toast” button while modal is open
   - toast includes a clickable dismiss button
@@ -69,7 +69,7 @@ Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for th
 **Deliverables**
 - Add a `--repeat N` option to `scripts/debug-ui.mjs` (default 1).
 - Run key scenarios with `--repeat 50` locally:
-  - `solid-select`, `solid-combobox`, `solid-dialog`, `solid-overlay`, `solid-dropdownmenu`.
+  - `labs-select`, `labs-combobox`, `labs-dialog`, `labs-overlay`, `labs-dropdownmenu`.
 
 ### 5) Seeded random jitter
 **Why:** microtask/effect ordering issues often need event timing variance.
@@ -103,13 +103,13 @@ Related: `KOBALTE_AUDIT.md` (module order + Kobalte→Dart source mapping for th
 ## Acceptance criteria
 - New scenarios pass locally in a loop (`--repeat 50`) without flakes.
 - No regression in existing scenarios:
-  - `npm run debug:solid-select`
-  - `npm run debug:solid-combobox`
-  - `npm run debug:solid-listbox`
-  - `npm run debug:solid-dropdownmenu`
-  - `npm run debug:solid-dialog`
-  - `npm run debug:solid-toast`
-  - `npm run debug:solid-overlay`
+  - `npm run debug:labs-select`
+  - `npm run debug:labs-combobox`
+  - `npm run debug:labs-listbox`
+  - `npm run debug:labs-dropdownmenu`
+  - `npm run debug:labs-dialog`
+  - `npm run debug:labs-toast`
+  - `npm run debug:labs-overlay`
 
 ## Suggested execution order
 1. OptionBuilder reactivity demo + test (highest product risk).

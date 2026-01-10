@@ -4,7 +4,7 @@ slug: overlay
 group: Foundations
 order: 10
 description: Portal + presence + layer stack primitives for building overlays.
-labHref: "?solid=overlay"
+labHref: "?lab=overlay"
 status: beta
 tags: [overlay, a11y]
 ---

@@ -125,8 +125,8 @@ void _positionFixed({
   final y = top.roundToDouble();
   floating.style.transform = "translate3d(${x.toStringAsFixed(0)}px, ${y.toStringAsFixed(0)}px, 0)";
   try {
-    floating.setAttribute("data-solid-placement", effective);
-    floating.style.setProperty("--solid-popper-current-placement", effective);
+    floating.setAttribute("data-solidus-placement", effective);
+    floating.style.setProperty("--solidus-popper-current-placement", effective);
   } catch (_) {}
 }
 
@@ -171,8 +171,8 @@ FloatingHandle floatToAnchor({
   // positioning/transform. Keep it off-screen until the first positioning pass
   // completes (visibility:hidden can interfere with focus).
   try {
-    if (floating.getAttribute("data-solid-popper-pending") == null) {
-      floating.setAttribute("data-solid-popper-pending", "1");
+    if (floating.getAttribute("data-solidus-popper-pending") == null) {
+      floating.setAttribute("data-solidus-popper-pending", "1");
     }
     floating.style.position = "fixed";
     floating.style.top = "0";
@@ -246,8 +246,8 @@ FloatingHandle floatToAnchor({
 
   void finalizeFirstPaint() {
     try {
-      if (floating.getAttribute("data-solid-popper-pending") != null) {
-        floating.removeAttribute("data-solid-popper-pending");
+      if (floating.getAttribute("data-solidus-popper-pending") != null) {
+        floating.removeAttribute("data-solidus-popper-pending");
       }
     } catch (_) {}
   }

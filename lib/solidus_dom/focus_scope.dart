@@ -61,7 +61,7 @@ List<web.HTMLElement> _tabbablesWithin(web.Element root) {
   for (var i = 0; i < nodes.length; i++) {
     final n = nodes.item(i);
     if (n == null || n is! web.HTMLElement) continue;
-    if (n.getAttribute("data-solid-focus-sentinel") != null) continue;
+    if (n.getAttribute("data-solidus-focus-sentinel") != null) continue;
     final disabled = (n is web.HTMLButtonElement && n.disabled) ||
         (n is web.HTMLInputElement && n.disabled) ||
         (n is web.HTMLSelectElement && n.disabled) ||
@@ -75,7 +75,7 @@ List<web.HTMLElement> _tabbablesWithin(web.Element root) {
 
 web.HTMLElement _createSentinel() {
   final el = web.HTMLSpanElement()
-    ..setAttribute("data-solid-focus-sentinel", "1")
+    ..setAttribute("data-solidus-focus-sentinel", "1")
     ..tabIndex = 0;
   final style = el.style;
   style.position = "fixed";
@@ -200,7 +200,7 @@ FocusScopeHandle focusScope(
     final target = e.target;
     if (target is! web.HTMLElement) return;
     if (!container.contains(target)) return;
-    if (target.getAttribute("data-solid-focus-sentinel") != null) return;
+    if (target.getAttribute("data-solidus-focus-sentinel") != null) return;
     entry.lastFocusedWithin = target;
   }
 
@@ -239,7 +239,7 @@ FocusScopeHandle focusScope(
     if (target is! web.Node) return;
     if (container.contains(target)) return;
     if (target is web.Element &&
-        target.closest("[data-solid-top-layer]") != null) {
+        target.closest("[data-solidus-top-layer]") != null) {
       return;
     }
 

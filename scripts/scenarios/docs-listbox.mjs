@@ -23,7 +23,7 @@ export async function runDocsListboxScenario(page, ctx) {
   const openLab = page
     .locator('[data-doc-demo="listbox-basic"]')
     .locator("xpath=..")
-    .locator('a[href*="?solid=listbox"]');
+    .locator('a[href*="?lab=listbox"]');
   await openLab.first().focus();
   await page.keyboard.press("Tab");
 
@@ -45,4 +45,3 @@ export async function runDocsListboxScenario(page, ctx) {
     throw new Error("Expected aria-activedescendant to be set after ArrowDown.");
   }
 }
-

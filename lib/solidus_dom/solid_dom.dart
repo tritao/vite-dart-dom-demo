@@ -219,7 +219,7 @@ web.Comment Portal({
   final placeholder = web.Comment("solid:portal");
   final target = mount ?? _ensurePortalRoot();
   final container = web.HTMLDivElement()
-    ..setAttribute("data-solid-portal", "1");
+    ..setAttribute("data-solidus-portal", "1");
   if (id != null) container.id = id;
   if (className != null) container.className = className;
   if (attrs != null) {
@@ -252,7 +252,7 @@ int _portalRootRefCount = 0;
 web.HTMLElement? _portalRoot;
 
 web.HTMLElement _ensurePortalRoot() {
-  final existing = web.document.querySelector("#solid-portal-root");
+  final existing = web.document.querySelector("#solidus-portal-root");
   if (existing is web.HTMLElement) {
     _portalRoot = existing;
     _portalRootRefCount++;
@@ -260,8 +260,8 @@ web.HTMLElement _ensurePortalRoot() {
     return existing;
   }
   final root = web.HTMLDivElement()
-    ..id = "solid-portal-root"
-    ..setAttribute("data-solid-portal-root", "1");
+    ..id = "solidus-portal-root"
+    ..setAttribute("data-solidus-portal-root", "1");
   web.document.body!.appendChild(root);
   _portalRoot = root;
   _portalRootRefCount++;

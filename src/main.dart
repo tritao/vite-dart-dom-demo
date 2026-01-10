@@ -17,7 +17,7 @@ void main() {
   final query = search.startsWith("?") ? search.substring(1) : search;
   final params = Uri.splitQueryString(query);
   final docs = params["docs"];
-  final solid = params["solid"];
+  final lab = params["lab"];
   final demos = params["demos"];
 
   // Split bundles: redirect to dedicated entrypoints for docs/labs.
@@ -25,7 +25,7 @@ void main() {
     web.window.location.assign("docs.html$search");
     return;
   }
-  if (solid != null) {
+  if (lab != null) {
     web.window.location.assign("labs.html$search");
     return;
   }

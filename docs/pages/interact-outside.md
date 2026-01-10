@@ -4,7 +4,7 @@ slug: interact-outside
 group: Foundations
 order: 30
 description: Outside interaction detection (pointer + focus) for dismissable overlays.
-labHref: "?solid=popover"
+labHref: "?lab=popover"
 status: beta
 tags: [overlay]
 ---

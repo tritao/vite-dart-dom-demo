@@ -636,7 +636,7 @@
     width: 100%;
   }
 
-  [data-solid-dialog-wrapper="1"] {
+  [data-solidus-dialog-wrapper="1"] {
     position: fixed;
     inset: 0;
     display: flex;
@@ -647,19 +647,19 @@
     z-index: 1000;
   }
 
-  [data-solid-backdrop="1"] {
+  [data-solidus-backdrop="1"] {
     position: absolute;
     inset: 0;
     background: hsl(0 0% 0% / 0.4);
     z-index: 0;
   }
 
-  [data-solid-backdrop="1"] + * {
+  [data-solidus-backdrop="1"] + * {
     position: relative;
     z-index: 1;
   }
 
-  [data-solid-dialog-content="1"] {
+  [data-solidus-dialog-content="1"] {
     position: relative;
     z-index: 1;
     width: 100%;

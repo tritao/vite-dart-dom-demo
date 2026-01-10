@@ -1,26 +1,26 @@
 import "package:web/web.dart" as web;
 
-import "./solid/dom_demo.dart";
-import "./solid/overlay_demo.dart";
-import "./solid/dialog_demo.dart";
-import "./solid/popover_demo.dart";
-import "./solid/roving_demo.dart";
-import "./solid/toast_demo.dart";
-import "./solid/catalog_demo.dart";
-import "./solid/dropdown_menu_demo.dart";
-import "./solid/menubar_demo.dart";
-import "./solid/context_menu_demo.dart";
-import "./solid/tooltip_demo.dart";
-import "./solid/select_demo.dart";
-import "./solid/combobox_demo.dart";
-import "./solid/listbox_demo.dart";
-import "./solid/selection_demo.dart";
-import "./solid/tabs_demo.dart";
-import "./solid/accordion_demo.dart";
-import "./solid/switch_demo.dart";
-import "./solid/nesting_demo.dart";
-import "./solid/toast_modal_demo.dart";
-import "./solid/optionbuilder_demo.dart";
+import "./labs/dom_demo.dart";
+import "./labs/overlay_demo.dart";
+import "./labs/dialog_demo.dart";
+import "./labs/popover_demo.dart";
+import "./labs/roving_demo.dart";
+import "./labs/toast_demo.dart";
+import "./labs/catalog_demo.dart";
+import "./labs/dropdown_menu_demo.dart";
+import "./labs/menubar_demo.dart";
+import "./labs/context_menu_demo.dart";
+import "./labs/tooltip_demo.dart";
+import "./labs/select_demo.dart";
+import "./labs/combobox_demo.dart";
+import "./labs/listbox_demo.dart";
+import "./labs/selection_demo.dart";
+import "./labs/tabs_demo.dart";
+import "./labs/accordion_demo.dart";
+import "./labs/switch_demo.dart";
+import "./labs/nesting_demo.dart";
+import "./labs/toast_modal_demo.dart";
+import "./labs/optionbuilder_demo.dart";
 import "package:solidus/dom_ui/theme.dart" as theme;
 
 void main() {
@@ -33,7 +33,7 @@ void main() {
   final query = search.startsWith("?") ? search.substring(1) : search;
   final params = Uri.splitQueryString(query);
   final docs = params["docs"];
-  final solid = params["solid"];
+  final lab = params["lab"];
   final demos = params["demos"];
 
   // Cross-page navigation: prefer the dedicated bundles.
@@ -46,93 +46,92 @@ void main() {
     return;
   }
 
-  final mode = solid ?? "catalog";
+  final mode = lab ?? "catalog";
 
   if (mode == "overlay") {
-    mountSolidOverlayDemo(mount);
+    mountLabsOverlayDemo(mount);
     return;
   }
   if (mode == "dialog") {
-    mountSolidDialogDemo(mount);
+    mountLabsDialogDemo(mount);
     return;
   }
   if (mode == "popover") {
-    mountSolidPopoverDemo(mount);
+    mountLabsPopoverDemo(mount);
     return;
   }
   if (mode == "roving") {
-    mountSolidRovingDemo(mount);
+    mountLabsRovingDemo(mount);
     return;
   }
   if (mode == "toast") {
-    mountSolidToastDemo(mount);
+    mountLabsToastDemo(mount);
     return;
   }
   if (mode == "catalog") {
-    mountSolidCatalogDemo(mount);
+    mountLabsCatalogDemo(mount);
     return;
   }
   if (mode == "dropdownmenu") {
-    mountSolidDropdownMenuDemo(mount);
+    mountLabsDropdownMenuDemo(mount);
     return;
   }
   if (mode == "menubar") {
-    mountSolidMenubarDemo(mount);
+    mountLabsMenubarDemo(mount);
     return;
   }
   if (mode == "contextmenu") {
-    mountSolidContextMenuDemo(mount);
+    mountLabsContextMenuDemo(mount);
     return;
   }
   if (mode == "tooltip") {
-    mountSolidTooltipDemo(mount);
+    mountLabsTooltipDemo(mount);
     return;
   }
   if (mode == "select") {
-    mountSolidSelectDemo(mount);
+    mountLabsSelectDemo(mount);
     return;
   }
   if (mode == "combobox") {
-    mountSolidComboboxDemo(mount);
+    mountLabsComboboxDemo(mount);
     return;
   }
   if (mode == "listbox") {
-    mountSolidListboxDemo(mount);
+    mountLabsListboxDemo(mount);
     return;
   }
   if (mode == "selection") {
-    mountSolidSelectionDemo(mount);
+    mountLabsSelectionDemo(mount);
     return;
   }
   if (mode == "tabs") {
-    mountSolidTabsDemo(mount);
+    mountLabsTabsDemo(mount);
     return;
   }
   if (mode == "accordion") {
-    mountSolidAccordionDemo(mount);
+    mountLabsAccordionDemo(mount);
     return;
   }
   if (mode == "switch") {
-    mountSolidSwitchDemo(mount);
+    mountLabsSwitchDemo(mount);
     return;
   }
   if (mode == "nesting") {
-    mountSolidNestingDemo(mount);
+    mountLabsNestingDemo(mount);
     return;
   }
   if (mode == "toast-modal") {
-    mountSolidToastModalDemo(mount);
+    mountLabsToastModalDemo(mount);
     return;
   }
   if (mode == "optionbuilder") {
-    mountSolidOptionBuilderDemo(mount);
+    mountLabsOptionBuilderDemo(mount);
     return;
   }
-  if (mode == "1") {
-    mountSolidDomDemo(mount);
+  if (mode == "dom") {
+    mountLabsDomDemo(mount);
     return;
   }
 
-  mountSolidCatalogDemo(mount);
+  mountLabsCatalogDemo(mount);
 }
-

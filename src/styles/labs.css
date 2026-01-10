@@ -1,16 +1,16 @@
 @layer labs {
-  .solid-demo-nav {
+  .labs-demo-nav {
     margin-bottom: 16px;
   }
 
-  .solid-demo-nav-row {
+  .labs-demo-nav-row {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
   }
 
-  .solid-demo-nav [aria-current="page"] {
+  .labs-demo-nav [aria-current="page"] {
     outline: 2px solid hsl(var(--ring) / 0.35);
     outline-offset: 2px;
   }

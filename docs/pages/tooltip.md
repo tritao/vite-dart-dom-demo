@@ -4,7 +4,7 @@ slug: tooltip
 group: Overlays & Menus
 order: 30
 description: Small anchored label shown on hover or focus.
-labHref: "?solid=tooltip"
+labHref: "?lab=tooltip"
 status: beta
 tags: [overlay, popper, a11y]
 ---

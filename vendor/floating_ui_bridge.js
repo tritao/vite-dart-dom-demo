@@ -82,9 +82,9 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
         const aw = Math.floor(availableWidth);
         const ah = Math.floor(availableHeight);
 
-        floating.style.setProperty("--solid-popper-anchor-width", `${referenceWidth}px`);
-        floating.style.setProperty("--solid-popper-content-available-width", `${aw}px`);
-        floating.style.setProperty("--solid-popper-content-available-height", `${ah}px`);
+        floating.style.setProperty("--solidus-popper-anchor-width", `${referenceWidth}px`);
+        floating.style.setProperty("--solidus-popper-content-available-width", `${aw}px`);
+        floating.style.setProperty("--solidus-popper-content-available-height", `${ah}px`);
 
         if (sameWidth) {
           if (!floating.style.boxSizing) floating.style.boxSizing = "border-box";
@@ -107,11 +107,11 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
   // Avoid a 1-frame flash in the wrong place: Dart marks newly-mounted poppers
   // as pending until the first computePosition completes.
   const isPending = () =>
-    floating?.getAttribute?.("data-solid-popper-pending") === "1";
+    floating?.getAttribute?.("data-solidus-popper-pending") === "1";
   const clearPending = () => {
     try {
       if (!isPending()) return;
-      floating.removeAttribute("data-solid-popper-pending");
+      floating.removeAttribute("data-solidus-popper-pending");
     } catch {}
   };
 
@@ -131,8 +131,8 @@ globalThis.__solidFloatToAnchor = (anchor, floating, opts = {}) => {
     floating.style.left = "0";
     floating.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     try {
-      floating.setAttribute("data-solid-placement", pos.placement);
-      floating.style.setProperty("--solid-popper-current-placement", pos.placement);
+      floating.setAttribute("data-solidus-placement", pos.placement);
+      floating.style.setProperty("--solidus-popper-current-placement", pos.placement);
     } catch {}
 
     if (hideWhenDetached) {

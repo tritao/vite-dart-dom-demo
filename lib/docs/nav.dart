@@ -2,7 +2,7 @@ import "dart:js_interop";
 
 import "package:web/web.dart" as web;
 
-web.HTMLElement solidDocsNav({required String active}) {
+web.HTMLElement solidusDocsNav({required String active}) {
   final nav = web.HTMLDivElement()
     ..className = "docsTopbar"
     ..setAttribute("role", "navigation")
@@ -33,7 +33,7 @@ web.HTMLElement solidDocsNav({required String active}) {
 
   final links = web.HTMLDivElement()..className = "docsTopbarLinks";
   links.appendChild(link("Docs", "?docs=1", current: active == "docs"));
-  links.appendChild(link("Labs", "?solid=catalog", current: active == "labs"));
+  links.appendChild(link("Labs", "?lab=catalog", current: active == "labs"));
   inner.appendChild(links);
 
   final search = web.HTMLDivElement()..className = "docsTopbarSearch";

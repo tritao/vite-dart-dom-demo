@@ -40,7 +40,7 @@ Dispose mountDocsPopperBasic(web.Element mount) {
             );
             final arrow = web.HTMLDivElement()
               ..className = "popperArrow"
-              ..setAttribute("data-solid-popper-arrow", "1");
+              ..setAttribute("data-solidus-popper-arrow", "1");
             panel.appendChild(arrow);
 
             final handle = attachPopper(

@@ -444,7 +444,7 @@ web.DocumentFragment createCombobox<T>({
         if (showArrow) {
           arrowEl = web.HTMLDivElement()
             ..className = "popperArrow"
-            ..setAttribute("data-solid-popper-arrow", "1");
+            ..setAttribute("data-solidus-popper-arrow", "1");
           listbox.element.appendChild(arrowEl!);
         }
         listboxRef = listbox.element;

@@ -5,6 +5,5 @@ import "package:solidus/wordproc/wordproc.dart";
 void main() {
   final mount = web.document.querySelector("#app");
   if (mount == null) return;
-  mountSolidWordprocShellDemo(mount);
+  mountWordprocShellDemo(mount);
 }
-

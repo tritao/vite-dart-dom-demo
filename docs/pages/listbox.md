@@ -4,7 +4,7 @@ slug: listbox
 group: Selection
 order: 30
 description: A selectable list with keyboard navigation and virtual focus.
-labHref: "?solid=listbox"
+labHref: "?lab=listbox"
 status: beta
 tags: [selection, a11y]
 ---

@@ -108,8 +108,8 @@ final class ToastController {
         }
 
         viewport
-          ..setAttribute("data-solid-toast-viewport", "1")
-          ..setAttribute("data-solid-top-layer", "1")
+          ..setAttribute("data-solidus-toast-viewport", "1")
+          ..setAttribute("data-solidus-top-layer", "1")
           ..setAttribute("role", "region")
           ..setAttribute("aria-label", "Notifications")
           ..setAttribute("aria-live", "polite");

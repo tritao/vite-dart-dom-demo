@@ -4,7 +4,7 @@ slug: popover
 group: Overlays & Menus
 order: 20
 description: Anchored floating panel for non-modal interactions.
-labHref: "?solid=popover"
+labHref: "?lab=popover"
 status: beta
 tags: [overlay, popper]
 ---

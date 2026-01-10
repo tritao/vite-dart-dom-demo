@@ -166,7 +166,7 @@ web.DocumentFragment createSelect<T>({
               : (opt, {required selected, required active}) =>
                   optionBuilder(opt, selected, active),
         );
-        handle.element.setAttribute("data-solid-select-listbox", "1");
+        handle.element.setAttribute("data-solidus-select-listbox", "1");
         currentHandle = handle;
         onCleanup(() {
           if (identical(currentHandle, handle)) currentHandle = null;

@@ -4,7 +4,7 @@ slug: focus-scope
 group: Foundations
 order: 20
 description: Focus containment and trapping used by modal overlays.
-labHref: "?solid=dialog"
+labHref: "?lab=dialog"
 status: beta
 tags: [focus, a11y]
 ---

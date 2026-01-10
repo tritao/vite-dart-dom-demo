@@ -10,8 +10,10 @@ UI primitives + a SolidJS-ish reactive runtime for **Dart on the DOM**, with doc
 
 - 📚 **Docs**: component pages + minimal examples → `docs.html?docs=index`
 - 🧪 **Labs**: edge cases + Playwright scenarios → `labs.html`
-- 🧱 **Runtime**: SolidJS-ish reactivity + component base → `lib/dom_ui/`
-- 🧩 **Components**: accessible primitives (overlays, forms, nav, etc.) → `docs.html?docs=index`
+- ⚡ **Reactivity**: SolidJS-ish signals/effects/memos → `lib/solidus/`
+- 🧱 **DOM UI runtime**: component base + DOM helpers → `lib/dom_ui/`
+- 🧭 **Router**: query router + browser router → `lib/dom_ui/router.dart` + `lib/solidus_router/`
+- 🧩 **Components**: accessible primitives (overlays, forms, nav, etc.) → `lib/solidus_ui/` + `lib/solidus_dom/`
 - 🧰 **Vite + Dart**: import `.dart` directly via `vite-plugin-dart` → `vendor/vite-plugin-dart/`
 
 ![Demo screenshot](public/assets/demo.png)
@@ -77,14 +79,16 @@ npm run dev
 Open (pick your adventure ✨🗺️):
 
 - 📚 Docs: `http://localhost:5173/docs.html?docs=index`
-- 🧪 Labs: `http://localhost:5173/labs.html?solid=1`
-- 🧪 Solid demos: `http://localhost:5173/labs.html?solid=dialog` (or `overlay`, `popover`, …)
+- 🧪 Labs catalog: `http://localhost:5173/labs.html?lab=catalog`
+- 🧪 Labs demo (DOM): `http://localhost:5173/labs.html?lab=dom`
+- 🧪 Labs demo (Dialog): `http://localhost:5173/labs.html?lab=dialog` (or `overlay`, `popover`, …)
 - 🧪 Original “Dart + Vite” demo: `http://localhost:5173/?demos=1`
 
 ## 🧪 Headless checks (Playwright) 🤖
 
 - 🧫 Smoke UI (basic app): `npm run debug:ui` (CI: `npm run debug:ui:ci`)
 - 📚 Docs suites (CI bundle): `npm run docs:ci`
+- 🧪 Full local CI run (build + tests + Playwright on Linux): `bash scripts/ci.sh`
 
 Artifacts land in `.cache/` 🗂️✨
 
@@ -104,10 +108,13 @@ In the original demo (`/?demos=1`):
 
 ## 🗂️ Repo map 🧭
 
-- 🧱 Runtime primitives: `lib/dom_ui/`
+- ⚡ Solidus reactive core: `lib/solidus/` + `lib/solidus.dart`
+- 🧱 DOM UI runtime helpers: `lib/dom_ui/`
+- 🧩 UI primitives: `lib/solidus_dom/` + `lib/solidus_ui/`
+- 🧭 Router: `lib/solidus_router/`
 - 📦 App shell + demo routes: `src/app/`
 - 📚 Docs runtime + demos: `src/docs/` + `docs/pages/` + `tool/build_docs.dart`
-- 🧪 Labs / conformance demos: `src/solid/` + `scripts/scenarios/`
+- 🧪 Labs / conformance demos: `src/labs/` + `scripts/scenarios/`
 - ⚙️ Vite integration: `vite.config.mjs` + `vendor/vite-plugin-dart/`
 - 🏛️ Architecture notes: `ARCHITECTURE.md`
 

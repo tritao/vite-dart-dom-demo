@@ -4,7 +4,7 @@ slug: toast
 group: Overlays & Menus
 order: 70
 description: Non-blocking notifications with stacking and timeouts.
-labHref: "?solid=toast"
+labHref: "?lab=toast"
 status: beta
 tags: [overlay]
 ---

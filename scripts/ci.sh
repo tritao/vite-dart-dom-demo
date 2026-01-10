@@ -84,16 +84,16 @@ if [[ "$IS_LINUX" -eq 1 && "$RUN_PLAYWRIGHT" -eq 1 ]]; then
   log "playwright: app smoke (preview)"
   npm run debug:ui:ci
 
-  log "playwright: solid demos"
-  npm run debug:solid-dom:ci
-  npm run debug:solid-for:ci
-  npm run debug:solid-overlay:ci
-  npm run debug:solid-dialog:ci
-  npm run debug:solid-roving:ci
-  npm run debug:solid-popover:ci
-  npm run debug:solid-popover-position:ci
-  npm run debug:solid-popover-flip:ci
-  npm run debug:solid-toast:ci
+  log "playwright: labs demos"
+  npm run debug:labs-dom:ci
+  npm run debug:labs-for:ci
+  npm run debug:labs-overlay:ci
+  npm run debug:labs-dialog:ci
+  npm run debug:labs-roving:ci
+  npm run debug:labs-popover:ci
+  npm run debug:labs-popover-position:ci
+  npm run debug:labs-popover-flip:ci
+  npm run debug:labs-toast:ci
 
   log "playwright: docs suites"
   npm run docs:ci

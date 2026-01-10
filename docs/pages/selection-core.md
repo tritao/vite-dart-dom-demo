@@ -4,7 +4,7 @@ slug: selection-core
 group: Foundations
 order: 50
 description: SelectionManager + selectable collection/item utilities.
-labHref: "?solid=selection"
+labHref: "?lab=selection"
 status: beta
 tags: [selection, a11y]
 ---

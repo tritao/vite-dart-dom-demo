@@ -4,7 +4,7 @@ slug: context-menu
 group: Overlays & Menus
 order: 60
 description: Right-click / long-press menu anchored to a point.
-labHref: "?solid=contextmenu"
+labHref: "?lab=contextmenu"
 status: beta
 tags: [menu, overlay]
 ---
