@@ -60,6 +60,6 @@ When you need to validate edge cases (nested overlays, flip/slide positioning, c
 ## Next steps
 
 - Runtime: [Reactivity](?docs=runtime-reactivity), [Router](?docs=runtime-browser-router)
-- Foundations: [Overlay](?docs=overlay), [FocusScope](?docs=focus-scope), [Popper / Positioning](?docs=popper), [Selection core](?docs=selection-core)
+- Foundations: [DOM DSL](?docs=dom-dsl), [Overlay](?docs=overlay), [FocusScope](?docs=focus-scope), [Popper / Positioning](?docs=popper), [Selection core](?docs=selection-core)
 - Forms: [Forms](?docs=forms), [FormField](?docs=form-field), [Input](?docs=input), [Combobox](?docs=combobox)
 - UI: [Button](?docs=button), [Tabs](?docs=tabs), [Accordion](?docs=accordion)
