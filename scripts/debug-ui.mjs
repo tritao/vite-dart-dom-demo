@@ -5,6 +5,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { chromium } from "playwright";
 import { setTimeout as delay } from "node:timers/promises";
+import { setTimeout as setTimeoutCb } from "node:timers";
 
 import { runSolidWordprocScenario } from "./scenarios/solid-wordproc.mjs";
 import { runSolidNestingScenario } from "./scenarios/solid-nesting.mjs";
@@ -218,6 +219,13 @@ function isIgnorable404(url) {
   }
 }
 
+function isIgnorableRequestFailureText(text) {
+  if (!text) return false;
+  // Playwright reports aborted requests during navigations (expected when we
+  // rapidly change docs pages in scenarios).
+  return /ERR_ABORTED|NS_BINDING_ABORTED/i.test(text);
+}
+
 function isIgnorableConsoleError(text) {
   return (
     /Failed to load resource/i.test(text) && /favicon\.ico/i.test(text)
@@ -270,6 +278,7 @@ async function inspectUrl(
       method: req.method(),
       failure: req.failure()?.errorText,
     };
+    if (isIgnorableRequestFailureText(record.failure)) return;
     if (!isIgnorable404(record.url)) failedRequests.push(record);
   });
   page.on("response", (resp) => {
@@ -528,13 +537,19 @@ async function main() {
       });
       started.push(server.child);
 
-      await server.waitFor(
+      const waitForOutput = server.waitFor(
         (out) =>
           out.includes(url) ||
           out.includes(`http://${HOST}:${port}`) ||
           out.includes("Local:"),
         args.timeoutMs,
       );
+      const waitForHttp = waitForHttpReady(url, {
+        timeoutMs: args.timeoutMs,
+        name: `${args.mode} server`,
+        child: server.child,
+      });
+      await Promise.race([waitForOutput, waitForHttp]);
     }
 
     const repeat = Number(args.repeat ?? 1);
@@ -621,3 +636,36 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+async function waitForHttpReady(
+  url,
+  { timeoutMs, name = "server", child = null },
+) {
+  const start = Date.now();
+
+  while (Date.now() - start < timeoutMs) {
+    if (child?.exitCode != null) {
+      throw new Error(`${name} exited early with code ${child.exitCode}`);
+    }
+
+    const controller = new AbortController();
+    const t = setTimeoutCb(() => controller.abort(), 2000);
+    try {
+      const resp = await fetch(url, {
+        signal: controller.signal,
+        redirect: "manual",
+      });
+      // Any response means the server is reachable; a 404 is fine because some
+      // pages are multi-entry and Vite still serves an HTML shell.
+      if (resp && resp.status > 0) return;
+    } catch {
+      // ignore and retry
+    } finally {
+      clearTimeout(t);
+    }
+
+    await delay(150);
+  }
+
+  throw new Error(`Timed out waiting for ${name} HTTP readiness: ${url}`);
+}
