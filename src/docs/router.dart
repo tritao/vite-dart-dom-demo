@@ -371,7 +371,7 @@ void mountSolidDocs(web.Element mount) {
       final home = web.HTMLAnchorElement()
         ..href = "#/"
         ..className = "docsNavLink"
-        ..textContent = "Docs home";
+        ..textContent = "Introduction";
       if (slug.value == "index") {
         home.setAttribute("data-active", "true");
         home.setAttribute("aria-current", "page");
