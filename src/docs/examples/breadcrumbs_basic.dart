@@ -13,7 +13,7 @@ Dispose mountDocsBreadcrumbsBasic(web.Element mount) {
       ],
     );
 
-    return div(className: "stack", children: [
+    return stack(children: [
       crumbs,
       p("Use this for hierarchical navigation.", className: "muted"),
     ]);

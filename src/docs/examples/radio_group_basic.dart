@@ -30,7 +30,7 @@ Dispose mountDocsRadioGroupBasic(web.Element mount) {
     final status =
         p("", className: "muted", children: [text(() => "value=${value.value}")]);
 
-    return div(className: "stack", children: [label, group, status]);
+    return stack(children: [label, group, status]);
   });
   // #doc:endregion snippet
 }

@@ -198,6 +198,13 @@
     flex-wrap: wrap;
   }
 
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
   .input {
     flex: 1 1 240px;
     padding: 10px 12px;

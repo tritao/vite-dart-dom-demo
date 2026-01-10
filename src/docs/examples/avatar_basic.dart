@@ -33,7 +33,7 @@ Dispose mountDocsAvatarBasic(web.Element mount) {
       className: "muted",
     );
 
-    return div(className: "stack", children: [avatarsRow, label]);
+    return stack(children: [avatarsRow, label]);
   });
   // #doc:endregion snippet
 }

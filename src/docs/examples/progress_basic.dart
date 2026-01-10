@@ -72,13 +72,13 @@ Dispose mountDocsProgressBasic(web.Element mount) {
       ],
     );
 
-    final stack = div(className: "stack", children: [
+    final root = stack(children: [
       controls,
       determinate,
       indeterminate,
       status,
     ])..style.maxWidth = "520px";
-    return stack;
+    return root;
   });
   // #doc:endregion snippet
 }

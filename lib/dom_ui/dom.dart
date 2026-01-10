@@ -41,6 +41,21 @@ web.HTMLDivElement row({
         className: className == null ? 'row' : 'row $className',
         children: children);
 
+web.HTMLDivElement stack({
+  String? className,
+  List<web.Node>? children,
+}) =>
+    div(
+        className: className == null ? 'stack' : 'stack $className',
+        children: children);
+
+// Alias: `row` but vertical (handy in docs/demos).
+web.HTMLDivElement col({
+  String? className,
+  List<web.Node>? children,
+}) =>
+    stack(className: className, children: children);
+
 web.HTMLDivElement buttonRow({
   List<web.Node> children = const [],
 }) =>

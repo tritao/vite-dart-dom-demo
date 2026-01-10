@@ -10,6 +10,8 @@ export "dom_ui/dom.dart"
     show
         div,
         row,
+        stack,
+        col,
         buttonRow,
         spacer,
         mountPoint,

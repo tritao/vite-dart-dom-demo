@@ -50,7 +50,7 @@ Dispose mountDocsToggleGroupBasic(web.Element mount) {
       ],
     );
 
-    return div(className: "stack", children: [
+    return stack(children: [
       p("Single (toggleable)", className: "muted"),
       singleGroup,
       p("Multiple", className: "muted"),

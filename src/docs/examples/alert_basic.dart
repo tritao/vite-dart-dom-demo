@@ -20,7 +20,7 @@ Dispose mountDocsAlertBasic(web.Element mount) {
       ],
     )..setAttribute("data-test", "destructive");
 
-    return div(className: "stack", children: [normal, destructive]);
+    return stack(children: [normal, destructive]);
   });
   // #doc:endregion snippet
 }

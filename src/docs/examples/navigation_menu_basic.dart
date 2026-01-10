@@ -74,7 +74,7 @@ Dispose mountDocsNavigationMenuBasic(web.Element mount) {
       className: "muted",
     );
 
-    return div(className: "stack", children: [menu, note]);
+    return stack(children: [menu, note]);
   });
   // #doc:endregion snippet
 }
