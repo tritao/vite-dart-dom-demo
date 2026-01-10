@@ -11,6 +11,7 @@
     "dev": "vite",
     "prebuild": "npm run dart:get && npm run docs:build",
     "build": "vite build",
+    "prebuild:all": "npm run dart:get && npm run docs:build",
     "build:all": "BUILD_WORDPROC=1 vite build",
     "preview": "vite preview",
     "docs:ci": "npm run debug:docs-props:ci && npm run debug:docs-forms-suite:ci && npm run debug:docs-overlay-suite:ci && npm run debug:docs-ui-suite:ci",
