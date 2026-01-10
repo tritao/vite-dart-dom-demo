@@ -180,11 +180,42 @@ void _copyOptionalDocsAssets() {
 String _renderMarkdownWithDirectives(String raw, {String? labHref}) {
   final normalized = raw.replaceAll("\r\n", "\n");
   final expanded = _expandDirectives(normalized, labHref: labHref);
-  final html = md.markdownToHtml(
+  var html = md.markdownToHtml(
     expanded,
     extensionSet: md.ExtensionSet.gitHubFlavored,
   );
+  html = _rewriteAppLinks(html);
   return _wrapMarkedCodeBlocks(html);
+}
+
+String _rewriteAppLinks(String html) {
+  String? rewriteHref(String rawHref) {
+    final href = rawHref.trim();
+
+    if (href.startsWith("?docs=")) {
+      final uri = Uri.tryParse(href);
+      final docs = uri?.queryParameters["docs"];
+      final slug = docs == null || docs.isEmpty || docs == "1" ? "" : docs;
+      final fragment = slug.isEmpty ? "#/" : "#/$slug";
+      return fragment;
+    }
+
+    if (href.startsWith("?lab=")) {
+      return "labs.html$href";
+    }
+
+    return null;
+  }
+
+  final re = RegExp('href=(["\'])([^"\']*)\\1');
+  return html.replaceAllMapped(re, (m) {
+    final full = m.group(0)!;
+    final quote = m.group(1)!;
+    final href = m.group(2)!;
+    final rewritten = rewriteHref(href);
+    if (rewritten == null) return full;
+    return 'href=$quote$rewritten$quote';
+  });
 }
 
 String _expandDirectives(String input, {String? labHref}) {

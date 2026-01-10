@@ -7,8 +7,8 @@ Dispose mountDocsBreadcrumbsBasic(web.Element mount) {
   return render(mount, () {
     final crumbs = Breadcrumbs(
       items: [
-        BreadcrumbItem(label: "Docs", href: "?docs=index"),
-        BreadcrumbItem(label: "UI", href: "?docs=button"),
+        BreadcrumbItem(label: "Docs", href: "#/"),
+        BreadcrumbItem(label: "UI", href: "#/button"),
         BreadcrumbItem(label: "Breadcrumbs", current: true),
       ],
     );

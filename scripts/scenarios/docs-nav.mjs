@@ -20,13 +20,13 @@ export async function runDocsNavScenario(page, ctx) {
   });
 
   // Clicking a docs link should not trigger a full reload. Same-document
-  // navigation (history.pushState) is expected.
+  // navigation (hash navigation) is expected.
   const sentinel = await page.evaluate(() => {
     window.__docsNavSentinel = Math.random();
     return window.__docsNavSentinel;
   });
   await sidebar.getByRole("link", { name: "Dialog" }).click();
-  await page.waitForURL(/\\?docs=dialog/, { timeout: timeoutMs });
+  await page.waitForURL(/#\\/dialog/, { timeout: timeoutMs });
 
   const stillThere = await page.evaluate(() => window.__docsNavSentinel);
   if (stillThere !== sentinel) {

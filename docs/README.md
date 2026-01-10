@@ -4,8 +4,8 @@ Docs pages live in `docs/pages/**/*.md` and are compiled into static HTML under 
 
 ## Routes
 
-- `/?docs=1` → `docs/pages/index.md`
-- `/?docs=<slug>` → `docs/pages/<slug>.md` (via frontmatter `slug`)
+- `docs.html#/` → `docs/pages/index.md`
+- `docs.html#/<slug>` → `docs/pages/<slug>.md` (via frontmatter `slug`)
 
 ## Frontmatter
 

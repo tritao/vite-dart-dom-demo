@@ -151,9 +151,23 @@ String _escapeHtml(String input) {
       .replaceAll('"', "&quot;");
 }
 
-void mountSolidDocs(web.Element mount, String? page) {
+String _docsSlugFromFragment(String? fragment) {
+  if (fragment == null) return "index";
+  var f = fragment.trim();
+  if (f.startsWith("#")) f = f.substring(1);
+  if (f.startsWith("/")) f = f.substring(1);
+  while (f.endsWith("/")) {
+    f = f.substring(0, f.length - 1);
+  }
+  if (f.isEmpty) return "index";
+  final first = f.split("/").first;
+  if (first.isEmpty || first == "1") return "index";
+  return first;
+}
+
+void mountSolidDocs(web.Element mount) {
   render(mount, () {
-    final slug = createSignal(router.normalizeDocsSlug(page));
+    final slug = createSignal(_docsSlugFromFragment(Uri.base.fragment));
 
     final root = web.HTMLDivElement()..id = "docs-root";
 
@@ -256,9 +270,9 @@ void mountSolidDocs(web.Element mount, String? page) {
       });
     }
 
-    // Client-side docs navigation: intercept `?docs=...` clicks and drive URL +
-    // state with pushState. This avoids full reloads and keeps the manifest
-    // resource warm, removing the sidebar "Loading…" flash on page changes.
+    // Client-side docs navigation:
+    // - Intercept legacy `?docs=...` links and convert to hash routes.
+    // - Let hash navigation drive the active page (supports back/forward).
     on(root, "click", (e) {
       if (e is! web.MouseEvent) return;
       if (e.defaultPrevented) return;
@@ -286,18 +300,25 @@ void mountSolidDocs(web.Element mount, String? page) {
       if (uri.hasScheme || uri.host.isNotEmpty) return;
 
       final nextDocs = uri.queryParameters["docs"];
-      if (nextDocs == null) return;
+      final nextLab = uri.queryParameters["lab"];
+      if (nextDocs == null && nextLab == null) return;
 
       e.preventDefault();
-      router.setQueryParam("docs", nextDocs, replace: false);
-      slug.value = router.normalizeDocsSlug(nextDocs);
+      if (nextDocs != null) {
+        final nextSlug = router.normalizeDocsSlug(nextDocs);
+        web.window.location.hash = nextSlug == "index" ? "/" : "/$nextSlug";
+        return;
+      }
+      if (nextLab != null) {
+        web.window.location.assign("labs.html?lab=$nextLab");
+        return;
+      }
     });
 
     // Back/forward support within docs.
-    final stopPop = router.listenPopState((_) {
-      slug.value = router.normalizeDocsSlug(router.getQueryParam("docs"));
+    on(web.window, "hashchange", (_) {
+      slug.value = _docsSlugFromFragment(Uri.base.fragment);
     });
-    onCleanup(stopPop);
 
     final title = web.HTMLHeadingElement.h1()
       ..id = "docs-title"
@@ -348,7 +369,7 @@ void mountSolidDocs(web.Element mount, String? page) {
       final q = searchQuery.value.trim().toLowerCase();
 
       final home = web.HTMLAnchorElement()
-        ..href = "?docs=1"
+        ..href = "#/"
         ..className = "docsNavLink"
         ..textContent = "Docs home";
       if (slug.value == "index") {
@@ -368,7 +389,7 @@ void mountSolidDocs(web.Element mount, String? page) {
           ..className = "muted"
           ..textContent = "Docs manifest failed to load.");
         sidebar.appendChild(web.HTMLAnchorElement()
-          ..href = "?lab=catalog"
+          ..href = "labs.html?lab=catalog"
           ..className = "docsNavLink"
           ..textContent = "Open labs");
         return;
@@ -407,7 +428,7 @@ void mountSolidDocs(web.Element mount, String? page) {
 
         for (final p in visiblePages) {
           final a = web.HTMLAnchorElement()
-            ..href = "?docs=${p.slug}"
+            ..href = p.slug == "index" ? "#/" : "#/${p.slug}"
             ..className = "docsNavLink"
             ..textContent = p.title;
           if (slug.value == p.slug) {

@@ -12,7 +12,7 @@ web.HTMLElement solidusDocsNav({required String active}) {
   nav.appendChild(inner);
 
   final brand = web.HTMLAnchorElement()
-    ..href = "?docs=1"
+    ..href = "#/"
     ..className = "docsTopbarBrand";
   final brandLogo = web.HTMLImageElement()
     ..className = "docsTopbarLogo"
@@ -32,8 +32,8 @@ web.HTMLElement solidusDocsNav({required String active}) {
   }
 
   final links = web.HTMLDivElement()..className = "docsTopbarLinks";
-  links.appendChild(link("Docs", "?docs=1", current: active == "docs"));
-  links.appendChild(link("Labs", "?lab=catalog", current: active == "labs"));
+  links.appendChild(link("Docs", "#/", current: active == "docs"));
+  links.appendChild(link("Labs", "labs.html?lab=catalog", current: active == "labs"));
   inner.appendChild(links);
 
   final search = web.HTMLDivElement()..className = "docsTopbarSearch";

@@ -8,7 +8,7 @@ UI primitives + a SolidJS-ish reactive runtime for **Dart on the DOM**, with doc
 
 ## 🌟 What’s in here?
 
-- 📚 **Docs**: component pages + minimal examples → `docs.html?docs=index`
+- 📚 **Docs**: component pages + minimal examples → `docs.html#/`
 - 🧪 **Labs**: edge cases + Playwright scenarios → `labs.html`
 - ⚡ **Reactivity**: SolidJS-ish signals/effects/memos → `lib/solidus/`
 - 🧱 **DOM UI runtime**: component base + DOM helpers → `lib/dom_ui/`
@@ -49,7 +49,7 @@ This repo ships a growing set of DOM UI primitives with docs + examples, includi
 - 🧾 Forms: Input, InputOTP, FormField, Textarea, Checkbox, RadioGroup, Slider, Select, Combobox, Listbox, ToggleGroup
 - 🧠 Focus/interaction: FocusScope, InteractOutside, Roving focus
 
-Browse: `docs.html?docs=index` 📚✨
+Browse: `docs.html#/` 📚✨
 
 ## ⚡ Quickstart
 
@@ -78,7 +78,7 @@ npm run dev
 
 Open (pick your adventure ✨🗺️):
 
-- 📚 Docs: `http://localhost:5173/docs.html?docs=index`
+- 📚 Docs: `http://localhost:5173/docs.html#/`
 - 🧪 Labs catalog: `http://localhost:5173/labs.html?lab=catalog`
 - 🧪 Labs demo (DOM): `http://localhost:5173/labs.html?lab=dom`
 - 🧪 Labs demo (Dialog): `http://localhost:5173/labs.html?lab=dialog` (or `overlay`, `popover`, …)

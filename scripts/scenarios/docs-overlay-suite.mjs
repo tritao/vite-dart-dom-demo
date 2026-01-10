@@ -9,9 +9,10 @@ import { runDocsToastScenario } from "./docs-toast.mjs";
 
 async function gotoDocs(page, slug, timeoutMs) {
   const u = new URL(page.url());
-  u.searchParams.set("docs", slug);
+  u.searchParams.delete("docs");
+  u.hash = slug === "1" || slug === "index" ? "#/" : `#/${slug}`;
   await page.goto(u.toString(), { timeout: timeoutMs });
-  await page.waitForURL(new RegExp(`\\?docs=${slug.replace(/[-/]/g, "[-/]")}`), {
+  await page.waitForURL(new RegExp(`#\\/${slug.replace(/[-/]/g, "[-/]")}`), {
     timeout: timeoutMs,
   });
 }
@@ -42,4 +43,3 @@ export async function runDocsOverlaySuiteScenario(page, ctx) {
   await gotoDocs(page, "toast", timeoutMs);
   await runDocsToastScenario(page, { timeoutMs });
 }
-
