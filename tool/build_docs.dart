@@ -48,10 +48,13 @@ Future<void> main(List<String> args) async {
   // Keep `docs/api/props.json` in sync with source by generating it before
   // building pages (avoids drift from manual edits).
   try {
-    await gen.main(const []);
+    await gen.main(const ["--strict"]);
   } catch (e) {
-    stderr.writeln("WARN: props generation failed: $e");
+    stderr.writeln("ERROR: props generation failed: $e");
+    exitCode = 1;
+    return;
   }
+  if (exitCode != 0) return;
 
   final pagesRoot = Directory("docs/pages");
   if (!pagesRoot.existsSync()) {
@@ -226,7 +229,11 @@ String _expandDirectives(String input, {String? labHref}) {
       if (bodyHtml.isNotEmpty) {
         out.writeln('  <div class="docDemoDesc muted">$bodyHtml</div>');
       }
-      out.writeln('  <div class="docDemoMount" data-doc-demo="${_escapeHtml(id)}"></div>');
+      out.writeln('  <div class="docDemoMount">');
+      out.writeln(
+        '    <iframe class="docDemoIframe" data-doc-demo="${_escapeHtml(id)}" loading="lazy" src="docs-embed.html?demo=${_escapeHtml(id)}"></iframe>',
+      );
+      out.writeln("  </div>");
       out.writeln("</div>");
       continue;
     }

@@ -13,6 +13,7 @@
     "build": "vite build",
     "build:all": "BUILD_WORDPROC=1 vite build",
     "preview": "vite preview",
+    "docs:ci": "npm run debug:docs-props:ci && npm run debug:docs-forms-suite:ci && npm run debug:docs-overlay-suite:ci && npm run debug:docs-ui-suite:ci",
     "debug:ui": "node scripts/debug-ui.mjs --path \"/?demos=1\" --expect-h1 \"Dart + Vite (DOM demo)\" --expect-selector \"#app-root\"",
     "debug:ui:dev": "node scripts/debug-ui.mjs --mode dev --path \"/?demos=1\" --expect-h1 \"Dart + Vite (DOM demo)\" --expect-selector \"#app-root\"",
     "debug:ui:preview": "node scripts/debug-ui.mjs --mode preview --path \"/?demos=1\" --expect-h1 \"Dart + Vite (DOM demo)\" --expect-selector \"#app-root\"",

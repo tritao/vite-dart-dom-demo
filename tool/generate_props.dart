@@ -40,7 +40,9 @@ final class PropsSpec {
 }
 
 Future<void> main(List<String> args) async {
-  final outPath = args.isNotEmpty ? args.first : "docs/api/props.json";
+  final strict = args.contains("--strict");
+  final pathArg = args.where((a) => a != "--strict").toList();
+  final outPath = pathArg.isNotEmpty ? pathArg.first : "docs/api/props.json";
   final names = _collectPropsNames();
 
   final old = _readExisting(outPath);
@@ -115,6 +117,20 @@ Future<void> main(List<String> args) async {
   outFile.createSync(recursive: true);
   outFile.writeAsStringSync(const JsonEncoder.withIndent("  ").convert(sortedOut));
   stdout.writeln("[generate_props] Wrote ${sortedKeys.length} specs -> $outPath");
+
+  if (strict) {
+    final empty = <String>[];
+    for (final k in sortedKeys) {
+      final v = sortedOut[k];
+      if (v is! Map) continue;
+      final rows = v["rows"];
+      if (rows is List && rows.isEmpty) empty.add(k);
+    }
+    if (empty.isNotEmpty) {
+      stderr.writeln("[generate_props] ERROR: empty props specs: ${empty.join(', ')}");
+      exitCode = 1;
+    }
+  }
 }
 
 Set<String> _collectPropsNames() {
