@@ -216,6 +216,7 @@ Future<void> _handleCopyCode(web.HTMLButtonElement button) async {
 void mountSolidDocs(web.Element mount) {
   render(mount, () {
     final slug = createSignal(_docsSlugFromFragment(Uri.base.fragment));
+    final docsBuild = createSignal<int>(0);
 
     final root = web.HTMLDivElement()..id = "docs-root";
 
@@ -234,9 +235,18 @@ void mountSolidDocs(web.Element mount) {
     layout.appendChild(main);
     container.appendChild(layout);
 
-    final manifest = createResource(_fetchManifest);
-    final pageHtml = createResourceWithSource(() => slug.value, _fetchPageHtml);
-    final propsData = createResource(_fetchProps);
+    final manifest = createResourceWithSource((() {
+      docsBuild.value;
+      return 0;
+    }), (_) => _fetchManifest());
+    final pageHtml = createResourceWithSource((() {
+      docsBuild.value;
+      return slug.value;
+    }), _fetchPageHtml);
+    final propsData = createResourceWithSource((() {
+      docsBuild.value;
+      return 0;
+    }), (_) => _fetchProps());
 
     final searchQuery = createSignal("");
     final themeMode = createSignal(theme.getThemePreference());
@@ -374,6 +384,11 @@ void mountSolidDocs(web.Element mount) {
     // Back/forward support within docs.
     on(web.window, "hashchange", (_) {
       slug.value = _docsSlugFromFragment(Uri.base.fragment);
+    });
+
+    // Dev-only docs refresh (wired from Vite HMR via `src/docs.js`).
+    on(web.window, "solidus:docs-built", (_) {
+      docsBuild.value = docsBuild.value + 1;
     });
 
     final title = web.HTMLHeadingElement.h1()

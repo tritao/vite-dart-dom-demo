@@ -6,3 +6,9 @@ import "./docs_main.dart";
 
 globalThis.morphPatch = morphPatch;
 globalThis.docsHighlightWithin = highlightWithin;
+
+if (import.meta.hot) {
+  import.meta.hot.on("solidus:docs-built", () => {
+    window.dispatchEvent(new CustomEvent("solidus:docs-built"));
+  });
+}
