@@ -394,7 +394,7 @@ final class BackendPlaygroundComponent extends Component {
         subtitle: 'Raw JSON from the last request.',
         children: [
           dom.spacer(),
-          if (state.lastJson.isEmpty) dom.muted('No requests yet.') else pre(state.lastJson),
+          pre(state.lastJson.isEmpty ? 'No requests yet.' : state.lastJson),
         ],
       ),
     ]);
