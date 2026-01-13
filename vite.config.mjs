@@ -57,9 +57,24 @@ export default defineConfig(({ mode, command }) => {
     }
   };
 
+  const backendTarget =
+    env.SOLIDUS_BACKEND_PROXY ??
+    env.VITE_SOLIDUS_BACKEND_PROXY ??
+    process.env.SOLIDUS_BACKEND_PROXY ??
+    process.env.VITE_SOLIDUS_BACKEND_PROXY ??
+    "http://127.0.0.1:8080";
+
   return {
     base,
     server: {
+      proxy: {
+        "/api": {
+          target: backendTarget,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (p) => p.replace(/^\/api/, ""),
+        },
+      },
       watch: {
         // `tool/build_docs.dart` writes into `public/assets/docs/**`; we trigger
         // a targeted refresh ourselves to avoid feedback loops.

@@ -2,6 +2,7 @@ import 'package:web/web.dart' as web;
 
 import './app/app_component.dart';
 import './app/counter_component.dart';
+import './app/backend_playground_component.dart';
 import './app/intro_component.dart';
 import './app/todos_component.dart';
 import './app/users_component.dart';
@@ -19,6 +20,7 @@ void main() {
   final docs = params["docs"];
   final lab = params["lab"];
   final demos = params["demos"];
+  final backend = params["backend"];
 
   // Split bundles: redirect to dedicated entrypoints for docs/labs.
   if (docs != null) {
@@ -36,6 +38,11 @@ void main() {
       todos: TodosComponent(),
       usersFactory: () => UsersComponent(),
     ).mountInto(mount);
+    return;
+  }
+
+  if (backend == "1" || backend == "true") {
+    BackendPlaygroundComponent().mountInto(mount);
     return;
   }
 

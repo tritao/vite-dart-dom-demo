@@ -119,6 +119,7 @@ final class AppComponent extends Component {
           dom.linkButton('Home', href: './'),
           dom.linkButton('Docs', href: 'docs.html#/'),
           dom.linkButton('Labs', href: 'labs.html?lab=catalog'),
+          dom.linkButton('Backend', href: '?backend=1'),
         ],
       ),
       dom.spacer(),
@@ -130,6 +131,7 @@ final class AppComponent extends Component {
           dom.spacer(),
           dom.row(children: [
             dom.linkButton('Demos', href: '?demos=1'),
+            dom.linkButton('Backend', href: '?backend=1'),
             dom.linkButton('Docs', href: 'docs.html#/'),
             dom.linkButton('Catalog', href: 'labs.html?lab=catalog'),
             dom.linkButton('DropdownMenu', href: 'labs.html?lab=dropdownmenu'),

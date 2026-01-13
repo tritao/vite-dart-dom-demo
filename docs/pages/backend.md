@@ -47,6 +47,16 @@ curl -X POST http://127.0.0.1:8080/bootstrap \
   -d '{"email":"owner@example.com","password":"passw0rd!pass"}'
 ```
 
+## Backend playground (Solidus web app)
+
+This repo includes a small Solidus web page to exercise the backend:
+
+- Open `http://localhost:5173/?backend=1`
+
+It defaults to `Base URL = /api` and uses the Vite dev-server proxy:
+
+- `vite.config.mjs` proxies `/api/*` → `http://127.0.0.1:8080/*` (override via `SOLIDUS_BACKEND_PROXY`)
+
 ## Email links and token leakage
 
 By default, links are built with query params (e.g. `...?token=...`).

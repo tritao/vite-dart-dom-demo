@@ -1,3 +1,17 @@
 @layer components {
   /* Intentionally kept minimal: layout/util helpers only. */
+
+  .codeBlock {
+    margin: 0;
+    padding: 12px;
+    max-height: 320px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+      monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 }

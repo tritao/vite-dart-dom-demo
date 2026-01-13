@@ -23,6 +23,7 @@ final class IntroComponent extends Component {
           dom.linkButton("Docs", href: "docs.html#/"),
           dom.linkButton("Labs", href: "labs.html?lab=catalog"),
           dom.linkButton("Demos", href: "?demos=1", kind: "primary"),
+          dom.linkButton("Backend", href: "?backend=1"),
         ]),
       ]),
       dom.spacer(),
