@@ -13,7 +13,9 @@ import 'auth/password_hasher.dart';
 import 'auth/totp.dart';
 import 'config.dart';
 import 'db/app_db.dart';
+import 'email/email_dispatcher.dart';
 import 'email/email_sender.dart';
+import 'email/resend_email_sender.dart';
 import 'email/templates.dart';
 import 'http/cookies.dart';
 import 'http/http_utils.dart';
@@ -28,17 +30,21 @@ class SolidusBackendServer {
     required this.config,
     required this.db,
     required HttpServer httpServer,
-  }) : _httpServer = httpServer;
+    required EmailDispatcher emailDispatcher,
+  })  : _httpServer = httpServer,
+        _emailDispatcher = emailDispatcher;
 
   final SolidusBackendConfig config;
   final AppDatabase db;
   final HttpServer _httpServer;
+  final EmailDispatcher _emailDispatcher;
 
   String get host => _httpServer.address.host;
   int get port => _httpServer.port;
 
   Future<void> stop() async {
     await _httpServer.close(force: true);
+    await _emailDispatcher.close();
     await db.close();
   }
 
@@ -56,14 +62,26 @@ class SolidusBackendServer {
       await _ensureDefaultTenant(db, config);
     }
 
-    final handler = _buildHandler(db: db, config: config, logger: logger);
+    final emailSender = _buildEmailSender(config: config, logger: logger);
+    final dispatcher = EmailDispatcher(sender: emailSender, logger: logger);
+    final handler = _buildHandler(
+      db: db,
+      config: config,
+      logger: logger,
+      emailDispatcher: dispatcher,
+    );
     final server = await shelf_io.serve(
       handler,
       config.host,
       config.port,
     );
 
-    return SolidusBackendServer._(config: config, db: db, httpServer: server);
+    return SolidusBackendServer._(
+      config: config,
+      db: db,
+      httpServer: server,
+      emailDispatcher: dispatcher,
+    );
   }
 }
 
@@ -86,6 +104,7 @@ Handler _buildHandler({
   required AppDatabase db,
   required SolidusBackendConfig config,
   required Logger logger,
+  required EmailDispatcher emailDispatcher,
 }) {
   final router = Router();
 
@@ -93,7 +112,6 @@ Handler _buildHandler({
   final encryptor = AesGcmEncryptor(config.authMasterKey);
   final totp = Totp();
   final rateLimiter = InMemoryRateLimiter();
-  final emailSender = _buildEmailSender(config: config, logger: logger);
 
   router.get('/healthz', (Request request) {
     return Response.ok('ok');
@@ -155,13 +173,13 @@ Handler _buildHandler({
       resetUrl: resetUrl.toString(),
       expiresIn: const Duration(minutes: 30),
     );
-    final delivery = await _sendEmailBestEffort(
-      emailSender: emailSender,
+    final delivery = await _deliverEmail(
+      emailDispatcher: emailDispatcher,
+      config: config,
       to: user.email,
-      from: config.emailFrom,
       subject: tpl.subject,
       text: tpl.text,
-      logger: logger,
+      html: tpl.html,
     );
     await _audit(
       db,
@@ -1035,13 +1053,13 @@ Handler _buildHandler({
       verifyUrl: verifyUrl.toString(),
       expiresIn: const Duration(hours: 24),
     );
-    final delivery = await _sendEmailBestEffort(
-      emailSender: emailSender,
+    final delivery = await _deliverEmail(
+      emailDispatcher: emailDispatcher,
+      config: config,
       to: auth.user.email,
-      from: config.emailFrom,
       subject: tpl.subject,
       text: tpl.text,
-      logger: logger,
+      html: tpl.html,
     );
     await _audit(
       db,
@@ -1674,6 +1692,19 @@ EmailSender _buildEmailSender({
   switch (config.emailTransport) {
     case 'log':
       return LogEmailSender(logger);
+    case 'resend':
+      final from = config.emailFrom;
+      final apiKey = config.resendApiKey;
+      if (from == null) {
+        throw StateError('Resend email transport requires SOLIDUS_EMAIL_FROM');
+      }
+      if (apiKey == null) {
+        throw StateError('Resend email transport requires SOLIDUS_RESEND_API_KEY');
+      }
+      return ResendEmailSender(
+        apiKey: apiKey,
+        endpoint: Uri.parse(config.resendEndpoint),
+      );
     case 'smtp':
       final from = config.emailFrom;
       final host = config.smtpHost;
@@ -1697,7 +1728,7 @@ EmailSender _buildEmailSender({
   }
 }
 
-class _NoopEmailSender implements EmailSender {
+class _NoopEmailSender extends EmailSender {
   @override
   Future<void> send(OutboundEmail email) async {}
 }
@@ -1744,29 +1775,38 @@ String _joinPath(String basePath, String add) {
   return '$a$b';
 }
 
-Future<String> _sendEmailBestEffort({
-  required EmailSender emailSender,
+Future<String> _deliverEmail({
+  required EmailDispatcher emailDispatcher,
+  required SolidusBackendConfig config,
   required String to,
-  required String? from,
   required String subject,
   required String text,
-  required Logger logger,
+  String? html,
 }) async {
+  if (config.emailTransport == 'disabled') return 'skipped_disabled';
+  final from = config.emailFrom;
   if (from == null || from.isEmpty) return 'skipped_no_from';
-  try {
-    await emailSender.send(
-      OutboundEmail(
-        to: to,
-        from: from,
-        subject: subject,
-        text: text,
-      ),
-    );
-    return 'sent';
-  } catch (e, st) {
-    logger.warning('email delivery failed: $e\n$st');
-    return 'failed';
+
+  final email = OutboundEmail(
+    to: to,
+    from: from,
+    subject: subject,
+    text: text,
+    html: html,
+  );
+
+  if (config.emailDeliveryMode == 'sync') {
+    // Synchronous delivery is only recommended for dev; it makes requests slower.
+    try {
+      await emailDispatcher.sendNow(email);
+      return 'sent';
+    } catch (_) {
+      return 'failed';
+    }
   }
+
+  emailDispatcher.enqueue(email);
+  return 'queued';
 }
 
 Future<bool> _useRecoveryCode(

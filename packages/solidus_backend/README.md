@@ -50,12 +50,14 @@ Env vars (most useful):
 
 Email delivery:
 
-- `SOLIDUS_EMAIL_TRANSPORT=disabled|log|smtp` (default `disabled`)
+- `SOLIDUS_EMAIL_TRANSPORT=disabled|log|smtp|resend` (default `disabled`)
+- `SOLIDUS_EMAIL_DELIVERY_MODE=async|sync` (default `async`): `async` queues in-process so requests don’t block
 - `SOLIDUS_EMAIL_FROM` (required for `smtp`, recommended for `log`)
 - `SOLIDUS_PUBLIC_BASE_URL` (recommended): used to build links, e.g. `https://app.example.com`
 - `SOLIDUS_FRONTEND_RESET_PATH` (default `/reset-password`)
 - `SOLIDUS_FRONTEND_VERIFY_EMAIL_PATH` (default `/verify-email`)
 - SMTP: `SOLIDUS_SMTP_HOST`, `SOLIDUS_SMTP_PORT`, `SOLIDUS_SMTP_USERNAME`, `SOLIDUS_SMTP_PASSWORD`, `SOLIDUS_SMTP_SSL=1`, `SOLIDUS_SMTP_ALLOW_INSECURE=0`
+- Resend: `SOLIDUS_RESEND_API_KEY`, `SOLIDUS_RESEND_ENDPOINT` (default `https://api.resend.com/emails`)
 
 Bootstrap the first user (only works when there are no users yet):
 

@@ -104,6 +104,9 @@ void main() {
       smtpPassword: null,
       smtpSsl: true,
       smtpAllowInsecure: false,
+      emailDeliveryMode: 'async',
+      resendApiKey: null,
+      resendEndpoint: 'https://api.resend.com/emails',
     );
 
     final server = await SolidusBackendServer.start(config);

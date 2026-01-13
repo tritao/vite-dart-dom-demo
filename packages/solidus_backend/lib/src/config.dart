@@ -32,6 +32,9 @@ class SolidusBackendConfig {
     required this.smtpPassword,
     required this.smtpSsl,
     required this.smtpAllowInsecure,
+    required this.emailDeliveryMode,
+    required this.resendApiKey,
+    required this.resendEndpoint,
   });
 
   final String host;
@@ -71,6 +74,10 @@ class SolidusBackendConfig {
   final String? smtpPassword;
   final bool smtpSsl;
   final bool smtpAllowInsecure;
+
+  final String emailDeliveryMode; // async|sync
+  final String? resendApiKey;
+  final String resendEndpoint;
 
   static SolidusBackendConfig fromEnv({Map<String, String>? env}) {
     final e = env ?? Platform.environment;
@@ -140,6 +147,11 @@ class SolidusBackendConfig {
     final smtpSsl = (e['SOLIDUS_SMTP_SSL'] ?? '1') != '0';
     final smtpAllowInsecure = (e['SOLIDUS_SMTP_ALLOW_INSECURE'] ?? '0') == '1';
 
+    final emailDeliveryMode = (e['SOLIDUS_EMAIL_DELIVERY_MODE'] ?? 'async').trim();
+    final resendApiKey = (e['SOLIDUS_RESEND_API_KEY'] ?? '').trim();
+    final resendEndpoint =
+        (e['SOLIDUS_RESEND_ENDPOINT'] ?? 'https://api.resend.com/emails').trim();
+
     return SolidusBackendConfig(
       host: host,
       port: port,
@@ -171,6 +183,9 @@ class SolidusBackendConfig {
       smtpPassword: smtpPassword.isEmpty ? null : smtpPassword,
       smtpSsl: smtpSsl,
       smtpAllowInsecure: smtpAllowInsecure,
+      emailDeliveryMode: emailDeliveryMode.isEmpty ? 'async' : emailDeliveryMode,
+      resendApiKey: resendApiKey.isEmpty ? null : resendApiKey,
+      resendEndpoint: resendEndpoint.isEmpty ? 'https://api.resend.com/emails' : resendEndpoint,
     );
   }
 }

@@ -20,9 +20,11 @@ class OutboundEmail {
 
 abstract class EmailSender {
   Future<void> send(OutboundEmail email);
+
+  Future<void> close() async {}
 }
 
-class LogEmailSender implements EmailSender {
+class LogEmailSender extends EmailSender {
   LogEmailSender(this._logger);
 
   final Logger _logger;
@@ -35,7 +37,7 @@ class LogEmailSender implements EmailSender {
   }
 }
 
-class SmtpEmailSender implements EmailSender {
+class SmtpEmailSender extends EmailSender {
   SmtpEmailSender({
     required String host,
     required int port,
