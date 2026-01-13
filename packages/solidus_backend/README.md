@@ -26,6 +26,7 @@ If `dart` isn't on your PATH, this repo usually has a provisioned SDK at `../../
 - `../../.dart-sdk/dart-sdk/bin/dart test`
 - End-to-end flow test: `packages/solidus_backend/test/flow_test.dart`
 - Shell smoke script (optional): `bash packages/solidus_backend/scripts/smoke.sh`
+- Example client: `../../.dart-sdk/dart-sdk/bin/dart run packages/solidus_backend/example/client.dart --base http://127.0.0.1:8080 --email owner@example.com --password 'passw0rd!pass'`
 
 ## Minimal API surface
 

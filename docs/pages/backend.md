@@ -88,3 +88,28 @@ Resend env vars:
 - Sessions: `GET /sessions`, `POST /sessions/<id>/revoke`, `POST /sessions/revoke_others`
 - 2FA: `POST /mfa/enroll/start`, `POST /mfa/enroll/confirm`, `POST /mfa/verify`, `POST /mfa/disable`, `POST /mfa/recovery/regenerate`
 - Tenant admin: `POST /t/<slug>/admin/invites`, `GET /t/<slug>/admin/members`, `POST /t/<slug>/admin/members/<userId>/role`, `POST /t/<slug>/admin/settings/mfa`
+
+## Examples
+
+### Dart client example
+
+See `packages/solidus_backend/example/client.dart` for a small cookie + CSRF aware client.
+
+### Login + CSRF (curl)
+
+```bash
+# login (stores cookies to cookiejar.txt)
+curl -sS -c cookiejar.txt http://127.0.0.1:8080/login \
+  -H 'content-type: application/json' \
+  -d '{"email":"owner@example.com","password":"passw0rd!pass"}' \
+  | tee /tmp/login.json
+
+# extract csrfToken
+CSRF=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["csrfToken"])' </tmp/login.json)
+
+# select tenant (requires CSRF header)
+curl -sS -b cookiejar.txt http://127.0.0.1:8080/tenants/select \
+  -H 'content-type: application/json' \
+  -H "x-csrf-token: $CSRF" \
+  -d '{"slug":"default"}'
+```
