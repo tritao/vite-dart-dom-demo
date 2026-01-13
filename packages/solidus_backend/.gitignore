@@ -1,0 +1,7 @@
+.dart_tool/
+build/
+.cache/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.types.temp.dart
