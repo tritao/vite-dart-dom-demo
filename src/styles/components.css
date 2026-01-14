@@ -26,6 +26,7 @@
 
   .input.inputSm {
     min-width: 0;
+    flex: 0 0 auto;
     height: 36px;
     padding: 8px 10px;
   }
