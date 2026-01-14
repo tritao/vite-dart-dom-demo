@@ -318,6 +318,50 @@ final class AdminController {
     await refreshSession();
   }
 
+  Future<void> demoBootstrapAndLogin({
+    required String email,
+    required String password,
+  }) async {
+    final res = await _run<Map<String, Object?>>(
+      topic: AdminTopic.session,
+      actionName: AdminActions.demoBootstrapLogin,
+      action: () async {
+        Object? bootstrapRes;
+        try {
+          bootstrapRes = await api.postJson(
+            '/bootstrap',
+            {'email': email, 'password': password},
+          );
+        } on BackendApiException catch (e) {
+          bootstrapRes = {
+            'error': e.toString(),
+            'statusCode': e.statusCode,
+            'body': e.body,
+          };
+        }
+
+        final loginRes = await api.postJson(
+          '/login',
+          {'email': email, 'password': password},
+        );
+
+        final csrfToken = loginRes['csrfToken'];
+        _csrfToken =
+            csrfToken is String && csrfToken.isNotEmpty ? csrfToken : null;
+        api.csrfToken = _csrfToken;
+
+        return {
+          'bootstrap': bootstrapRes,
+          'login': loginRes,
+        };
+      },
+    );
+    if (res == null) return;
+    _setLastJson(res);
+    _setStatus('Demo user logged in.');
+    await refreshSession();
+  }
+
   Future<void> bootstrap(
       {required String email, required String password}) async {
     final res = await _run<Map<String, Object?>>(
@@ -613,6 +657,7 @@ final class AdminController {
 abstract final class AdminActions {
   static const refreshMe = 'admin-refresh-me';
   static const login = 'admin-login';
+  static const demoBootstrapLogin = 'admin-demo-bootstrap-login';
   static const bootstrap = 'admin-bootstrap';
   static const logout = 'admin-logout';
 

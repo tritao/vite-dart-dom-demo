@@ -37,6 +37,10 @@ web.Element _pre(String text) {
 }
 
 final class AdminLoginPage extends Component {
+  static const _demoEmail = 'demo@solidus.local';
+  static const _demoPassword = 'demo-password-123456';
+  static const _actionPrefillDemo = 'admin-prefill-demo';
+
   AdminController get _ctrl => useContext<AdminController>(adminControllerKey);
   AdminNavigator get _nav => useContext<AdminNavigator>(adminNavigatorKey);
 
@@ -53,6 +57,7 @@ final class AdminLoginPage extends Component {
   web.Element render() {
     final disabledLogin = _ctrl.isDisabledFor(AdminActions.login);
     final disabledBootstrap = _ctrl.isDisabledFor(AdminActions.bootstrap);
+    final disabledDemo = _ctrl.isDisabledFor(AdminActions.demoBootstrapLogin);
 
     return dom.section(
       title: 'Login',
@@ -67,6 +72,16 @@ final class AdminLoginPage extends Component {
             'Login',
             action: AdminActions.login,
             disabled: disabledLogin,
+          ),
+          dom.secondaryButton(
+            'Prefill demo',
+            action: _actionPrefillDemo,
+            disabled: _ctrl.busy,
+          ),
+          dom.secondaryButton(
+            'Demo bootstrap + login',
+            action: AdminActions.demoBootstrapLogin,
+            disabled: disabledDemo,
           ),
           dom.secondaryButton(
             'Bootstrap (first user)',
@@ -105,6 +120,27 @@ final class AdminLoginPage extends Component {
         await _ctrl.login(
           email: _value(this, _AdminIds.email),
           password: _value(this, _AdminIds.password),
+        );
+        if (_ctrl.isAuthenticated) {
+          await _ctrl.loadTenants();
+          _nav.go('tenants');
+        }
+      },
+      _actionPrefillDemo: (_) {
+        final email = query<web.HTMLInputElement>('#${_AdminIds.email}');
+        final password = query<web.HTMLInputElement>('#${_AdminIds.password}');
+        if (email != null) email.value = _demoEmail;
+        if (password != null) password.value = _demoPassword;
+      },
+      AdminActions.demoBootstrapLogin: (_) async {
+        final email = query<web.HTMLInputElement>('#${_AdminIds.email}');
+        final password = query<web.HTMLInputElement>('#${_AdminIds.password}');
+        if (email != null) email.value = _demoEmail;
+        if (password != null) password.value = _demoPassword;
+
+        await _ctrl.demoBootstrapAndLogin(
+          email: _demoEmail,
+          password: _demoPassword,
         );
         if (_ctrl.isAuthenticated) {
           await _ctrl.loadTenants();
