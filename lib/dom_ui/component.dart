@@ -362,6 +362,9 @@ abstract class Component {
       } catch (_) {}
     }
     _cleanups.clear();
+    try {
+      _root.remove();
+    } catch (_) {}
     _mounted = false;
   }
 }
