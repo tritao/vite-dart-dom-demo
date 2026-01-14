@@ -99,6 +99,86 @@ function randomBase64Key32() {
   return crypto.randomBytes(32).toString("base64");
 }
 
+function isTruthyFlag(value) {
+  if (value == null) return false;
+  const v = String(value).trim().toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "on";
+}
+
+function isFalsyFlag(value) {
+  if (value == null) return false;
+  const v = String(value).trim().toLowerCase();
+  return v === "0" || v === "false" || v === "no" || v === "off";
+}
+
+function shouldIgnoreBackendWatchPath(p) {
+  const s = p.split(path.sep).join("/");
+  return (
+    s.includes("/.dart_tool/") ||
+    s.includes("/.cache/") ||
+    s.includes("/build/") ||
+    s.endsWith(".sqlite") ||
+    s.endsWith(".sqlite-wal") ||
+    s.endsWith(".sqlite-shm") ||
+    s.endsWith(".sqlite-journal") ||
+    s.endsWith(".db") ||
+    s.endsWith(".db-wal") ||
+    s.endsWith(".db-shm") ||
+    s.endsWith(".db-journal")
+  );
+}
+
+function watchBackendTree(backendDir, onChange) {
+  // Minimal recursive watcher without extra deps.
+  // We watch all subdirectories under the backend package, and debounce restarts.
+  const watchedDirs = new Set();
+  const watchers = [];
+
+  const addDir = (dir) => {
+    const resolved = path.resolve(dir);
+    if (watchedDirs.has(resolved)) return;
+    watchedDirs.add(resolved);
+    try {
+      const w = fs.watch(resolved, { persistent: true }, (eventType, filename) => {
+        const name = filename ? filename.toString() : "";
+        const fullPath = name ? path.join(resolved, name) : resolved;
+        if (shouldIgnoreBackendWatchPath(fullPath)) return;
+        onChange({ eventType, path: fullPath });
+      });
+      watchers.push(w);
+    } catch {
+      // ignore
+    }
+  };
+
+  const walk = (dir) => {
+    addDir(dir);
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (entry.name.startsWith(".")) continue;
+      const next = path.join(dir, entry.name);
+      if (shouldIgnoreBackendWatchPath(next)) continue;
+      walk(next);
+    }
+  };
+
+  walk(backendDir);
+
+  return () => {
+    for (const w of watchers) {
+      try {
+        w.close();
+      } catch {}
+    }
+  };
+}
+
 const root = process.cwd();
 const envLocal = parseEnvFile(path.join(root, ".env.local"));
 const env = { ...envLocal, ...process.env };
@@ -106,11 +186,14 @@ const args = parseArgs(process.argv.slice(2));
 
 if (args.help || args.h) {
   console.log(`
-Usage: npm run dev:full [--backend-port 8080] [--proxy http://127.0.0.1:8080]
+Usage: npm run dev:full [--backend-port 8080] [--proxy http://127.0.0.1:8080] [--backend-watch 1]
 
 Starts:
   - solidus_backend (packages/solidus_backend)
   - Vite dev server (with /api proxy to backend)
+
+Options:
+  --backend-watch 1|0     Restart backend on file changes (default: 1)
 
 Env overrides:
   - SOLIDUS_BACKEND_PROXY (overrides the Vite proxy target)
@@ -165,24 +248,100 @@ console.log(`[dev:full] backend: ${backendUrl}`);
 console.log(`[dev:full] vite /api proxy -> ${proxyTarget}`);
 console.log(`[dev:full] open: http://localhost:5173/?backend=1`);
 
-const backend = spawn(dart, ["run", "bin/server.dart"], {
-  cwd: backendDir,
-  stdio: "inherit",
-  env: backendEnv,
-});
+const backendWatch =
+  isTruthyFlag(args["backend-watch"]) ||
+  (!isFalsyFlag(args["backend-watch"]) && !isTruthyFlag(args["no-backend-watch"]));
 
+let shuttingDown = false;
+let backend = null;
+let backendStop = null;
+
+function spawnBackend() {
+  return spawn(dart, ["run", "bin/server.dart"], {
+    cwd: backendDir,
+    stdio: "inherit",
+    env: backendEnv,
+  });
+}
+
+async function stopBackend(timeoutMs = 2500) {
+  const child = backend;
+  if (!child) return;
+  if (child.exitCode != null) return;
+
+  await new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+
+    const timer = setTimeout(() => {
+      try {
+        child.kill("SIGKILL");
+      } catch {}
+      finish();
+    }, timeoutMs);
+
+    child.once("exit", () => {
+      clearTimeout(timer);
+      finish();
+    });
+
+    try {
+      child.kill("SIGTERM");
+    } catch {
+      clearTimeout(timer);
+      finish();
+    }
+  });
+}
+
+async function restartBackend(reason) {
+  if (shuttingDown) return;
+  console.log(`[dev:full] backend restart: ${reason}`);
+  await stopBackend();
+  backend = spawnBackend();
+  const ok = await waitForHealthz(`${backendUrl}/healthz`, 15_000);
+  if (!ok) {
+    console.error("[dev:full] backend did not become healthy after restart");
+  }
+}
+
+backend = spawnBackend();
 backend.on("exit", (code) => {
+  if (shuttingDown) return;
   if (code && code !== 0) {
     console.error(`[dev:full] backend exited with code ${code}`);
-  } else {
-    console.log("[dev:full] backend exited");
+    process.exit(code ?? 0);
   }
-  process.exit(code ?? 0);
+  // If it exits cleanly while we're in dev:full, bring it back.
+  restartBackend("backend exited");
 });
 
 const healthy = await waitForHealthz(`${backendUrl}/healthz`, 30_000);
 if (!healthy) {
   console.error("[dev:full] backend did not become healthy; continuing anyway");
+}
+
+if (backendWatch) {
+  console.log("[dev:full] backend watch: enabled");
+  let timer = null;
+  let lastChanged = null;
+  backendStop = watchBackendTree(backendDir, ({ path: changedPath }) => {
+    lastChanged = changedPath;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      const pretty = lastChanged
+        ? path.relative(root, lastChanged).split(path.sep).join("/")
+        : "(unknown)";
+      restartBackend(`file changed: ${pretty}`);
+    }, 200);
+  });
+} else {
+  console.log("[dev:full] backend watch: disabled");
 }
 
 const viteEnv = {
@@ -201,11 +360,15 @@ const vite = spawn(
 );
 
 const killAll = () => {
+  shuttingDown = true;
   try {
     vite.kill("SIGTERM");
   } catch {}
   try {
     backend.kill("SIGTERM");
+  } catch {}
+  try {
+    backendStop?.();
   } catch {}
 };
 
