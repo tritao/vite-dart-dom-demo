@@ -257,7 +257,23 @@ final class AdminController {
       api.csrfToken = _csrfToken;
       return await action();
     } on BackendApiException catch (e) {
-      _setStatus('Error: ${e.toString()}');
+      final statusCode = e.statusCode;
+      final body = e.body ?? '';
+
+      var message = e.toString();
+      if (statusCode == 404 &&
+          (body.contains('Not Found') ||
+              body.toLowerCase().contains('not found'))) {
+        if (actionName.startsWith('admin-outbox')) {
+          message =
+              'HTTP 404: outbox endpoints disabled (run via `npm run dev:full` or set `SOLIDUS_EXPOSE_DEV_TOKENS=1`).';
+        } else {
+          message =
+              'HTTP 404: endpoint not found (restart backend / ensure you pulled latest).';
+        }
+      }
+
+      _setStatus('Error: $message');
       _setLastJson(
           {'error': e.toString(), 'statusCode': e.statusCode, 'body': e.body});
       return null;
