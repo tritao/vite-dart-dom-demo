@@ -57,7 +57,8 @@ class SolidusBackendServer {
     Logger.root.level = Level.INFO;
     Logger.root.onRecord.listen((r) {
       // ignore: avoid_print
-      print('${r.level.name} ${r.time.toIso8601String()} ${r.loggerName}: ${r.message}');
+      print(
+          '${r.level.name} ${r.time.toIso8601String()} ${r.loggerName}: ${r.message}');
     });
 
     if (config.autoCreateDefaultTenant) {
@@ -155,7 +156,9 @@ Handler _buildHandler({
     final expiresAt = now.add(const Duration(minutes: 30));
 
     // Keep one active reset token per user.
-    await (db.delete(db.passwordResetTokens)..where((t) => t.userId.equals(user.id) & t.usedAt.isNull())).go();
+    await (db.delete(db.passwordResetTokens)
+          ..where((t) => t.userId.equals(user.id) & t.usedAt.isNull()))
+        .go();
     await db.into(db.passwordResetTokens).insert(
           PasswordResetTokensCompanion.insert(
             id: const Uuid().v4(),
@@ -169,12 +172,12 @@ Handler _buildHandler({
 
     await _audit(
       db,
-        action: 'auth.password_reset_requested',
-        actorUserId: user.id,
-        metadata: {'created': true},
-        ip: remoteIp(request),
-        userAgent: request.headers['user-agent'],
-      );
+      action: 'auth.password_reset_requested',
+      actorUserId: user.id,
+      metadata: {'created': true},
+      ip: remoteIp(request),
+      userAgent: request.headers['user-agent'],
+    );
 
     final resetUrl = _buildFrontendUrl(
       config: config,
@@ -239,12 +242,17 @@ Handler _buildHandler({
       await (db.update(db.users)..where((u) => u.id.equals(user.id))).write(
         UsersCompanion(passwordHash: Value(pwHash)),
       );
-      await (db.update(db.passwordResetTokens)..where((t) => t.id.equals(row.id))).write(
+      await (db.update(db.passwordResetTokens)
+            ..where((t) => t.id.equals(row.id)))
+          .write(
         PasswordResetTokensCompanion(usedAt: Value(now)),
       );
-      await (db.delete(db.passwordResetTokens)..where((t) => t.userId.equals(user.id) & t.usedAt.isNull())).go();
+      await (db.delete(db.passwordResetTokens)
+            ..where((t) => t.userId.equals(user.id) & t.usedAt.isNull()))
+          .go();
       // Revoke all sessions on password reset.
-      await (db.delete(db.sessions)..where((s) => s.userId.equals(user.id))).go();
+      await (db.delete(db.sessions)..where((s) => s.userId.equals(user.id)))
+          .go();
     });
 
     await _audit(
@@ -281,7 +289,8 @@ Handler _buildHandler({
     final now = DateTime.now().toUtc();
     if (locked != null && locked.isAfter(now)) {
       final retry = locked.difference(now).inSeconds;
-      return jsonError(429, 'too many attempts', details: {'retryAfterSeconds': retry});
+      return jsonError(429, 'too many attempts',
+          details: {'retryAfterSeconds': retry});
     }
 
     final user = await db.getUserByEmail(email);
@@ -326,7 +335,8 @@ Handler _buildHandler({
 
     // Best-effort rehash if params changed.
     // ignore: unawaited_futures
-    _maybeUpgradePasswordHash(db, passwordHasher: passwordHasher, user: user, password: password);
+    _maybeUpgradePasswordHash(db,
+        passwordHasher: passwordHasher, user: user, password: password);
 
     final has2fa = await _isTotpEnabled(db, userId: user.id);
     final session = await _createSession(
@@ -432,7 +442,10 @@ Handler _buildHandler({
       userAgent: request.headers['user-agent'],
     );
     return jsonResponse(
-      {'ok': true, 'tenant': {'slug': tenant.slug}},
+      {
+        'ok': true,
+        'tenant': {'slug': tenant.slug}
+      },
       statusCode: 201,
     );
   });
@@ -491,7 +504,8 @@ Handler _buildHandler({
 
     final rows = await (db.select(db.memberships).join([
       innerJoin(db.tenants, db.tenants.id.equalsExp(db.memberships.tenantId)),
-    ])..where(db.memberships.userId.equals(auth.user.id)))
+    ])
+          ..where(db.memberships.userId.equals(auth.user.id)))
         .get();
 
     final tenants = rows.map((row) {
@@ -519,10 +533,12 @@ Handler _buildHandler({
     final tenant = await db.maybeGetTenantBySlug(slug);
     if (tenant == null) return jsonError(404, 'tenant not found');
 
-    final membership = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    final membership =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
     if (membership == null) return jsonError(403, 'not a member of tenant');
 
-    await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id))).write(
+    await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id)))
+        .write(
       SessionsCompanion(activeTenantId: Value(tenant.id)),
     );
     await _audit(
@@ -548,8 +564,11 @@ Handler _buildHandler({
     final json = await readJsonObject(request);
     final slug = (getString(json, 'slug') ?? '').trim();
     final name = (getString(json, 'name') ?? '').trim();
-    final signupMode = (getString(json, 'signupMode') ?? config.defaultSignupMode).trim();
-    if (slug.isEmpty || name.isEmpty) return jsonError(400, 'slug and name required');
+    final signupMode =
+        (getString(json, 'signupMode') ?? config.defaultSignupMode).trim();
+    if (slug.isEmpty || name.isEmpty) {
+      return jsonError(400, 'slug and name required');
+    }
 
     final existing = await db.maybeGetTenantBySlug(slug);
     if (existing != null) return jsonError(409, 'tenant slug already exists');
@@ -585,7 +604,10 @@ Handler _buildHandler({
     });
 
     return jsonResponse(
-      {'ok': true, 'tenant': {'id': tenantId, 'slug': slug, 'name': name}},
+      {
+        'ok': true,
+        'tenant': {'id': tenantId, 'slug': slug, 'name': name}
+      },
       statusCode: 201,
     );
   });
@@ -593,7 +615,9 @@ Handler _buildHandler({
   router.get('/sessions', (Request request) async {
     final auth = request.auth;
     if (auth == null) return jsonError(401, 'not authenticated');
-    final rows = await (db.select(db.sessions)..where((s) => s.userId.equals(auth.user.id))).get();
+    final rows = await (db.select(db.sessions)
+          ..where((s) => s.userId.equals(auth.user.id)))
+        .get();
     final sessions = rows
         .map((s) => {
               'id': s.id,
@@ -614,7 +638,9 @@ Handler _buildHandler({
     final auth = request.auth;
     if (auth == null) return jsonError(401, 'not authenticated');
     final row = await db.getSessionById(id);
-    if (row == null || row.userId != auth.user.id) return jsonError(404, 'session not found');
+    if (row == null || row.userId != auth.user.id) {
+      return jsonError(404, 'session not found');
+    }
     await db.deleteSession(id);
     final headers = <String, String>{};
     if (id == auth.session.id) {
@@ -640,7 +666,8 @@ Handler _buildHandler({
     final auth = request.auth;
     if (auth == null) return jsonError(401, 'not authenticated');
     final others = await (db.select(db.sessions)
-          ..where((s) => s.userId.equals(auth.user.id) & s.id.isNotValue(auth.session.id)))
+          ..where((s) =>
+              s.userId.equals(auth.user.id) & s.id.isNotValue(auth.session.id)))
         .get();
     for (final s in others) {
       await db.deleteSession(s.id);
@@ -655,6 +682,114 @@ Handler _buildHandler({
       userAgent: request.headers['user-agent'],
     );
     return jsonResponse({'ok': true, 'revoked': others.length});
+  });
+
+  // Dev/admin: email outbox inspection & retry.
+  //
+  // This is intentionally gated behind `SOLIDUS_EXPOSE_DEV_TOKENS=1` for now,
+  // since Solidus does not yet have a first-class super-admin concept.
+  router.get('/admin/email/outbox', (Request request) async {
+    final auth = request.auth;
+    if (auth == null) return jsonError(401, 'not authenticated');
+    if (!config.exposeDevTokens) return jsonError(404, 'not found');
+
+    final qp = request.url.queryParameters;
+    final status = (qp['status'] ?? '').trim();
+    final limit = int.tryParse((qp['limit'] ?? '').trim())?.clamp(1, 200) ?? 50;
+    final offset = int.tryParse((qp['offset'] ?? '').trim()) ?? 0;
+
+    final q = db.select(db.emailOutbox)
+      ..orderBy([(e) => OrderingTerm.desc(e.createdAt)])
+      ..limit(limit, offset: offset);
+
+    if (status.isNotEmpty) {
+      q.where((e) => e.status.equals(status));
+    }
+
+    final rows = await q.get();
+    final emails = rows
+        .map((e) => {
+              'id': e.id,
+              'to': e.to,
+              'from': e.from,
+              'subject': e.subject,
+              'status': e.status,
+              'attempts': e.attempts,
+              'nextAttemptAt': e.nextAttemptAt.toIso8601String(),
+              'sentAt': e.sentAt?.toIso8601String(),
+              'lastError': e.lastError,
+              'createdAt': e.createdAt.toIso8601String(),
+              'updatedAt': e.updatedAt.toIso8601String(),
+            })
+        .toList(growable: false);
+
+    return jsonResponse({'emails': emails, 'limit': limit, 'offset': offset});
+  });
+
+  router.get('/admin/email/outbox/<id>', (Request request, String id) async {
+    final auth = request.auth;
+    if (auth == null) return jsonError(401, 'not authenticated');
+    if (!config.exposeDevTokens) return jsonError(404, 'not found');
+
+    final row = await (db.select(db.emailOutbox)..where((e) => e.id.equals(id)))
+        .getSingleOrNull();
+    if (row == null) return jsonError(404, 'email not found');
+
+    return jsonResponse({
+      'email': {
+        'id': row.id,
+        'to': row.to,
+        'from': row.from,
+        'subject': row.subject,
+        'textBody': row.textBody,
+        'htmlBody': row.htmlBody,
+        'status': row.status,
+        'attempts': row.attempts,
+        'nextAttemptAt': row.nextAttemptAt.toIso8601String(),
+        'sentAt': row.sentAt?.toIso8601String(),
+        'lastError': row.lastError,
+        'createdAt': row.createdAt.toIso8601String(),
+        'updatedAt': row.updatedAt.toIso8601String(),
+      },
+    });
+  });
+
+  router.post('/admin/email/outbox/<id>/retry',
+      (Request request, String id) async {
+    final auth = request.auth;
+    if (auth == null) return jsonError(401, 'not authenticated');
+    if (!config.exposeDevTokens) return jsonError(404, 'not found');
+    if (!_isRecent(auth.session, window: config.recentAuthWindow)) {
+      return jsonError(403, 'recent login required');
+    }
+
+    final row = await (db.select(db.emailOutbox)..where((e) => e.id.equals(id)))
+        .getSingleOrNull();
+    if (row == null) return jsonError(404, 'email not found');
+    if (row.status == 'sent') return jsonError(409, 'email already sent');
+
+    final now = DateTime.now().toUtc();
+    await (db.update(db.emailOutbox)..where((e) => e.id.equals(id))).write(
+      EmailOutboxCompanion(
+        status: const Value('pending'),
+        nextAttemptAt: Value(now),
+        lastError: const Value<String?>(null),
+        updatedAt: Value(now),
+      ),
+    );
+
+    await _audit(
+      db,
+      action: 'email.outbox_retry',
+      actorUserId: auth.user.id,
+      tenantId: auth.session.activeTenantId,
+      target: id,
+      metadata: {'fromStatus': row.status},
+      ip: remoteIp(request),
+      userAgent: request.headers['user-agent'],
+    );
+
+    return jsonResponse({'ok': true});
   });
 
   // 2FA enrollment
@@ -730,13 +865,17 @@ Handler _buildHandler({
     final now = DateTime.now().toUtc();
     final recoveryCodes = _generateRecoveryCodes(config: config, count: 10);
     await db.transaction(() async {
-      await (db.update(db.totpCredentials)..where((c) => c.userId.equals(auth.user.id))).write(
+      await (db.update(db.totpCredentials)
+            ..where((c) => c.userId.equals(auth.user.id)))
+          .write(
         TotpCredentialsCompanion(
           enabledAt: Value(now),
           updatedAt: Value(now),
         ),
       );
-      await (db.delete(db.recoveryCodes)..where((c) => c.userId.equals(auth.user.id))).go();
+      await (db.delete(db.recoveryCodes)
+            ..where((c) => c.userId.equals(auth.user.id)))
+          .go();
       for (final code in recoveryCodes) {
         await db.into(db.recoveryCodes).insert(
               RecoveryCodesCompanion.insert(
@@ -748,7 +887,8 @@ Handler _buildHandler({
               ),
             );
       }
-      await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id))).write(
+      await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id)))
+          .write(
         SessionsCompanion(
           mfaVerified: const Value(true),
           recentAuthAt: Value(now),
@@ -775,7 +915,8 @@ Handler _buildHandler({
     final now = DateTime.now().toUtc();
     if (locked != null && locked.isAfter(now)) {
       final retry = locked.difference(now).inSeconds;
-      return jsonError(429, 'too many attempts', details: {'retryAfterSeconds': retry});
+      return jsonError(429, 'too many attempts',
+          details: {'retryAfterSeconds': retry});
     }
 
     final json = await readJsonObject(request);
@@ -787,9 +928,11 @@ Handler _buildHandler({
 
     var ok = false;
     if (recovery.isNotEmpty) {
-      ok = await _useRecoveryCode(db, config: config, userId: auth.user.id, code: recovery);
+      ok = await _useRecoveryCode(db,
+          config: config, userId: auth.user.id, code: recovery);
     } else {
-      ok = await _verifyTotp(db, encryptor: encryptor, totp: totp, userId: auth.user.id, code: code);
+      ok = await _verifyTotp(db,
+          encryptor: encryptor, totp: totp, userId: auth.user.id, code: code);
     }
     if (!ok) {
       await throttle.registerFailure(throttleKey, now: now);
@@ -846,7 +989,9 @@ Handler _buildHandler({
     final now = DateTime.now().toUtc();
     final recoveryCodes = _generateRecoveryCodes(config: config, count: 10);
     await db.transaction(() async {
-      await (db.delete(db.recoveryCodes)..where((c) => c.userId.equals(auth.user.id))).go();
+      await (db.delete(db.recoveryCodes)
+            ..where((c) => c.userId.equals(auth.user.id)))
+          .go();
       for (final code in recoveryCodes) {
         await db.into(db.recoveryCodes).insert(
               RecoveryCodesCompanion.insert(
@@ -883,20 +1028,29 @@ Handler _buildHandler({
     final json = await readJsonObject(request);
     final code = (getString(json, 'code') ?? '').trim();
     final recovery = (getString(json, 'recoveryCode') ?? '').trim();
-    if (code.isEmpty && recovery.isEmpty) return jsonError(400, 'code or recoveryCode required');
+    if (code.isEmpty && recovery.isEmpty) {
+      return jsonError(400, 'code or recoveryCode required');
+    }
 
     var ok = false;
     if (recovery.isNotEmpty) {
-      ok = await _useRecoveryCode(db, config: config, userId: auth.user.id, code: recovery);
+      ok = await _useRecoveryCode(db,
+          config: config, userId: auth.user.id, code: recovery);
     } else {
-      ok = await _verifyTotp(db, encryptor: encryptor, totp: totp, userId: auth.user.id, code: code);
+      ok = await _verifyTotp(db,
+          encryptor: encryptor, totp: totp, userId: auth.user.id, code: code);
     }
     if (!ok) return jsonError(401, 'invalid code');
 
     await db.transaction(() async {
-      await (db.delete(db.totpCredentials)..where((c) => c.userId.equals(auth.user.id))).go();
-      await (db.delete(db.recoveryCodes)..where((c) => c.userId.equals(auth.user.id))).go();
-      await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id))).write(
+      await (db.delete(db.totpCredentials)
+            ..where((c) => c.userId.equals(auth.user.id)))
+          .go();
+      await (db.delete(db.recoveryCodes)
+            ..where((c) => c.userId.equals(auth.user.id)))
+          .go();
+      await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id)))
+          .write(
         const SessionsCompanion(mfaVerified: Value(false)),
       );
     });
@@ -964,7 +1118,8 @@ Handler _buildHandler({
 
   router.post('/t/<slug>/invites/accept', (Request request, String slug) async {
     final json = await readJsonObject(request);
-    final token = ((getString(json, 'token') ?? getString(json, 'code')) ?? '').trim();
+    final token =
+        ((getString(json, 'token') ?? getString(json, 'code')) ?? '').trim();
     final password = (getString(json, 'password') ?? '').trim();
     if (token.isEmpty || password.isEmpty) {
       return jsonError(400, 'token and password required');
@@ -977,7 +1132,8 @@ Handler _buildHandler({
 
     final tokenHash = _hashRecoveryOrInviteToken(config, token);
     final invite = await (db.select(db.invites)
-          ..where((i) => i.tenantId.equals(tenant.id) & i.tokenHash.equals(tokenHash)))
+          ..where((i) =>
+              i.tenantId.equals(tenant.id) & i.tokenHash.equals(tokenHash)))
         .getSingleOrNull();
     if (invite == null) return jsonError(401, 'invalid invite token');
     if (invite.acceptedAt != null) return jsonError(409, 'invite already used');
@@ -988,7 +1144,8 @@ Handler _buildHandler({
     final email = invite.email;
     final existing = await db.getUserByEmail(email);
     if (existing != null) {
-      return jsonError(409, 'account already exists; login and accept via admin flow');
+      return jsonError(
+          409, 'account already exists; login and accept via admin flow');
     }
 
     final now = DateTime.now().toUtc();
@@ -1145,10 +1302,14 @@ Handler _buildHandler({
       await (db.update(db.users)..where((u) => u.id.equals(user.id))).write(
         UsersCompanion(emailVerifiedAt: Value(now)),
       );
-      await (db.update(db.emailVerificationTokens)..where((t) => t.id.equals(row.id))).write(
+      await (db.update(db.emailVerificationTokens)
+            ..where((t) => t.id.equals(row.id)))
+          .write(
         EmailVerificationTokensCompanion(usedAt: Value(now)),
       );
-      await (db.delete(db.emailVerificationTokens)..where((t) => t.userId.equals(user.id) & t.usedAt.isNull())).go();
+      await (db.delete(db.emailVerificationTokens)
+            ..where((t) => t.userId.equals(user.id) & t.usedAt.isNull()))
+          .go();
     });
 
     await _audit(
@@ -1162,12 +1323,14 @@ Handler _buildHandler({
     return jsonResponse({'ok': true});
   });
 
-  router.post('/t/<slug>/invites/accept_existing', (Request request, String slug) async {
+  router.post('/t/<slug>/invites/accept_existing',
+      (Request request, String slug) async {
     final auth = request.auth;
     if (auth == null) return jsonError(401, 'not authenticated');
 
     final json = await readJsonObject(request);
-    final token = ((getString(json, 'token') ?? getString(json, 'code')) ?? '').trim();
+    final token =
+        ((getString(json, 'token') ?? getString(json, 'code')) ?? '').trim();
     if (token.isEmpty) return jsonError(400, 'token required');
 
     final tenant = await db.maybeGetTenantBySlug(slug);
@@ -1175,17 +1338,23 @@ Handler _buildHandler({
 
     final tokenHash = _hashRecoveryOrInviteToken(config, token);
     final invite = await (db.select(db.invites)
-          ..where((i) => i.tenantId.equals(tenant.id) & i.tokenHash.equals(tokenHash)))
+          ..where((i) =>
+              i.tenantId.equals(tenant.id) & i.tokenHash.equals(tokenHash)))
         .getSingleOrNull();
     if (invite == null) return jsonError(401, 'invalid invite token');
     if (invite.acceptedAt != null) return jsonError(409, 'invite already used');
-    if (invite.expiresAt.isBefore(DateTime.now().toUtc())) return jsonError(401, 'invite expired');
+    if (invite.expiresAt.isBefore(DateTime.now().toUtc())) {
+      return jsonError(401, 'invite expired');
+    }
     if (invite.email != auth.user.email) {
       return jsonError(403, 'invite email mismatch');
     }
 
-    final existingMembership = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
-    if (existingMembership != null) return jsonError(409, 'already a member of tenant');
+    final existingMembership =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    if (existingMembership != null) {
+      return jsonError(409, 'already a member of tenant');
+    }
 
     final now = DateTime.now().toUtc();
     await db.transaction(() async {
@@ -1200,7 +1369,8 @@ Handler _buildHandler({
       await (db.update(db.invites)..where((i) => i.id.equals(invite.id))).write(
         InvitesCompanion(acceptedAt: Value(now)),
       );
-      await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id))).write(
+      await (db.update(db.sessions)..where((s) => s.id.equals(auth.session.id)))
+          .write(
         SessionsCompanion(activeTenantId: Value(tenant.id)),
       );
     });
@@ -1215,7 +1385,10 @@ Handler _buildHandler({
       userAgent: request.headers['user-agent'],
     );
 
-    return jsonResponse({'ok': true, 'activeTenant': {'id': tenant.id, 'slug': tenant.slug}});
+    return jsonResponse({
+      'ok': true,
+      'activeTenant': {'id': tenant.id, 'slug': tenant.slug}
+    });
   });
 
   router.post('/t/<slug>/admin/invites', (Request request, String slug) async {
@@ -1224,12 +1397,14 @@ Handler _buildHandler({
 
     final tenant = await db.maybeGetTenantBySlug(slug);
     if (tenant == null) return jsonError(404, 'tenant not found');
-    final membership = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    final membership =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
     if (membership == null) return jsonError(403, 'not a member of tenant');
     if (membership.role != 'owner' && membership.role != 'admin') {
       return jsonError(403, 'insufficient role');
     }
-    final mfaPolicyError = await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
+    final mfaPolicyError =
+        await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
     if (mfaPolicyError != null) return mfaPolicyError;
     if (!_isRecent(auth.session, window: config.recentAuthWindow)) {
       return jsonError(403, 'recent login required');
@@ -1312,19 +1487,99 @@ Handler _buildHandler({
     );
   });
 
+  router.get('/t/<slug>/admin/invites', (Request request, String slug) async {
+    final auth = request.auth;
+    if (auth == null) return jsonError(401, 'not authenticated');
+
+    final tenant = await db.maybeGetTenantBySlug(slug);
+    if (tenant == null) return jsonError(404, 'tenant not found');
+    final membership =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    if (membership == null) return jsonError(403, 'not a member of tenant');
+    if (membership.role != 'owner' && membership.role != 'admin') {
+      return jsonError(403, 'insufficient role');
+    }
+    final mfaPolicyError =
+        await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
+    if (mfaPolicyError != null) return mfaPolicyError;
+
+    final rows = await (db.select(db.invites)
+          ..where((i) => i.tenantId.equals(tenant.id))
+          ..orderBy([(i) => OrderingTerm.desc(i.createdAt)]))
+        .get();
+
+    final invites = rows
+        .map((i) => {
+              'id': i.id,
+              'email': i.email,
+              'role': i.role,
+              'createdAt': i.createdAt.toIso8601String(),
+              'expiresAt': i.expiresAt.toIso8601String(),
+              'acceptedAt': i.acceptedAt?.toIso8601String(),
+            })
+        .toList(growable: false);
+
+    return jsonResponse({'invites': invites});
+  });
+
+  router.post('/t/<slug>/admin/invites/<inviteId>/revoke',
+      (Request request, String slug, String inviteId) async {
+    final auth = request.auth;
+    if (auth == null) return jsonError(401, 'not authenticated');
+
+    final tenant = await db.maybeGetTenantBySlug(slug);
+    if (tenant == null) return jsonError(404, 'tenant not found');
+    final membership =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    if (membership == null) return jsonError(403, 'not a member of tenant');
+    if (membership.role != 'owner' && membership.role != 'admin') {
+      return jsonError(403, 'insufficient role');
+    }
+    final mfaPolicyError =
+        await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
+    if (mfaPolicyError != null) return mfaPolicyError;
+    if (!_isRecent(auth.session, window: config.recentAuthWindow)) {
+      return jsonError(403, 'recent login required');
+    }
+
+    final invite = await (db.select(db.invites)
+          ..where((i) => i.id.equals(inviteId) & i.tenantId.equals(tenant.id)))
+        .getSingleOrNull();
+    if (invite == null) return jsonError(404, 'invite not found');
+    if (invite.acceptedAt != null) return jsonError(409, 'invite already used');
+
+    await (db.delete(db.invites)..where((i) => i.id.equals(invite.id))).go();
+
+    await _audit(
+      db,
+      action: 'tenant.invite_revoked',
+      actorUserId: auth.user.id,
+      tenantId: tenant.id,
+      target: invite.id,
+      metadata: {'email': invite.email, 'role': invite.role},
+      ip: remoteIp(request),
+      userAgent: request.headers['user-agent'],
+    );
+
+    return jsonResponse({'ok': true});
+  });
+
   router.get('/t/<slug>/me', (Request request, String slug) async {
     final auth = request.auth;
     if (auth == null) return jsonError(401, 'not authenticated');
 
     final tenant = await db.maybeGetTenantBySlug(slug);
     if (tenant == null) return jsonError(404, 'tenant not found');
-    final membership = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    final membership =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
     if (membership == null) return jsonError(403, 'not a member of tenant');
 
     if (auth.session.activeTenantId != tenant.id) {
-      return jsonError(409, 'tenant not selected', code: 'TENANT_NOT_SELECTED', details: {
-        'hint': 'Call POST /tenants/select with this tenant slug first.',
-      });
+      return jsonError(409, 'tenant not selected',
+          code: 'TENANT_NOT_SELECTED',
+          details: {
+            'hint': 'Call POST /tenants/select with this tenant slug first.',
+          });
     }
 
     return jsonResponse({
@@ -1340,15 +1595,20 @@ Handler _buildHandler({
 
     final tenant = await db.maybeGetTenantBySlug(slug);
     if (tenant == null) return jsonError(404, 'tenant not found');
-    final me = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    final me =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
     if (me == null) return jsonError(403, 'not a member of tenant');
-    if (me.role != 'owner' && me.role != 'admin') return jsonError(403, 'insufficient role');
-    final mfaPolicyError = await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
+    if (me.role != 'owner' && me.role != 'admin') {
+      return jsonError(403, 'insufficient role');
+    }
+    final mfaPolicyError =
+        await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
     if (mfaPolicyError != null) return mfaPolicyError;
 
     final rows = await (db.select(db.memberships).join([
       innerJoin(db.users, db.users.id.equalsExp(db.memberships.userId)),
-    ])..where(db.memberships.tenantId.equals(tenant.id)))
+    ])
+          ..where(db.memberships.tenantId.equals(tenant.id)))
         .get();
 
     final members = rows.map((row) {
@@ -1367,10 +1627,14 @@ Handler _buildHandler({
 
     final tenant = await db.maybeGetTenantBySlug(slug);
     if (tenant == null) return jsonError(404, 'tenant not found');
-    final me = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    final me =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
     if (me == null) return jsonError(403, 'not a member of tenant');
-    if (me.role != 'owner' && me.role != 'admin') return jsonError(403, 'insufficient role');
-    final mfaPolicyError = await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
+    if (me.role != 'owner' && me.role != 'admin') {
+      return jsonError(403, 'insufficient role');
+    }
+    final mfaPolicyError =
+        await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
     if (mfaPolicyError != null) return mfaPolicyError;
     if (!_isRecent(auth.session, window: config.recentAuthWindow)) {
       return jsonError(403, 'recent login required');
@@ -1385,11 +1649,13 @@ Handler _buildHandler({
       return jsonError(403, 'only owner can assign owner role');
     }
 
-    final existing = await db.getMembership(tenantId: tenant.id, userId: userId);
+    final existing =
+        await db.getMembership(tenantId: tenant.id, userId: userId);
     if (existing == null) return jsonError(404, 'membership not found');
 
     await (db.update(db.memberships)
-          ..where((m) => m.tenantId.equals(tenant.id) & m.userId.equals(userId)))
+          ..where(
+              (m) => m.tenantId.equals(tenant.id) & m.userId.equals(userId)))
         .write(MembershipsCompanion(role: Value(role)));
 
     await _audit(
@@ -1406,15 +1672,78 @@ Handler _buildHandler({
     return jsonResponse({'ok': true});
   });
 
-  router.post('/t/<slug>/admin/settings/mfa', (Request request, String slug) async {
+  router.post('/t/<slug>/admin/members/<userId>/remove',
+      (Request request, String slug, String userId) async {
     final auth = request.auth;
     if (auth == null) return jsonError(401, 'not authenticated');
 
     final tenant = await db.maybeGetTenantBySlug(slug);
     if (tenant == null) return jsonError(404, 'tenant not found');
-    final me = await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    final me =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
     if (me == null) return jsonError(403, 'not a member of tenant');
-    if (me.role != 'owner') return jsonError(403, 'only owner can change settings');
+    if (me.role != 'owner' && me.role != 'admin') {
+      return jsonError(403, 'insufficient role');
+    }
+    final mfaPolicyError =
+        await _enforceAdminMfaPolicy(db, auth: auth, tenantId: tenant.id);
+    if (mfaPolicyError != null) return mfaPolicyError;
+    if (!_isRecent(auth.session, window: config.recentAuthWindow)) {
+      return jsonError(403, 'recent login required');
+    }
+
+    if (userId == auth.user.id) return jsonError(409, 'cannot remove yourself');
+
+    final membership =
+        await db.getMembership(tenantId: tenant.id, userId: userId);
+    if (membership == null) return jsonError(404, 'membership not found');
+
+    if (me.role != 'owner' && membership.role != 'member') {
+      return jsonError(403, 'only owner can remove admins/owners');
+    }
+
+    if (membership.role == 'owner') {
+      final owners = await (db.selectOnly(db.memberships)
+            ..addColumns([db.memberships.userId.count()])
+            ..where(db.memberships.tenantId.equals(tenant.id) &
+                db.memberships.role.equals('owner')))
+          .getSingle();
+      final ownerCount = owners.read(db.memberships.userId.count()) ?? 0;
+      if (ownerCount <= 1) return jsonError(409, 'cannot remove last owner');
+    }
+
+    await (db.delete(db.memberships)
+          ..where(
+              (m) => m.tenantId.equals(tenant.id) & m.userId.equals(userId)))
+        .go();
+
+    await _audit(
+      db,
+      action: 'tenant.member_removed',
+      actorUserId: auth.user.id,
+      tenantId: tenant.id,
+      target: userId,
+      metadata: {'role': membership.role},
+      ip: remoteIp(request),
+      userAgent: request.headers['user-agent'],
+    );
+
+    return jsonResponse({'ok': true});
+  });
+
+  router.post('/t/<slug>/admin/settings/mfa',
+      (Request request, String slug) async {
+    final auth = request.auth;
+    if (auth == null) return jsonError(401, 'not authenticated');
+
+    final tenant = await db.maybeGetTenantBySlug(slug);
+    if (tenant == null) return jsonError(404, 'tenant not found');
+    final me =
+        await db.getMembership(tenantId: tenant.id, userId: auth.user.id);
+    if (me == null) return jsonError(403, 'not a member of tenant');
+    if (me.role != 'owner') {
+      return jsonError(403, 'only owner can change settings');
+    }
     if (!_isRecent(auth.session, window: config.recentAuthWindow)) {
       return jsonError(403, 'recent login required');
     }
@@ -1440,7 +1769,9 @@ Handler _buildHandler({
     }
 
     final now = DateTime.now().toUtc();
-    await (db.update(db.tenantSettings)..where((s) => s.tenantId.equals(tenant.id))).write(
+    await (db.update(db.tenantSettings)
+          ..where((s) => s.tenantId.equals(tenant.id)))
+        .write(
       TenantSettingsCompanion(
         requireMfaForAdmins: Value(requireMfaForAdmins),
         updatedAt: Value(now),
@@ -1457,7 +1788,8 @@ Handler _buildHandler({
       userAgent: request.headers['user-agent'],
     );
 
-    return jsonResponse({'ok': true, 'requireMfaForAdmins': requireMfaForAdmins});
+    return jsonResponse(
+        {'ok': true, 'requireMfaForAdmins': requireMfaForAdmins});
   });
 
   final handler = Pipeline()
@@ -1466,7 +1798,10 @@ Handler _buildHandler({
         rateLimitMiddleware(
           limiter: rateLimiter,
           rules: [
-            RateLimitRule(key: 'global', window: const Duration(minutes: 1), maxHits: 120),
+            RateLimitRule(
+                key: 'global',
+                window: const Duration(minutes: 1),
+                maxHits: 120),
           ],
           keyFor: (req) => remoteIp(req) ?? 'unknown',
           appliesTo: (req) => true,
@@ -1477,7 +1812,10 @@ Handler _buildHandler({
         rateLimitMiddleware(
           limiter: rateLimiter,
           rules: [
-            RateLimitRule(key: 'login_ip', window: const Duration(minutes: 1), maxHits: 20),
+            RateLimitRule(
+                key: 'login_ip',
+                window: const Duration(minutes: 1),
+                maxHits: 20),
           ],
           keyFor: (req) => remoteIp(req) ?? 'unknown',
           appliesTo: (req) => req.method == 'POST' && req.url.path == 'login',
@@ -1488,10 +1826,12 @@ Handler _buildHandler({
         rateLimitMiddleware(
           limiter: rateLimiter,
           rules: [
-            RateLimitRule(key: 'mfa_ip', window: const Duration(minutes: 1), maxHits: 30),
+            RateLimitRule(
+                key: 'mfa_ip', window: const Duration(minutes: 1), maxHits: 30),
           ],
           keyFor: (req) => remoteIp(req) ?? 'unknown',
-          appliesTo: (req) => req.method == 'POST' && req.url.path.startsWith('mfa/'),
+          appliesTo: (req) =>
+              req.method == 'POST' && req.url.path.startsWith('mfa/'),
           onLimited: () => jsonError(429, 'too many attempts'),
         ),
       )
@@ -1499,12 +1839,14 @@ Handler _buildHandler({
         rateLimitMiddleware(
           limiter: rateLimiter,
           rules: [
-            RateLimitRule(key: 'pw_ip', window: const Duration(minutes: 1), maxHits: 30),
+            RateLimitRule(
+                key: 'pw_ip', window: const Duration(minutes: 1), maxHits: 30),
           ],
           keyFor: (req) => remoteIp(req) ?? 'unknown',
           appliesTo: (req) =>
               req.method == 'POST' &&
-              (req.url.path == 'password/forgot' || req.url.path == 'password/reset'),
+              (req.url.path == 'password/forgot' ||
+                  req.url.path == 'password/reset'),
           onLimited: () => jsonError(429, 'too many attempts'),
         ),
       )
@@ -1522,7 +1864,8 @@ Middleware _errorMiddleware(Logger logger) {
       try {
         return await inner(request);
       } on FormatException catch (e) {
-        return jsonError(400, 'invalid request', details: {'message': e.message});
+        return jsonError(400, 'invalid request',
+            details: {'message': e.message});
       } catch (e, st) {
         logger.severe('unhandled error: $e\n$st');
         return jsonError(500, 'internal error');
@@ -1535,8 +1878,9 @@ Middleware _corsMiddleware(SolidusBackendConfig config) {
   return (inner) {
     return (request) async {
       final origin = request.headers['origin'];
-      final allowed =
-          origin != null && config.allowedOrigins.isNotEmpty && config.allowedOrigins.contains(origin);
+      final allowed = origin != null &&
+          config.allowedOrigins.isNotEmpty &&
+          config.allowedOrigins.contains(origin);
       if (request.method == 'OPTIONS') {
         if (!allowed) return Response(204);
         return Response(
@@ -1569,7 +1913,8 @@ Middleware _sessionMiddleware({
 }) {
   return (inner) {
     return (request) async {
-      final cookies = parseCookieHeader(request.headers[HttpHeaders.cookieHeader]);
+      final cookies =
+          parseCookieHeader(request.headers[HttpHeaders.cookieHeader]);
       final sid = cookies[config.cookieName];
       if (sid == null || sid.isEmpty) {
         return await inner(request);
@@ -1577,21 +1922,24 @@ Middleware _sessionMiddleware({
 
       final session = await db.getSessionById(sid);
       if (session == null) {
-        final resp = await inner(request.change(context: {_ctxClearCookie: true}));
+        final resp =
+            await inner(request.change(context: {_ctxClearCookie: true}));
         return _maybeClearCookie(resp, request, config);
       }
 
       final now = DateTime.now().toUtc();
       if (session.expiresAt.isBefore(now)) {
         await db.deleteSession(session.id);
-        final resp = await inner(request.change(context: {_ctxClearCookie: true}));
+        final resp =
+            await inner(request.change(context: {_ctxClearCookie: true}));
         return _maybeClearCookie(resp, request, config);
       }
 
       final user = await db.getUserById(session.userId);
       if (user.disabledAt != null) {
         await db.deleteSession(session.id);
-        final resp = await inner(request.change(context: {_ctxClearCookie: true}));
+        final resp =
+            await inner(request.change(context: {_ctxClearCookie: true}));
         return _maybeClearCookie(resp, request, config);
       }
 
@@ -1610,7 +1958,8 @@ Middleware _sessionMiddleware({
   };
 }
 
-Response _maybeClearCookie(Response resp, Request request, SolidusBackendConfig config) {
+Response _maybeClearCookie(
+    Response resp, Request request, SolidusBackendConfig config) {
   if (!request.shouldClearCookie) return resp;
   return resp.change(headers: {
     ...resp.headers,
@@ -1635,7 +1984,9 @@ Middleware _csrfMiddleware(SolidusBackendConfig config) {
   return (inner) {
     return (request) async {
       final auth = request.auth;
-      final isUnsafe = request.method != 'GET' && request.method != 'HEAD' && request.method != 'OPTIONS';
+      final isUnsafe = request.method != 'GET' &&
+          request.method != 'HEAD' &&
+          request.method != 'OPTIONS';
       if (auth == null || !isUnsafe) return inner(request);
       final path = '/${request.url.path}';
       if (exempt.contains(path)) {
@@ -1682,7 +2033,8 @@ Future<Session> _createSession({
   final sessionCompanion = SessionsCompanion.insert(
     id: id,
     userId: userId,
-    activeTenantId: activeTenantId == null ? const Value.absent() : Value(activeTenantId),
+    activeTenantId:
+        activeTenantId == null ? const Value.absent() : Value(activeTenantId),
     mfaVerified: Value(mfaVerified),
     recentAuthAt: Value(recentAuthAt),
     csrfSecret: csrfSecret,
@@ -1745,8 +2097,10 @@ Future<bool> _verifyTotp(
         ..where((c) => c.userId.equals(userId) & c.enabledAt.isNotNull()))
       .getSingleOrNull();
   if (row == null) return false;
-  final secret = await encryptor.decrypt(nonce: row.secretNonce, ciphertext: row.secretCiphertext);
-  return totp.verifyCode(secret: secret, code: code, now: DateTime.now().toUtc());
+  final secret = await encryptor.decrypt(
+      nonce: row.secretNonce, ciphertext: row.secretCiphertext);
+  return totp.verifyCode(
+      secret: secret, code: code, now: DateTime.now().toUtc());
 }
 
 List<String> _generateRecoveryCodes({
@@ -1780,7 +2134,8 @@ EmailSender _buildEmailSender({
         throw StateError('Resend email transport requires SOLIDUS_EMAIL_FROM');
       }
       if (apiKey == null) {
-        throw StateError('Resend email transport requires SOLIDUS_RESEND_API_KEY');
+        throw StateError(
+            'Resend email transport requires SOLIDUS_RESEND_API_KEY');
       }
       return ResendEmailSender(
         apiKey: apiKey,
@@ -1822,7 +2177,8 @@ Uri _buildFrontendUrl({
 }) {
   final tokenPlacement = config.urlTokenPlacement;
   final qp = tokenPlacement == 'query' ? query : null;
-  final fragment = tokenPlacement == 'fragment' ? Uri(queryParameters: query).query : null;
+  final fragment =
+      tokenPlacement == 'fragment' ? Uri(queryParameters: query).query : null;
 
   final base = config.publicBaseUrl;
   if (base != null && base.isNotEmpty) {
@@ -1857,7 +2213,9 @@ Uri _buildFrontendUrl({
 }
 
 String _joinPath(String basePath, String add) {
-  final a = basePath.endsWith('/') ? basePath.substring(0, basePath.length - 1) : basePath;
+  final a = basePath.endsWith('/')
+      ? basePath.substring(0, basePath.length - 1)
+      : basePath;
   final b = add.startsWith('/') ? add : '/$add';
   if (a.isEmpty) return b;
   return '$a$b';
@@ -1909,7 +2267,10 @@ Future<bool> _useRecoveryCode(
 }) async {
   final hash = _hashRecoveryOrInviteToken(config, code);
   final row = await (db.select(db.recoveryCodes)
-        ..where((c) => c.userId.equals(userId) & c.usedAt.isNull() & c.codeHash.equals(hash)))
+        ..where((c) =>
+            c.userId.equals(userId) &
+            c.usedAt.isNull() &
+            c.codeHash.equals(hash)))
       .getSingleOrNull();
   if (row == null) return false;
   await (db.update(db.recoveryCodes)..where((c) => c.id.equals(row.id))).write(
@@ -1918,7 +2279,8 @@ Future<bool> _useRecoveryCode(
   return true;
 }
 
-Future<void> _ensureDefaultTenant(AppDatabase db, SolidusBackendConfig config) async {
+Future<void> _ensureDefaultTenant(
+    AppDatabase db, SolidusBackendConfig config) async {
   final existing = await db.maybeGetTenantBySlug(config.defaultTenantSlug);
   if (existing != null) return;
 
@@ -1955,7 +2317,8 @@ Future<Response?> _enforceAdminMfaPolicy(
   if (requireMfaForAdmins) {
     final enabled = await _isTotpEnabled(db, userId: auth.user.id);
     if (!enabled) {
-      return jsonError(403, 'mfa enrollment required', code: 'MFA_ENROLL_REQUIRED');
+      return jsonError(403, 'mfa enrollment required',
+          code: 'MFA_ENROLL_REQUIRED');
     }
     if (!auth.session.mfaVerified) {
       return jsonError(403, 'mfa required');
@@ -1964,7 +2327,8 @@ Future<Response?> _enforceAdminMfaPolicy(
   }
 
   // If the user has 2FA enabled, enforce step-up for admin actions.
-  if (!auth.session.mfaVerified && await _isTotpEnabled(db, userId: auth.user.id)) {
+  if (!auth.session.mfaVerified &&
+      await _isTotpEnabled(db, userId: auth.user.id)) {
     return jsonError(403, 'mfa required');
   }
   return null;
@@ -1981,16 +2345,22 @@ Future<void> _audit(
   String? userAgent,
 }) async {
   // ignore: unawaited_futures
-  db.into(db.auditLogs).insert(
+  db
+      .into(db.auditLogs)
+      .insert(
         AuditLogsCompanion.insert(
           id: const Uuid().v4(),
           tenantId: tenantId == null ? const Value.absent() : Value(tenantId),
-          actorUserId: actorUserId == null ? const Value.absent() : Value(actorUserId),
+          actorUserId:
+              actorUserId == null ? const Value.absent() : Value(actorUserId),
           action: action,
           target: target == null ? const Value.absent() : Value(target),
-          metadataJson: metadata == null ? const Value.absent() : Value(jsonEncode(metadata)),
+          metadataJson: metadata == null
+              ? const Value.absent()
+              : Value(jsonEncode(metadata)),
           ip: ip == null ? const Value.absent() : Value(ip),
-          userAgent: userAgent == null ? const Value.absent() : Value(userAgent),
+          userAgent:
+              userAgent == null ? const Value.absent() : Value(userAgent),
           createdAt: DateTime.now().toUtc(),
         ),
       )
